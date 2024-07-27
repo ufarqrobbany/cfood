@@ -1,0 +1,106 @@
+name: cfood
+description: "A new Flutter project."
+# The following line prevents the package from being accidentally published to
+# pub.dev using `flutter pub publish`. This is preferred for private packages.
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.4.3 <4.0.0'
+  # sdk: '>=2.12.0 <3.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  # splashscreen: ^1.2.0
+
+  # FONTS & ICONS
+  google_fonts: ^6.2.1
+  material_symbols_icons: ^4.2762.0
+  community_material_icon: ^5.9.55
+  cupertino_icons: ^1.0.6
+  font_awesome_flutter: ^10.7.0
+  uicons: ^1.0.1
+
+  # WIDGET
+  carousel_slider: ^4.2.1
+  smooth_page_indicator: ^1.1.0
+  otp_text_field: ^1.1.3
+  loading_animation_widget: ^1.2.1
+  flutter_staggered_grid_view: ^0.7.0
+  flutter_staggered_animations: ^1.1.1
+  flutter_chat_bubble: ^2.0.2
+  custom_refresh_indicator: ^3.1.1
+  shimmer: ^3.0.0
+  shimmer_animation: ^2.2.1
+  timelines: ^0.1.0
+
+  # HELPER
+  toast: ^0.3.0
+  flutter_styled_toast: ^2.2.1
+  fluttertoast: ^8.2.6
+  webview_flutter: ^4.0.4
+  web_browser: ^0.7.4
+  google_maps_flutter_web: ^0.5.8
+  image_picker: ^1.1.2
+
+  # CONFIG
+  shared_preferences: ^2.2.3
+  go_router: ^14.2.0
+  http: ^1.2.2
+  # http_parser: ^4.1.0
+  dio: ^5.5.0+1
+
+
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^3.0.0
+  flutter_launcher_icons: ^0.13.1
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/logoApp.png"
+  min_sdk_android: 21 # android min sdk min:16, default 21
+  adaptive_icon_foreground: "assets/logoApp.png"
+  adaptive_icon_background: "#FEFEFE"
+  # web:
+  #   generate: true
+  #   image_path: "assets/logoApp.png"
+  #   background_color: "#hexcode"
+  #   theme_color: "#hexcode"
+  # windows:
+  #   generate: true
+  #   image_path: "assets/logoApp.png"
+  #   icon_size: 48 # min:48, max:256, default: 48
+  # macos:
+  #   generate: true
+  #   image_path: "assets/logoApp.png"
+
+flutter:
+
+  uses-material-design: true
+
+  # To add assets to your application, add an assets section, like this:
+  assets:
+    - assets/
+    - assets/order_timeline_status_image/
+
+  # example:
+  # fonts:
+  #   - family: Schyler
+  #     fonts:
+  #       - asset: fonts/Schyler-Regular.ttf
+  #       - asset: fonts/Schyler-Italic.ttf
+  #         style: italic
+  #   - family: Trajan Pro
+  #     fonts:
+  #       - asset: fonts/TrajanPro.ttf
+  #       - asset: fonts/TrajanPro_Bold.ttf
+  #         weight: 700
+
