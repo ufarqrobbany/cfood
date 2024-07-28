@@ -53,6 +53,7 @@ class _MainScreenState extends State<MainScreen> {
     super.initState();
 
     if (dataUser == null) {
+      log(AppConfig.USER_ID.toString());
       getUserData(context);
     }
   }

@@ -13,6 +13,7 @@ import 'package:cfood/screens/app_setting_info.dart';
 import 'package:cfood/screens/inbox.dart';
 import 'package:cfood/screens/kantin_pages/main.dart';
 import 'package:cfood/screens/login.dart';
+import 'package:cfood/screens/main.dart';
 import 'package:cfood/screens/user_info.dart';
 import 'package:cfood/style.dart';
 import 'package:cfood/utils/auth.dart';
@@ -36,12 +37,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
   DataUser? dataUser;
   DataUserCampus? userCampus;
   StudentInformation? studentInfo;
+  bool? isStudent;
 
   @override
   void initState() {
     super.initState();
     // getUserData(context);
-    log('usertype : ${AppConfig.USER_TYPE}\n userId : ${AppConfig.USER_ID}');
+    isStudent = false;
+    log('usertype : ${AppConfig.USER_TYPE}\n userId : ${AppConfig.USER_ID}\n${AppConfig.NAME}');
   }
 
   Future<void> refreshPage() async {
@@ -60,17 +63,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
       dataUser = userResponse.data;
       userCampus = dataUser!.campus;
       studentInfo = dataUser!.studentInformation;
+
+      if (studentInfo != null) {
+        isStudent = true;
+      } else {
+        isStudent = false;
+      }
     });
   }
 
   void tapLogOut(BuildContext context) {
     AuthHelper().clearUserData();
     AuthHelper().chackUserData();
-    // navigateToRep(context, const LoginScreen());
-    context.pushReplacementNamed('login');
+    navigateToRep(context, const LoginScreen());
+    // context.pushReplacementNamed('login');
   }
-
-
 
   Future<void> addDriver(BuildContext context) async {
     AddDriverResponse dataResponse = await FetchController(
@@ -82,7 +89,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     showToast(dataResponse.message!);
 
-    if(dataResponse.data != null) {
+    if (dataResponse.data != null) {
       log('$dataResponse');
 
       setState(() {
@@ -141,8 +148,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             children: [
               profileBoxHeader(),
               joinWirausahaNotifBox(),
-              studentInfo?.id != null ?
-              joinDriverNotifBox() : Container(),
+              studentInfo?.id != null ? joinDriverNotifBox() : Container(),
               widget.userType == 'kantin'
                   ? sectionMenuBox(
                       title: 'Akun',
@@ -166,7 +172,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           showBorder: false,
                           text: 'Keluar',
                           onTap: () {
-                            context.pushReplacementNamed('main');
+                            // context.pushReplacementNamed('main');
+                            navigateToRep(context, const MainScreen());
                           },
                         ),
                       ],
@@ -174,14 +181,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   : sectionMenuBox(
                       title: 'Akun',
                       items: [
-                        menuItemContainer(
-                          icons: UIcons.solidRounded.graduation_cap,
-                          showBorder: true,
-                          text: 'Informasi Mahasiwa',
-                          onTap: () {
-                            navigateTo(context, const UserInformationScreen());
-                          },
-                        ),
+                        isStudent == true
+                            ? menuItemContainer(
+                                icons: UIcons.solidRounded.graduation_cap,
+                                showBorder: true,
+                                text: 'Informasi Mahasiwa',
+                                onTap: () {
+                                  navigateTo(
+                                      context, const UserInformationScreen());
+                                },
+                              )
+                            : menuItemContainer(),
                         menuItemContainer(
                           icons: UIcons.solidRounded.marker,
                           showBorder: true,

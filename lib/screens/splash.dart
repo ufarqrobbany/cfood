@@ -4,6 +4,7 @@ import 'package:cfood/custom/CPageMover.dart';
 import 'package:cfood/repository/fetch_controller.dart';
 import 'package:cfood/repository/login_repository.dart';
 import 'package:cfood/screens/main.dart';
+import 'package:cfood/screens/startup.dart';
 import 'package:cfood/style.dart';
 import 'package:cfood/utils/auth.dart';
 import 'package:cfood/utils/constant.dart';
@@ -64,7 +65,7 @@ class _SplashScreenState extends State<SplashScreen> {
       if (AppConfig.USER_TYPE == 'reguler') {
         // ignore: use_build_context_synchronously
         log('go to homepages');
-        navigateToRep(context,  const MainScreen());
+        navigateToRep(context, const MainScreen());
         // context.pushReplacementNamed('main');
       } else if (AppConfig.USER_TYPE == 'kantin') {
         log('go to kantin pages');
@@ -75,8 +76,8 @@ class _SplashScreenState extends State<SplashScreen> {
       }
     } else {
       log('go to startup');
-      context.pushReplacementNamed('startup');
-      // navigateToRep(context, const StartUpScreen());
+      // context.pushReplacementNamed('startup');
+      navigateToRep(context, const StartUpScreen());
     }
   }
 

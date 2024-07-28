@@ -24,13 +24,17 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final ScrollController _mainScrollController = ScrollController();
   String nama_user = '';
+  String first_name = '';
 
   @override
   void initState() {
     super.initState();
-    setState(() {
-      nama_user = AppConfig.NAME;
-    });
+    while (nama_user == '') {
+      setState(() {
+        nama_user = AppConfig.NAME;
+        first_name = nama_user.split(' ')[0];
+      });
+    }
   }
 
   Future<void> refreshPage() async {
@@ -71,7 +75,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   title: moveLocationBox
                       ? SizedBox(height: 40, child: boxLocation())
                       : Text(
-                          'Hai, $nama_user',
+                          'Hai, $first_name',
                           style: const TextStyle(
                             fontSize: 26,
                             fontWeight: FontWeight.w700,
@@ -524,6 +528,4 @@ class _HomeScreenState extends State<HomeScreen> {
       ],
     );
   }
-
-
 }
