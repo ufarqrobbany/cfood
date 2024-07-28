@@ -9,7 +9,6 @@ import 'package:cfood/style.dart';
 import 'package:cfood/utils/auth.dart';
 import 'package:cfood/utils/constant.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -21,6 +20,7 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
+    debugPrint('on splah');
     log("on splash screen");
     onStartUpAPP(context);
     super.initState();

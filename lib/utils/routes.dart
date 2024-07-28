@@ -522,17 +522,18 @@ import 'package:go_router/go_router.dart';
 
 class AppRoutes{
   Route<dynamic>? generateRoute(RouteSettings settings) {
+    debugPrint('Navigating to ${settings.name}');
     switch (settings.name) {
       case '/splash':
-        return _buildRoute(SplashScreen(), settings);
+        return _buildRoute(const SplashScreen(), settings);
       case '/startup':
-        return _buildRoute(StartUpScreen(), settings);
+        return _buildRoute(const StartUpScreen(), settings);
       case '/login':
-        return _buildRoute(LoginScreen(), settings);
+        return _buildRoute(const LoginScreen(), settings);
       case '/register':
-        return _buildRoute(SignupScreen(), settings);
+        return _buildRoute(const SignupScreen(), settings);
       case '/register-student':
-        return _buildRoute(SignUpStudentScreen(), settings);
+        return _buildRoute(const SignUpStudentScreen(), settings);
       case '/verification':
         return _buildRoute(VerificationScreen(), settings);
       case '/verification-success':
@@ -540,45 +541,45 @@ class AppRoutes{
       case '/create-pass':
         return _buildRoute(CreatePasswordScreen(), settings);
       case '/forgot-pass':
-        return _buildRoute(ForgotPasswordScreen(), settings);
+        return _buildRoute(const ForgotPasswordScreen(), settings);
       case '/':
-        return _buildRoute(MainScreen(), settings);
+        return _buildRoute(const MainScreen(), settings);
       case '/home':
-        return _buildRoute(HomeScreen(), settings);
+        return _buildRoute(const HomeScreen(), settings);
       case '/cart':
-        return _buildRoute(CartScreen(), settings);
+        return _buildRoute(const CartScreen(), settings);
       case '/order':
-        return _buildRoute(OrderScreen(), settings);
+        return _buildRoute(const OrderScreen(), settings);
       case '/order-detail':
-        return _buildRoute(OrderScreen(), settings);
+        return _buildRoute(const OrderScreen(), settings);
       case '/order-status':
-        return _buildRoute(OrderStatusScreen(), settings);
+        return _buildRoute(const OrderStatusScreen(), settings);
       case '/inbox':
         return _buildRoute(InboxScreen(), settings);
       case '/chat':
-        return _buildRoute(ChatScreen(), settings);
+        return _buildRoute(const ChatScreen(), settings);
       case '/organization':
-        return _buildRoute(OrganizationScreen(), settings);
+        return _buildRoute(const OrganizationScreen(), settings);
       case '/see-all':
-        return _buildRoute(SeeAllItemsScreen(), settings);
+        return _buildRoute(const SeeAllItemsScreen(), settings);
       case '/profile':
         return _buildRoute(ProfileScreen(), settings);
       case '/user-info':
-        return _buildRoute(UserInformationScreen(), settings);
+        return _buildRoute(const UserInformationScreen(), settings);
       case '/favorite':
-        return _buildRoute(FavoriteScreen(), settings);
+        return _buildRoute(const FavoriteScreen(), settings);
       case '/canteen':
-        return _buildRoute(CanteenScreen(), settings);
+        return _buildRoute(const CanteenScreen(), settings);
       case '/review':
-        return _buildRoute(ReviewScreen(), settings);
+        return _buildRoute(const ReviewScreen(), settings);
       case '/main-canteen':
-        return _buildRoute(MainScreenCanteen(), settings);
+        return _buildRoute(const MainScreenCanteen(), settings);
       case '/order-canteen':
-        return _buildRoute(OrderCanteenScreen(), settings);
+        return _buildRoute(const OrderCanteenScreen(), settings);
       case '/transaction':
-        return _buildRoute(TransactionScreen(), settings);
+        return _buildRoute(const TransactionScreen(), settings);
       default:
-        return null;
+        return _buildRoute(const SplashScreen(), settings);
     }
   }
 

@@ -21,7 +21,6 @@ import 'package:cfood/utils/constant.dart';
 import 'package:cfood/utils/prefs.dart';
 import 'package:community_material_icon/community_material_icon.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:toast/toast.dart';
 import 'package:uicons/uicons.dart';
 
