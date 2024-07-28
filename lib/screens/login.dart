@@ -12,6 +12,7 @@ import 'package:cfood/repository/register_repository.dart';
 import 'package:cfood/screens/forgot_password.dart';
 import 'package:cfood/screens/main.dart';
 import 'package:cfood/screens/signup.dart';
+import 'package:cfood/screens/verification.dart';
 import 'package:cfood/style.dart';
 import 'package:cfood/utils/auth.dart';
 import 'package:cfood/utils/constant.dart';
@@ -79,7 +80,8 @@ class _LoginScreenState extends State<LoginScreen> {
         password: passController.text,
       );
 
-      if (loginResponse.statusCode == 'error') {
+      if (loginResponse.status == 'error') {
+        log(loginResponse.statusCode.toString());
         setState(() {
           checked = true;
           buttonLoadState = false;
@@ -112,6 +114,20 @@ class _LoginScreenState extends State<LoginScreen> {
       });
       showToast(e.toString().replaceAll('Exception: ', ''));
       log('Error: $e');
+      if (e == 'Exception: Akun belum diverifikasi') {
+        log('go to verification');
+        setState(() {
+          loadState = false;
+        });
+        navigateTo(
+            context,
+            VerificationScreen(
+              email: emailController.text,
+            ));
+      }
+      setState(() {
+        loadState = false;
+      });
     }
   }
 
@@ -227,14 +243,14 @@ class _LoginScreenState extends State<LoginScreen> {
                 padding: const EdgeInsets.only(left: 25),
                 child: TextButton(
                     onPressed: () {
-                      setState(() {
-                        loadState = false;
-                      });
-                      // Navigator.push(
-                      //     context,
-                      //     MaterialPageRoute(
-                      //       builder: (context) => const ForgotPasswordScreen(),
-                      //     ));
+                      // setState(() {
+                      //   loadState = false;
+                      // });
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ForgotPasswordScreen(),
+                          ));
                     },
                     style: TextButton.styleFrom(
                       padding: EdgeInsets.zero,
@@ -291,17 +307,15 @@ class _LoginScreenState extends State<LoginScreen> {
                 children: [
                   TextSpan(
                     text: 'Daftar sekarang',
-                    style: TextStyle(
-                      color: Warna.biru,
-                      fontSize: 15
-                    ),
+                    style: TextStyle(color: Warna.biru, fontSize: 15),
                     recognizer: TapGestureRecognizer()
                       ..onTap = () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const SignupScreen()),
-                        );
+                        navigateToRep(context, const SignupScreen());
+                        // Navigator.push(
+                        //   context,
+                        //   MaterialPageRoute(
+                        //       builder: (context) => const SignupScreen()),
+                        // );
                       },
                   ),
                 ],

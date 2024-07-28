@@ -7,6 +7,7 @@ import 'package:cfood/custom/CTextField.dart';
 import 'package:cfood/custom/CToast.dart';
 import 'package:cfood/model/campuses_list_reponse.dart';
 import 'package:cfood/model/check_email_response.dart';
+import 'package:cfood/model/check_verify_email_response.dart';
 import 'package:cfood/model/validate_email_student_reponse.dart';
 import 'package:cfood/repository/register_repository.dart';
 import 'package:cfood/screens/create_password.dart';
@@ -82,16 +83,16 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 
   Future<bool?> checkVerifyEmail(String email, BuildContext context) async {
-    CheckEmailResponse checkVerifyEmailResponse =
-        await RegisterRepository().checkPostEmail(
+    CheckVerifyEmailResponse checkVerifyEmailResponse =
+        await RegisterRepository().checkGetVerifyEmail(
       email: email,
       context: context,
     );
-    DataCheckEmailItem? checkVerifiedEmail = checkVerifyEmailResponse.data;
+    DataVerifyEmail? checkVerifiedEmail = checkVerifyEmailResponse.data;
 
     log(checkVerifiedEmail.toString());
 
-    return checkVerifiedEmail!.available;
+    return checkVerifiedEmail!.verified;
   }
 
   Future<bool?> validateEmailStudent({
@@ -233,21 +234,21 @@ class _SignupScreenState extends State<SignupScreen> {
                 checkVerifyEmail(emailController.text, context)
                     .then((emailVerified) {
                   if (emailVerified != null && emailVerified) {
-                    // checked = false;
-                    emptyField = 'Email sudah terdaftar dan terverifikasi';
-                    showToast(emptyField);
-                    log(emptyField);
-                    navigateTo(context, const MainScreen());
-                    log('to main screen');
+                    showToast('Email Sudah Terverikasi');
                     setState(() {
                       loadButton = false;
                     });
                   } else {
-                    log('to verification screen');
+                    emptyField = 'Email Belum Terverifikasi';
+                    showToast(emptyField);
+                    log(emptyField);
                     setState(() {
                       loadButton = false;
                     });
-                    navigateTo(context, VerificationScreen(forgotPass: false));
+                    navigateTo(context, VerificationScreen(
+                        forgotPass: false,
+                        email: emailController.text
+                      ));
                   }
                 });
               }
@@ -259,7 +260,7 @@ class _SignupScreenState extends State<SignupScreen> {
         checkEmail(emailController.text, context).then((emailAvailable) {
           if (emailAvailable != null && emailAvailable) {
             setState(() {
-              loadButton = true;
+              loadButton = false;
             });
             navigateTo(
                 context,
@@ -277,19 +278,21 @@ class _SignupScreenState extends State<SignupScreen> {
               if (emailVerified != null && emailVerified) {
                 // checked = false;
                 setState(() {
-                  loadButton = true;
+                  loadButton = false;
                 });
                 emptyField = 'Email sudah terdaftar dan terverifikasi';
                 showToast(emptyField);
                 log(emptyField);
+                navigateToRep(context, const LoginScreen());
               } else {
                 setState(() {
-                  loadButton = true;
+                  loadButton = false;
                 });
                 navigateTo(
                     context,
                     VerificationScreen(
                       forgotPass: false,
+                      email: emailController.text,
                     ));
               }
             });
@@ -298,7 +301,7 @@ class _SignupScreenState extends State<SignupScreen> {
       }
     } on Exception catch (e) {
       setState(() {
-        loadButton = true;
+        loadButton = false;
       });
       log(e.toString());
       showToast(e.toString().replaceAll('Exception: ', ''));
@@ -436,11 +439,12 @@ class _SignupScreenState extends State<SignupScreen> {
                     style: TextStyle(color: Warna.biru, fontSize: 15),
                     recognizer: TapGestureRecognizer()
                       ..onTap = () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const LoginScreen()),
-                        );
+                        navigateToRep(context, const LoginScreen());
+                        // Navigator.push(
+                        //   context,
+                        //   MaterialPageRoute(
+                        //       builder: (context) => const LoginScreen()),
+                        // );
                       },
                   ),
                 ],

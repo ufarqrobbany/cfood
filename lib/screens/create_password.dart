@@ -4,16 +4,19 @@ import 'package:cfood/custom/CButtons.dart';
 import 'package:cfood/custom/CPageMover.dart';
 import 'package:cfood/custom/CTextField.dart';
 import 'package:cfood/custom/CToast.dart';
+import 'package:cfood/model/add_student_response.dart';
 import 'package:cfood/model/add_user_response.dart';
 import 'package:cfood/model/check_email_response.dart';
 import 'package:cfood/model/check_verify_email_response.dart';
 import 'package:cfood/model/reponse_handler.dart';
 import 'package:cfood/repository/fetch_controller.dart';
+import 'package:cfood/repository/fetch_interceptor_controller.dart';
 import 'package:cfood/repository/register_repository.dart';
 import 'package:cfood/screens/verification.dart';
 import 'package:cfood/style.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:toast/toast.dart';
 
 // ignore: must_be_immutable
 class CreatePasswordScreen extends StatefulWidget {
@@ -166,50 +169,78 @@ class _CreatePasswordScreenState extends State<CreatePasswordScreen> {
       loadButton = true;
     });
 
-    log('add user');
-    AddUserResponse userResponse = await RegisterRepository().addPostUser(
-      context,
-      email: widget.email!,
-      name: widget.name!,
-      campusId: widget.campusId!,
-      password: pass2Controller.text,
-    );
-
-    DataAddUser? dataUser = userResponse.data;
-    log(dataUser.toString());
-
-    if (dataUser != null) {
-      if (widget.isStudent) {
-        log('add student');
-        await RegisterRepository().addPostStudent(
-          // ignore: use_build_context_synchronously
-          context,
-          userId: dataUser.id!,
-          campusId: widget.campusId!,
-          majorId: widget.majorId!,
-          nim: widget.nim!,
-          studyProgramId: widget.studyProgramId!,
-          addmissionYear: widget.addmissionYear!,
-        );
-      }
-
-      log('request otp');
-      await RegisterRepository().sendPostOtp(
+    try {
+      log('add user');
+      AddUserResponse userResponse = await RegisterRepository().addPostUser(
         context,
-        userId: dataUser.id!,
-        name: dataUser.name,
-        to: dataUser.email,
-        type: widget.forgotPass ? "RESET_PASSWORD" : "REGISTER",
+        email: widget.email!,
+        name: widget.name!,
+        campusId: widget.campusId!,
+        password: pass2Controller.text,
       );
 
-      log('go to verification email');
-      navigateTo(context, VerificationScreen(userId: dataUser.id!,));
-    }
+      DataAddUser? dataUser = userResponse.data;
+      log(dataUser.toString());
 
-    // Menonaktifkan indikator loading (jika diperlukan)
-    setState(() {
-      loadButton = false;
-    });
+      if (dataUser != null) {
+        if (widget.isStudent) {
+          log('add student');
+          // await RegisterRepository().addPostStudent(
+          //   // ignore: use_build_context_synchronously
+          //   context,
+          //   userId: dataUser.id!,
+          //   campusId: widget.campusId!,
+          //   majorId: widget.majorId!,
+          //   nim: widget.nim!,
+          //   studyProgramId: widget.studyProgramId!,
+          //   addmissionYear: widget.addmissionYear!,
+          // );
+          await FetchInterceptorController(
+            context: context,
+            endpoint: 'students/',
+            fromJson: (json) => AddStudentResponse.fromJson(json),
+          ).postData({
+            'nim': widget.nim,
+            'addmissionYear': widget.addmissionYear,
+            'campusId': widget.campusId,
+            'majorId': widget.majorId,
+            'studyProgramId': widget.studyProgramId,
+            'userId': dataUser.id,
+          }).then((data) {
+            // Handle the data
+            log(data);
+          }).catchError((error) {
+            // Handle the error
+            log(error.toString());
+          });
+        }
+
+        log('request otp');
+        await RegisterRepository().sendPostOtp(
+          context,
+          userId: dataUser.id!,
+          name: dataUser.name,
+          to: dataUser.email,
+          type: widget.forgotPass ? "RESET_PASSWORD" : "REGISTER",
+        );
+
+        log('go to verification email');
+        setState(() {
+          loadButton = false;
+        });
+        navigateTo(
+            context,
+            VerificationScreen(
+              userId: dataUser.id!,
+            ));
+      }
+    } on Exception catch (e) {
+      // Menonaktifkan indikator loading (jika diperlukan)
+      setState(() {
+        loadButton = false;
+      });
+      showToast(e.toString());
+    }
   }
 
   @override
@@ -219,6 +250,7 @@ class _CreatePasswordScreenState extends State<CreatePasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
+    ToastContext().init(context);
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,

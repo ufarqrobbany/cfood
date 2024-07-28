@@ -32,7 +32,7 @@ class AddStudentResponse {
 class DataAddStudent {
   int? studentId;
   int? userId;
-  String? nim;
+  String? nim; // watever
 
   DataAddStudent({this.studentId, this.userId, this.nim});
 

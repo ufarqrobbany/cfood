@@ -85,7 +85,7 @@ class _MainScreenState extends State<MainScreen> {
     });
   }
 
-  void invokePopScope(bool diPop) {
+  bool invokePopScope(bool diPop) {
     final now = DateTime.now();
     final backButtonHasNotBeenPressedOrSnackbarHasBeenClosed =
         lastPressed == null ||
@@ -105,6 +105,8 @@ class _MainScreenState extends State<MainScreen> {
         canPopNow = true;
       });
     }
+
+    return canPopNow;
   }
 
   @override

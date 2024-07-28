@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:cfood/custom/CButtons.dart';
 import 'package:cfood/custom/CPageMover.dart';
+import 'package:cfood/custom/CToast.dart';
 import 'package:cfood/model/check_verify_email_response.dart';
 import 'package:cfood/model/otp_check_response.dart';
 import 'package:cfood/model/reponse_handler.dart';
@@ -14,13 +15,15 @@ import 'package:flutter/material.dart';
 import 'package:otp_text_field/otp_field.dart';
 import 'package:otp_text_field/otp_field_style.dart';
 import 'package:otp_text_field/style.dart';
+import 'package:toast/toast.dart';
 
 // ignore: must_be_immutable
 class VerificationScreen extends StatefulWidget {
   bool forgotPass;
   int? userId;
   String? email;
-  VerificationScreen({super.key, this.userId, this.forgotPass = false, this.email});
+  VerificationScreen(
+      {super.key, this.userId, this.forgotPass = false, this.email});
 
   @override
   State<VerificationScreen> createState() => _VerificationScreenState();
@@ -30,18 +33,23 @@ class _VerificationScreenState extends State<VerificationScreen> {
   final OtpFieldController otpController = OtpFieldController();
   bool loadState = false;
   int otpCode = 0;
-  int? userId;
+  int userId = 0;
 
   @override
   void initState() {
     super.initState();
-    if(widget.email != null) {
+    log(
+      {
+        'userId': widget.userId,
+      }.toString(),
+    );
+    if (widget.email != null) {
       notVerifyYet();
     }
 
-    if(widget.userId != null){
+    if (widget.userId != null) {
       setState(() {
-        userId = widget.userId;
+        userId = widget.userId!;
       });
     }
   }
@@ -55,53 +63,60 @@ class _VerificationScreenState extends State<VerificationScreen> {
     setState(() {
       loadState = true;
     });
-    OtpCheckResponse otpResponse = await RegisterRepository().checkPostOtp(
-      context,
-      userId: widget.userId!,
-      otpCode: otpCode,
-      otpType: widget.forgotPass ? "RESET_PASSWORD" : "REGISTER",
-    );
-
-    if (widget.forgotPass) {
-      if (otpResponse.data!.valid == true) {
-        log('go to create pass');
-        setState(() {
-          loadState = false;
-        });
-        navigateTo(
-            context,
-            CreatePasswordScreen(
-              forgotPass: true,
-              userId: widget.userId,
-            ));
-      } else {
-        log('otp problem');
-        setState(() {
-          loadState = false;
-        });
-      }
+    if (otpCode == 0 || otpCode.bitLength < 6) {
+      showToast('Masukkan Kode OTP yang sudah terkirim');
+      setState(() {
+        loadState = false;
+      });
     } else {
-      if (otpResponse.data!.valid == true) {
-        ResponseHendler response = await RegisterRepository().verifyUser(
-          context,
-          userId: widget.userId!,
-        );
+      OtpCheckResponse otpResponse = await RegisterRepository().checkPostOtp(
+        context,
+        userId: widget.userId! ?? userId,
+        otpCode: otpCode,
+        otpType: widget.forgotPass ? "RESET_PASSWORD" : "REGISTER",
+      );
 
-        if (response.status == 'success') {
-          log('go to verification success');
+      if (widget.forgotPass) {
+        if (otpResponse.data!.valid == true) {
+          log('go to create pass');
           setState(() {
             loadState = false;
           });
           navigateTo(
               context,
-              VerificationSuccess(
-                passChange: false,
+              CreatePasswordScreen(
+                forgotPass: true,
+                userId: widget.userId,
               ));
         } else {
-          log('verify problem');
+          log('otp problem');
           setState(() {
             loadState = false;
           });
+        }
+      } else {
+        if (otpResponse.data!.valid == true) {
+          ResponseHendler response = await RegisterRepository().verifyUser(
+            context,
+            userId: widget.userId!,
+          );
+
+          if (response.status == 'success') {
+            log('go to verification success');
+            setState(() {
+              loadState = false;
+            });
+            navigateTo(
+                context,
+                VerificationSuccess(
+                  passChange: false,
+                ));
+          } else {
+            log('verify problem');
+            setState(() {
+              loadState = false;
+            });
+          }
         }
       }
     }
@@ -112,28 +127,32 @@ class _VerificationScreenState extends State<VerificationScreen> {
     log('request otp');
     await RegisterRepository().sendPostOtp(
       context,
-      userId: userId!,
-      type: "RESET_PASSWORD",
+      userId: userId,
+      // userId: widget.userId!,
+      type:  widget.forgotPass ? "RESET_PASSWORD" : "REGISTER",
     );
   }
 
   Future<void> notVerifyYet() async {
+    log('load id');
     CheckVerifyEmailResponse verifyEmailResponse =
-          await RegisterRepository().checkGetVerifyEmail(
-        // ignore: use_build_context_synchronously
-        context: context,
-        email: widget.email!,
-      );
-      // DataCheckEmailItem? checkedEmail = checkEmailResponse.data;
-      DataVerifyEmail? verifyEmail = verifyEmailResponse.data;
-      setState(() {
-        userId = verifyEmail!.userId;
-      });
-      requestOTP(context);
+        await RegisterRepository().checkGetVerifyEmail(
+      // ignore: use_build_context_synchronously
+      context: context,
+      email: widget.email!,
+    );
+    // DataCheckEmailItem? checkedEmail = checkEmailResponse.data;
+    DataVerifyEmail? verifyEmail = verifyEmailResponse.data;
+    setState(() {
+      userId = verifyEmail!.userId!;
+    });
+    log("id : $userId");
+    requestOTP(context);
   }
 
   @override
   Widget build(BuildContext context) {
+    ToastContext().init(context);
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -217,10 +236,9 @@ class _VerificationScreenState extends State<VerificationScreen> {
                   TextSpan(
                     text: 'Kirim ulang',
                     style: TextStyle(
-                      color: Warna.biru,
-                      // fontWeight: FontWeight.bold,
-                      fontSize: 15
-                    ),
+                        color: Warna.biru,
+                        // fontWeight: FontWeight.bold,
+                        fontSize: 15),
                     recognizer: TapGestureRecognizer()
                       ..onTap = () {
                         log('kirim ulang');

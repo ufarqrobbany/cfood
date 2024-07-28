@@ -52,6 +52,7 @@ dependencies:
   http: ^1.2.2
   # http_parser: ^4.1.0
   dio: ^5.5.0+1
+  http_interceptor: ^2.0.0
 
 
 

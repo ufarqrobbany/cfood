@@ -1,3 +1,4 @@
+import 'package:cfood/screens/canteen.dart';
 import 'package:cfood/screens/cart.dart';
 import 'package:cfood/screens/chat.dart';
 import 'package:cfood/screens/create_password.dart';
@@ -11,11 +12,16 @@ import 'package:cfood/screens/kantin_pages/transaction.dart';
 import 'package:cfood/screens/login.dart';
 import 'package:cfood/screens/main.dart';
 import 'package:cfood/screens/order.dart';
+import 'package:cfood/screens/orderStatus.dart';
+import 'package:cfood/screens/organization.dart';
 import 'package:cfood/screens/profile.dart';
+import 'package:cfood/screens/reviews.dart';
+import 'package:cfood/screens/seeAll.dart';
 import 'package:cfood/screens/signup.dart';
 import 'package:cfood/screens/signup_student.dart';
 import 'package:cfood/screens/splash.dart';
 import 'package:cfood/screens/startup.dart';
+import 'package:cfood/screens/user_info.dart';
 import 'package:cfood/screens/verification.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -260,6 +266,42 @@ import 'package:go_router/go_router.dart';
       ),
 
       GoRoute(
+        name: 'order-detail',
+        path: '/order-detail',
+        // builder: (context, state) => const OrderScreen(),
+         pageBuilder: (context, state) {
+          return CustomTransitionPage(
+            child: const OrderScreen(), 
+            transitionDuration: const Duration(milliseconds: 200),
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              return FadeTransition(
+                opacity: CurveTween(curve: Curves.easeInOutCirc).animate(animation),
+                child: child,
+              );
+            },
+          );
+        },
+      ),
+
+      GoRoute(
+        name: 'order-status',
+        path: '/order-status',
+        // builder: (context, state) => const OrderScreen(),
+         pageBuilder: (context, state) {
+          return CustomTransitionPage(
+            child: const OrderStatusScreen(), 
+            transitionDuration: const Duration(milliseconds: 200),
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              return FadeTransition(
+                opacity: CurveTween(curve: Curves.easeInOutCirc).animate(animation),
+                child: child,
+              );
+            },
+          );
+        },
+      ),
+
+      GoRoute(
         name: 'inbox',
         path: '/inbox',
         // builder: (context, state) => InboxScreen(),
@@ -276,11 +318,48 @@ import 'package:go_router/go_router.dart';
         },
       ),
       GoRoute(
+        name: 'chat',
         path: '/chat',
         // builder: (context, state) => const ChatScreen(),
          pageBuilder: (context, state) {
           return CustomTransitionPage(
             child: const ChatScreen(), 
+            transitionDuration: const Duration(milliseconds: 200),
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              return FadeTransition(
+                opacity: CurveTween(curve: Curves.easeInOutCirc).animate(animation),
+                child: child,
+              );
+            },
+          );
+        },
+      ),
+
+      GoRoute(
+        name: 'organization',
+        path: '/organization',
+        // builder: (context, state) => const ChatScreen(),
+         pageBuilder: (context, state) {
+          return CustomTransitionPage(
+            child: const OrganizationScreen(), 
+            transitionDuration: const Duration(milliseconds: 200),
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              return FadeTransition(
+                opacity: CurveTween(curve: Curves.easeInOutCirc).animate(animation),
+                child: child,
+              );
+            },
+          );
+        },
+      ),
+
+      GoRoute(
+        name: 'see-all',
+        path: '/seall',
+        // builder: (context, state) => const ChatScreen(),
+         pageBuilder: (context, state) {
+          return CustomTransitionPage(
+            child: const SeeAllItemsScreen(), 
             transitionDuration: const Duration(milliseconds: 200),
             transitionsBuilder: (context, animation, secondaryAnimation, child) {
               return FadeTransition(
@@ -311,12 +390,66 @@ import 'package:go_router/go_router.dart';
       ),
 
       GoRoute(
+        name: 'user-info',
+        path: '/user-info',
+        // builder: (context, state) => const OrderScreen(),
+         pageBuilder: (context, state) {
+          return CustomTransitionPage(
+            child: const UserInformationScreen(), 
+            transitionDuration: const Duration(milliseconds: 200),
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              return FadeTransition(
+                opacity: CurveTween(curve: Curves.easeInOutCirc).animate(animation),
+                child: child,
+              );
+            },
+          );
+        },
+      ),
+
+      GoRoute(
         name: 'favorite',
         path: '/favorite',
         // builder: (context, state) => const FavoriteScreen(),
          pageBuilder: (context, state) {
           return CustomTransitionPage(
             child: const FavoriteScreen(), 
+            transitionDuration: const Duration(milliseconds: 200),
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              return FadeTransition(
+                opacity: CurveTween(curve: Curves.easeInOutCirc).animate(animation),
+                child: child,
+              );
+            },
+          );
+        },
+      ),
+      
+      GoRoute(
+        name: 'canteen',
+        path: '/canteen',
+        // builder: (context, state) => const OrderScreen(),
+         pageBuilder: (context, state) {
+          return CustomTransitionPage(
+            child: const CanteenScreen(), 
+            transitionDuration: const Duration(milliseconds: 200),
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              return FadeTransition(
+                opacity: CurveTween(curve: Curves.easeInOutCirc).animate(animation),
+                child: child,
+              );
+            },
+          );
+        },
+      ),
+
+      GoRoute(
+        name: 'review',
+        path: '/review',
+        // builder: (context, state) => const OrderScreen(),
+         pageBuilder: (context, state) {
+          return CustomTransitionPage(
+            child: const ReviewScreen(), 
             transitionDuration: const Duration(milliseconds: 200),
             transitionsBuilder: (context, animation, secondaryAnimation, child) {
               return FadeTransition(
