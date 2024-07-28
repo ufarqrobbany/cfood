@@ -352,10 +352,15 @@ class RegisterRepository {
         }));
 
     log(response.body);
-    if (response.statusCode <= 499) {
+    if (response.statusCode <= 399) {
       OtpCheckResponse data = otpCheckResponseFromJson(response.body);
       showToast(data.message!);
       return otpCheckResponseFromJson(response.body);
+    } else if(response.statusCode <= 499) {
+      OtpCheckResponse data = otpCheckResponseFromJson(response.body);
+      showToast(data.message!);
+      log(response.body);
+      throw Exception(data.status);
     } else {
       ErrorResponse data = errorResponseFromJson(response.body);
       log(response.body);
@@ -369,7 +374,7 @@ class RegisterRepository {
     int userId = 0,
   }) async {
     Uri url = Uri.parse("${AppConfig.BASE_URL}users/$userId/verify");
-    final response = await http.post(
+    final response = await http.put(
       url,
       headers: {
         "Content-Type": "application/json",

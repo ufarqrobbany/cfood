@@ -43,14 +43,15 @@ class _VerificationScreenState extends State<VerificationScreen> {
         'userId': widget.userId,
       }.toString(),
     );
-    if (widget.email != null) {
-      notVerifyYet();
-    }
+    // if (widget.email != null) {
+    //   notVerifyYet();
+    // }
 
     if (widget.userId != null) {
-      setState(() {
-        userId = widget.userId!;
-      });
+    // setState(() {
+    //   userId = widget.userId!;
+    // });
+    requestOTP(context);
     }
   }
 
@@ -69,86 +70,103 @@ class _VerificationScreenState extends State<VerificationScreen> {
         loadState = false;
       });
     } else {
-      OtpCheckResponse otpResponse = await RegisterRepository().checkPostOtp(
-        context,
-        userId: widget.userId! ?? userId,
-        otpCode: otpCode,
-        otpType: widget.forgotPass ? "RESET_PASSWORD" : "REGISTER",
-      );
+      try {
+        OtpCheckResponse otpResponse = await RegisterRepository().checkPostOtp(
+          context,
+          userId: widget.userId!,
+          otpCode: otpCode,
+          otpType: widget.forgotPass ? "RESET_PASSWORD" : "REGISTER",
+        );
 
-      if (widget.forgotPass) {
-        if (otpResponse.data!.valid == true) {
-          log('go to create pass');
-          setState(() {
-            loadState = false;
-          });
-          navigateTo(
-              context,
-              CreatePasswordScreen(
-                forgotPass: true,
-                userId: widget.userId,
-              ));
-        } else {
-          log('otp problem');
-          setState(() {
-            loadState = false;
-          });
-        }
-      } else {
-        if (otpResponse.data!.valid == true) {
-          ResponseHendler response = await RegisterRepository().verifyUser(
-            context,
-            userId: widget.userId!,
-          );
+        // if (otpResponse.status == 'success') {
+        //   setState(() {
+        //     loadState = false;
+        //   });
+        //   navigateToRep(context, VerificationSuccess(passChange: false,));
+        // }
 
-          if (response.status == 'success') {
-            log('go to verification success');
+        if (widget.forgotPass) {
+          if (otpResponse.data!.valid == true) {
+            log('go to create pass');
             setState(() {
               loadState = false;
             });
             navigateTo(
                 context,
-                VerificationSuccess(
-                  passChange: false,
+                CreatePasswordScreen(
+                  forgotPass: true,
+                  userId: widget.userId,
                 ));
           } else {
-            log('verify problem');
+            log('otp problem');
             setState(() {
               loadState = false;
             });
           }
+        } else {
+          if (otpResponse.data!.valid == true || otpResponse.status == 'success') {
+            ResponseHendler response = await RegisterRepository().verifyUser(
+              context,
+              userId: widget.userId!,
+            );
+
+            if (response.status == 'success') {
+              log('go to verification success');
+              setState(() {
+                loadState = false;
+              });
+              navigateTo(
+                  context,
+                  VerificationSuccess(
+                    passChange: false,
+                  ));
+            } else {
+              log('verify problem');
+              setState(() {
+                loadState = false;
+              });
+            }
+          }
         }
+      } on Exception catch (e) {
+        log(e.toString());
+        setState(() {
+          loadState = false;
+        });
       }
     }
   }
 
   Future<void> requestOTP(BuildContext context) async {
-    otpController.clear();
+    if (otpCode != 0) {
+      otpController.clear();
+    }
     log('request otp');
     await RegisterRepository().sendPostOtp(
       context,
-      userId: userId,
-      // userId: widget.userId!,
-      type:  widget.forgotPass ? "RESET_PASSWORD" : "REGISTER",
+      // userId: userId,
+      // userId: userId,
+      userId: widget.userId!,
+      type: widget.forgotPass ? "RESET_PASSWORD" : "REGISTER",
     );
   }
 
-  Future<void> notVerifyYet() async {
-    log('load id');
-    CheckVerifyEmailResponse verifyEmailResponse =
-        await RegisterRepository().checkGetVerifyEmail(
-      // ignore: use_build_context_synchronously
-      context: context,
-      email: widget.email!,
-    );
-    // DataCheckEmailItem? checkedEmail = checkEmailResponse.data;
-    DataVerifyEmail? verifyEmail = verifyEmailResponse.data;
-    setState(() {
-      userId = verifyEmail!.userId!;
-    });
-    log("id : $userId");
-    requestOTP(context);
-  }
+  // Future<void> notVerifyYet() async {
+  // log('load id');
+  // CheckVerifyEmailResponse verifyEmailResponse =
+  //     await RegisterRepository().checkGetVerifyEmail(
+  //   // ignore: use_build_context_synchronously
+  //   context: context,
+  //   email: widget.email!,
+  // );
+  // DataCheckEmailItem? checkedEmail = checkEmailResponse.data;
+  // DataVerifyEmail? verifyEmail = verifyEmailResponse.data;
+  // setState(() {
+  //   userId = verifyEmail!.userId!;
+  // });
+  //   log("id : $userId");
+  //   requestOTP(context);
+  // }
 
   @override
   Widget build(BuildContext context) {

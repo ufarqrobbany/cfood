@@ -108,7 +108,7 @@ class _SignupScreenState extends State<SignupScreen> {
   if (checkVerifiedEmail != null) {
     return VerifyEmailResult(
       verified: checkVerifiedEmail.verified ?? false,
-      userId: checkVerifiedEmail.userId ?? 0, // Pastikan DataVerifyEmail memiliki field userId
+      userId: checkVerifiedEmail.userId ?? 1, // Pastikan DataVerifyEmail memiliki field userId
     );
   } else {
     return null;
@@ -290,9 +290,7 @@ class _SignupScreenState extends State<SignupScreen> {
                           });
                           navigateTo(context, VerificationScreen(
                               forgotPass: false,
-                              userId: emailVerified.userId,
-                              email: emailController.text
-                            ));
+                              userId: emailVerified.userId                            ));
                         }
                       }
                 });
