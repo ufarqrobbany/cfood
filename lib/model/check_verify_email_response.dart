@@ -30,6 +30,13 @@ class CheckVerifyEmailResponse {
   }
 }
 
+class VerifyEmailResult {
+  final bool verified;
+  final int userId;
+
+  VerifyEmailResult({required this.verified, required this.userId});
+}
+
 class DataVerifyEmail {
   int? userId;
   String? email;

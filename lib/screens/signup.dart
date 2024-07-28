@@ -82,18 +82,60 @@ class _SignupScreenState extends State<SignupScreen> {
     return checkedEmail!.available;
   }
 
-  Future<bool?> checkVerifyEmail(String email, BuildContext context) async {
-    CheckVerifyEmailResponse checkVerifyEmailResponse =
-        await RegisterRepository().checkGetVerifyEmail(
-      email: email,
-      context: context,
+  // Future<bool?> checkVerifyEmail(String email, BuildContext context) async {
+  //   CheckVerifyEmailResponse checkVerifyEmailResponse =
+  //       await RegisterRepository().checkGetVerifyEmail(
+  //     email: email,
+  //     context: context,
+  //   );
+  //   DataVerifyEmail? checkVerifiedEmail = checkVerifyEmailResponse.data;
+
+  //   log(checkVerifiedEmail.toString());
+
+  //   return checkVerifiedEmail!.verified;
+  // }
+
+  Future<VerifyEmailResult?> checkVerifyEmail(String email, BuildContext context) async {
+  CheckVerifyEmailResponse checkVerifyEmailResponse =
+      await RegisterRepository().checkGetVerifyEmail(
+    email: email,
+    context: context,
+  );
+  DataVerifyEmail? checkVerifiedEmail = checkVerifyEmailResponse.data;
+
+  log(checkVerifiedEmail.toString());
+
+  if (checkVerifiedEmail != null) {
+    return VerifyEmailResult(
+      verified: checkVerifiedEmail.verified ?? false,
+      userId: checkVerifiedEmail.userId ?? 0, // Pastikan DataVerifyEmail memiliki field userId
     );
-    DataVerifyEmail? checkVerifiedEmail = checkVerifyEmailResponse.data;
-
-    log(checkVerifiedEmail.toString());
-
-    return checkVerifiedEmail!.verified;
+  } else {
+    return null;
   }
+}
+
+//   Future<DataVerifyEmail?> checkVerifyEmail(String email, BuildContext context) async {
+//   CheckVerifyEmailResponse checkVerifyEmailResponse =
+//       await RegisterRepository().checkGetVerifyEmail(
+//     email: email,
+//     context: context,
+//   );
+//   DataVerifyEmail? checkVerifiedEmail = checkVerifyEmailResponse.data;
+
+//   log(checkVerifiedEmail.toString());
+
+//   if (checkVerifiedEmail == null) {
+//     return null;
+//   }
+
+//   return DataVerifyEmail(
+//     userId: checkVerifiedEmail.userId,
+//     email: checkVerifiedEmail.email,
+//     verified: checkVerifiedEmail.verified ?? false,
+//   );
+// }
+
 
   Future<bool?> validateEmailStudent({
     required String email,
@@ -233,23 +275,26 @@ class _SignupScreenState extends State<SignupScreen> {
                 // Check if the email is verified
                 checkVerifyEmail(emailController.text, context)
                     .then((emailVerified) {
-                  if (emailVerified != null && emailVerified) {
-                    showToast('Email Sudah Terverikasi');
-                    setState(() {
-                      loadButton = false;
-                    });
-                  } else {
-                    emptyField = 'Email Belum Terverifikasi';
-                    showToast(emptyField);
-                    log(emptyField);
-                    setState(() {
-                      loadButton = false;
-                    });
-                    navigateTo(context, VerificationScreen(
-                        forgotPass: false,
-                        email: emailController.text
-                      ));
-                  }
+                      if(emailVerified != null) {
+                        if (emailVerified.verified) {
+                          showToast('Email Sudah Terverikasi');
+                          setState(() {
+                            loadButton = false;
+                          });
+                        } else {
+                          emptyField = 'Email Belum Terverifikasi';
+                          showToast(emptyField);
+                          log(emptyField);
+                          setState(() {
+                            loadButton = false;
+                          });
+                          navigateTo(context, VerificationScreen(
+                              forgotPass: false,
+                              userId: emailVerified.userId,
+                              email: emailController.text
+                            ));
+                        }
+                      }
                 });
               }
             });
@@ -257,47 +302,47 @@ class _SignupScreenState extends State<SignupScreen> {
         });
       } else {
         // Check if the email is available
-        checkEmail(emailController.text, context).then((emailAvailable) {
-          if (emailAvailable != null && emailAvailable) {
-            setState(() {
-              loadButton = false;
-            });
-            navigateTo(
-                context,
-                CreatePasswordScreen(
-                  email: emailController.text,
-                  name: nameController.text,
-                  campusId: selectedCampusesId,
-                  isStudent: false,
-                ));
-            return;
-          } else {
-            // Check if the email is verified
-            checkVerifyEmail(emailController.text, context)
-                .then((emailVerified) {
-              if (emailVerified != null && emailVerified) {
-                // checked = false;
-                setState(() {
-                  loadButton = false;
-                });
-                emptyField = 'Email sudah terdaftar dan terverifikasi';
-                showToast(emptyField);
-                log(emptyField);
-                navigateToRep(context, const LoginScreen());
-              } else {
-                setState(() {
-                  loadButton = false;
-                });
-                navigateTo(
-                    context,
-                    VerificationScreen(
-                      forgotPass: false,
-                      email: emailController.text,
-                    ));
-              }
-            });
-          }
-        });
+        // checkEmail(emailController.text, context).then((emailAvailable) {
+        //   if (emailAvailable != null && emailAvailable) {
+        //     setState(() {
+        //       loadButton = false;
+        //     });
+        //     navigateTo(
+        //         context,
+        //         CreatePasswordScreen(
+        //           email: emailController.text,
+        //           name: nameController.text,
+        //           campusId: selectedCampusesId,
+        //           isStudent: false,
+        //         ));
+        //     return;
+        //   } else {
+        //     // Check if the email is verified
+        //     checkVerifyEmail(emailController.text, context)
+        //         .then((emailVerified) {
+        //       if (emailVerified != null && emailVerified) {
+        //         // checked = false;
+        //         setState(() {
+        //           loadButton = false;
+        //         });
+        //         emptyField = 'Email sudah terdaftar dan terverifikasi';
+        //         showToast(emptyField);
+        //         log(emptyField);
+        //         navigateToRep(context, const LoginScreen());
+        //       } else {
+        //         setState(() {
+        //           loadButton = false;
+        //         });
+        //         navigateTo(
+        //             context,
+        //             VerificationScreen(
+        //               forgotPass: false,
+        //               email: emailController.text,
+        //             ));
+        //       }
+        //     });
+        //   }
+        // });
       }
     } on Exception catch (e) {
       setState(() {
