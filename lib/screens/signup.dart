@@ -19,6 +19,7 @@ import 'package:cfood/style.dart';
 import 'package:flutter/gestures.dart';
 // import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:toast/toast.dart';
 
 class SignupScreen extends StatefulWidget {
@@ -277,7 +278,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     .then((emailVerified) {
                       if(emailVerified != null) {
                         if (emailVerified.verified) {
-                          showToast('Email Sudah Terverikasi');
+                          showToast('Email Sudah Terdaftar');
                           setState(() {
                             loadButton = false;
                           });
@@ -360,143 +361,142 @@ class _SignupScreenState extends State<SignupScreen> {
   @override
   Widget build(BuildContext context) {
     ToastContext().init(context);
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            // HEADER
-            const CStylishHeader(
-              title: 'Daftar',
-              description: 'Isi data berikut untuk membuat akun',
-            ),
-            const SizedBox(
-              height: 30,
-            ),
-            // NAME
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 25),
-              child: CTextField(
-                controller: nameController,
-                hintText: 'Umar Faruq Robbany',
-                labelText: 'Nama Lengkap',
+    return PopScope(
+      canPop: false,
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              // HEADER
+              const CStylishHeader(
+                title: 'Daftar',
+                description: 'Isi data berikut untuk membuat akun',
               ),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            // EMAIL
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 25),
-              child: CTextField(
-                controller: emailController,
-                hintText: 'umar.faruq.tif423@polban.ac.id',
-                labelText: 'Email',
+              const SizedBox(
+                height: 30,
               ),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            // CAMPUS
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 25),
-              child: CTextField(
-                controller: campusController,
-                hintText: 'Politeknik Negeri Bandung',
-                labelText: 'Kampus',
-                onChanged: (p0) {
-                  _filterCampuses();
-                },
-                suffixIcon: IconButton(
-                  icon: Icon(
-                      _showSuggestions && campusController.text.isNotEmpty
-                          ? Icons.arrow_drop_down_rounded
-                          : Icons.arrow_left_rounded),
-                  onPressed: () {
-                    print(campusController.text);
-                    print("not filter : $campusesList");
-                    print("filtered : $_filteredCampusList");
-                    setState(() {
-                      _showSuggestions = !_showSuggestions;
-                    });
-                  },
+              // NAME
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 25),
+                child: CTextField(
+                  controller: nameController,
+                  hintText: 'Umar Faruq Robbany',
+                  labelText: 'Nama Lengkap',
                 ),
               ),
-            ),
-            if (_showSuggestions && campusController.text.isNotEmpty)
-              campusSelection(),
-
-            // const SizedBox(
-            //   height: 15,
-            // ),
-            // const Align(
-            //   alignment: Alignment.centerLeft,
-            //   child: Padding(
-            //     padding: EdgeInsets.only(left: 25),
-            //     child: Text(
-            //       'Apakah Kamu Mahasiswa?',
-            //       style: AppTextStyles.textRegular,
-            //     ),
-            //   ),
-            // ),
-            // studentSelection(),
-            const SizedBox(
-              height: 40,
-            ),
-            // SIGNIN BUTTON
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 25),
-              height: 55,
-              width: MediaQuery.of(context).size.width,
-              child: CBlueButton(
-                  isLoading: loadButton,
-                  onPressed: () {
-                    dataCheck(context);
-                    // Sign up button logic
-                    // if (dataCheck(context)) {
-                    //   if (_selectedOption == 'ya') {
-                    //     Navigator.push(
-                    //         context,
-                    //         MaterialPageRoute(
-                    //           builder: (context) => SignUpStudentScreen(
-                    //               selectedUniversity: selectedCampus),
-                    //         ));
-                    //   } else {
-                    //     print('go to password screen');
-                    //   }
-                    // }
-                  },
-                  text: 'Lanjut'),
-            ),
-            const SizedBox(
-              height: 40,
-            ),
-            // TEXT REGISTER
-            RichText(
-              text: TextSpan(
-                text: 'Sudah punya akun? ',
-                style: TextStyle(color: Colors.grey.shade900, fontSize: 15),
-                children: [
-                  TextSpan(
-                    text: 'Masuk sekarang',
-                    style: TextStyle(color: Warna.biru, fontSize: 15),
-                    recognizer: TapGestureRecognizer()
-                      ..onTap = () {
-                        navigateToRep(context, const LoginScreen());
-                        // Navigator.push(
-                        //   context,
-                        //   MaterialPageRoute(
-                        //       builder: (context) => const LoginScreen()),
-                        // );
-                      },
-                  ),
-                ],
+              const SizedBox(
+                height: 20,
               ),
-            ),
-            const SizedBox(
-              height: 50,
-            )
-          ],
+              // EMAIL
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 25),
+                child: CTextField(
+                  controller: emailController,
+                  hintText: 'umar.faruq.tif423@polban.ac.id',
+                  labelText: 'Email',
+                ),
+              ),
+              const SizedBox(
+                height: 20,
+              ),
+              // CAMPUS
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 25),
+                child: CTextField(
+                  controller: campusController,
+                  hintText: 'Politeknik Negeri Bandung',
+                  labelText: 'Kampus',
+                  onChanged: (p0) {
+                    _filterCampuses();
+                  },
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                        _showSuggestions && campusController.text.isNotEmpty
+                            ? Icons.arrow_drop_down_rounded
+                            : Icons.arrow_left_rounded),
+                    onPressed: () {
+                      print(campusController.text);
+                      print("not filter : $campusesList");
+                      print("filtered : $_filteredCampusList");
+                      setState(() {
+                        _showSuggestions = !_showSuggestions;
+                      });
+                    },
+                  ),
+                ),
+              ),
+              if (_showSuggestions && campusController.text.isNotEmpty)
+                campusSelection(),
+      
+              // const SizedBox(
+              //   height: 15,
+              // ),
+              // const Align(
+              //   alignment: Alignment.centerLeft,
+              //   child: Padding(
+              //     padding: EdgeInsets.only(left: 25),
+              //     child: Text(
+              //       'Apakah Kamu Mahasiswa?',
+              //       style: AppTextStyles.textRegular,
+              //     ),
+              //   ),
+              // ),
+              // studentSelection(),
+              const SizedBox(
+                height: 40,
+              ),
+              // SIGNIN BUTTON
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 25),
+                height: 55,
+                width: MediaQuery.of(context).size.width,
+                child: CBlueButton(
+                    isLoading: loadButton,
+                    onPressed: () {
+                      dataCheck(context);
+                      // Sign up button logic
+                      // if (dataCheck(context)) {
+                      //   if (_selectedOption == 'ya') {
+                      //     Navigator.push(
+                      //         context,
+                      //         MaterialPageRoute(
+                      //           builder: (context) => SignUpStudentScreen(
+                      //               selectedUniversity: selectedCampus),
+                      //         ));
+                      //   } else {
+                      //     print('go to password screen');
+                      //   }
+                      // }
+                    },
+                    text: 'Lanjut'),
+              ),
+              const SizedBox(
+                height: 40,
+              ),
+              // TEXT REGISTER
+              RichText(
+                text: TextSpan(
+                  text: 'Sudah punya akun? ',
+                  style: TextStyle(color: Colors.grey.shade900, fontSize: 15),
+                  children: [
+                    TextSpan(
+                      text: 'Masuk sekarang',
+                      style: TextStyle(color: Warna.biru, fontSize: 15),
+                      recognizer: TapGestureRecognizer()
+                        ..onTap = () {
+                          // context.pushReplacementNamed('login');
+                          navigateToRep(context, const LoginScreen());
+                        },
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(
+                height: 50,
+              )
+            ],
+          ),
         ),
       ),
     );

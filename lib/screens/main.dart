@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cfood/custom/CToast.dart';
 import 'package:cfood/model/get_user_response.dart';
 import 'package:cfood/repository/fetch_controller.dart';
@@ -50,34 +52,81 @@ class _MainScreenState extends State<MainScreen> {
   void initState() {
     super.initState();
 
-    if(dataUser == null){
+    if (dataUser == null) {
       getUserData(context);
     }
   }
 
   Future<void> getUserData(BuildContext context) async {
-    GetUserResponse userResponse = await FetchController(
-      endpoint: 'users/${AppConfig.USER_ID}',
-      fromJson: (json) => GetUserResponse.fromJson(json),
-    ).getData();
+    try {
+      GetUserResponse userResponse = await FetchController(
+        endpoint: 'users/${AppConfig.USER_ID}',
+        fromJson: (json) => GetUserResponse.fromJson(json),
+      ).getData();
 
-    setState(() {
-      dataUser = userResponse.data;
-      userCampus = dataUser!.campus;
-      studentInfo = dataUser!.studentInformation;
-      studentMajor = studentInfo!.major;
-      studentStudyProgram = studentInfo!.studyProgram;
-    });
+      if (userResponse.data != null) {
+        setState(() {
+          dataUser = userResponse.data;
+          userCampus = dataUser?.campus;
+          studentInfo = dataUser?.studentInformation;
+          studentMajor = studentInfo?.major;
+          studentStudyProgram = studentInfo?.studyProgram;
 
-    AuthHelper().setUserData(
-      userId: dataUser?.id.toString(),
-      studentId: studentInfo?.id.toString(),
-      username: dataUser?.name,
-      isDriver: dataUser?.kurir == false ? 'no' : 'yes',
-      type: dataUser?.isPenjual,
-      userPhoto: dataUser?.userPhoto,
-    );
+          AppConfig.NAME = dataUser?.name ?? '';
+          AppConfig.USER_ID = dataUser?.id ?? 0;
+          AppConfig.STUDENT_ID = studentInfo?.id ?? 0;
+          AppConfig.USER_TYPE = dataUser?.isPenjual ?? 'reguler';
+          AppConfig.IS_DRIVER = dataUser?.kurir ?? false;
+          AppConfig.URL_PHOTO_PROFILE =
+              '${AppConfig.URL_PHOTO_PROFILE}${dataUser?.userPhoto ?? ''}';
+        });
+
+        AuthHelper().setUserData(
+          userId: dataUser?.id.toString(),
+          studentId: studentInfo?.id.toString(),
+          username: dataUser?.name,
+          isDriver: dataUser?.kurir == false ? 'no' : 'yes',
+          type: dataUser?.isPenjual,
+          userPhoto: dataUser?.userPhoto,
+        );
+      } else {
+        log('Data user is null');
+      }
+    } catch (e) {
+      log('Failed to fetch user data: $e');
+    }
   }
+
+  // Future<void> getUserData(BuildContext context) async {
+  //   GetUserResponse userResponse = await FetchController(
+  //     endpoint: 'users/${AppConfig.USER_ID}',
+  //     fromJson: (json) => GetUserResponse.fromJson(json),
+  //   ).getData();
+
+  //   setState(() {
+  //     dataUser = userResponse.data;
+  //     userCampus = dataUser?.campus;
+  //     studentInfo = dataUser?.studentInformation;
+  //     studentMajor = studentInfo?.major;
+  //     studentStudyProgram = studentInfo?.studyProgram;
+
+  //     AppConfig.NAME = dataUser!.name!;
+  //     AppConfig.USER_ID = dataUser!.id!;
+  //     AppConfig.STUDENT_ID = studentInfo!.id!;
+  //     AppConfig.USER_TYPE = dataUser?.isPenjual ?? 'reguler';
+  //     AppConfig.IS_DRIVER = dataUser!.kurir!;
+  //     AppConfig.URL_PHOTO_PROFILE = '${AppConfig.URL_PHOTO_PROFILE}${dataUser!.userPhoto}';
+  //   });
+
+  //   AuthHelper().setUserData(
+  //     userId: dataUser?.id.toString(),
+  //     studentId: studentInfo?.id.toString(),
+  //     username: dataUser?.name,
+  //     isDriver: dataUser?.kurir == false ? 'no' : 'yes',
+  //     type: dataUser?.isPenjual,
+  //     userPhoto: dataUser?.userPhoto,
+  //   );
+  // }
 
   void selectScreen(screen) {
     setState(() {

@@ -77,21 +77,23 @@ class LoginRepository{
 
     log('response login: ${response.body}');
 
-    if (response.statusCode <= 300) {
+    if (response.statusCode <= 499) {
       LoginResponse data = loginResponseFromJson(response.body);
       log(response.body);
       showToast(data.message!);
       return loginResponseFromJson(response.body);
-    } else if (response.statusCode <= 500) {
+    } 
+    // else if (response.statusCode <= 499) {
+    //   Error400Response data = error400ResponseFromJson(response.body);
+    //   log(response.body);
+    //   showToast(data.message!);
+    //   throw Exception(data.message);
+    // } 
+    else {
       Error400Response data = error400ResponseFromJson(response.body);
       log(response.body);
       showToast(data.message!);
       throw Exception(data.message);
-    } else {
-      ErrorResponse data = errorResponseFromJson(response.body);
-      log(response.body);
-      showToast(data.error!);
-      throw Exception(data.status);
     }
   }
 }

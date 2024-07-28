@@ -9,6 +9,7 @@ import 'package:cfood/screens/organization.dart';
 import 'package:cfood/screens/search.dart';
 import 'package:cfood/screens/seeAll.dart';
 import 'package:cfood/style.dart';
+import 'package:cfood/utils/constant.dart';
 import 'package:community_material_icon/community_material_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:uicons/uicons.dart';
@@ -22,10 +23,14 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final ScrollController _mainScrollController = ScrollController();
+  String nama_user = '';
 
   @override
   void initState() {
     super.initState();
+    setState(() {
+      nama_user = AppConfig.NAME;
+    });
   }
 
   Future<void> refreshPage() async {
@@ -65,9 +70,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   stretch: true,
                   title: moveLocationBox
                       ? SizedBox(height: 40, child: boxLocation())
-                      : const Text(
-                          'Hai, Ahmad',
-                          style: TextStyle(
+                      : Text(
+                          'Hai, $nama_user',
+                          style: const TextStyle(
                             fontSize: 26,
                             fontWeight: FontWeight.w700,
                             color: Colors.white,

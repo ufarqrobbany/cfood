@@ -4,7 +4,6 @@ import 'package:cfood/custom/CButtons.dart';
 import 'package:cfood/custom/CPageMover.dart';
 import 'package:cfood/custom/CTextField.dart';
 import 'package:cfood/custom/CToast.dart';
-import 'package:cfood/model/check_email_response.dart';
 import 'package:cfood/model/check_verify_email_response.dart';
 import 'package:cfood/repository/register_repository.dart';
 import 'package:cfood/screens/verification.dart';

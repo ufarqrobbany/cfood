@@ -1,3 +1,5 @@
+// ignore_for_file: must_be_immutable
+
 import 'dart:developer';
 
 import 'package:cfood/custom/CButtons.dart';
@@ -64,8 +66,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void tapLogOut(BuildContext context) {
     AuthHelper().clearUserData();
     AuthHelper().chackUserData();
-    navigateToRep(context, const LoginScreen());
-    // context.pushReplacementNamed('login');
+    // navigateToRep(context, const LoginScreen());
+    context.pushReplacementNamed('login');
   }
 
 

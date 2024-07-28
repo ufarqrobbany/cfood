@@ -1,3 +1,4 @@
+import 'package:cfood/style.dart';
 import 'package:flutter/material.dart';
 import 'package:cfood/utils/routes.dart';
 import 'package:flutter/services.dart';
@@ -19,17 +20,28 @@ class MyApp extends StatelessWidget {
       statusBarColor: Color(0xFF002347), // Ganti dengan warna heksadesimal kustom Anda
       statusBarIconBrightness: Brightness.light, // Mengatur ikon status bar menjadi putih
     ));
-    
-    return MaterialApp.router(
-      routerConfig: routes,
+
+     return MaterialApp(
+      initialRoute: '/splash',
+      onGenerateRoute: AppRoutes().generateRoute,
       debugShowCheckedModeBanner: false,
       title: 'C-FOOD',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: Warna.biru),
         useMaterial3: true,
       ),
-      // home: const MyHomePage(title: 'HomePage'),
     );
+    
+    // return MaterialApp.router(
+    //   routerConfig: routes,
+    //   debugShowCheckedModeBanner: false,
+    //   title: 'C-FOOD',
+    //   theme: ThemeData(
+    //     colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+    //     useMaterial3: true,
+    //   ),
+    //   // home: const MyHomePage(title: 'HomePage'),
+    // );
   }
   
   // HomeScreen() {}

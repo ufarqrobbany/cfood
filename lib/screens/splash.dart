@@ -4,7 +4,6 @@ import 'package:cfood/custom/CPageMover.dart';
 import 'package:cfood/repository/fetch_controller.dart';
 import 'package:cfood/repository/login_repository.dart';
 import 'package:cfood/screens/main.dart';
-import 'package:cfood/screens/startup.dart';
 import 'package:cfood/style.dart';
 import 'package:cfood/utils/auth.dart';
 import 'package:cfood/utils/constant.dart';
@@ -50,7 +49,7 @@ class _SplashScreenState extends State<SplashScreen> {
     if (dataUser['email'] != '' &&
         dataUser['password'] != '' &&
         dataUser['id'] != '') {
-      await FetchController(
+      LoginResponse loginResponse = await FetchController(
         endpoint: 'users/login',
         fromJson: (json) => LoginResponse.fromJson(json),
       ).postData({
@@ -58,11 +57,15 @@ class _SplashScreenState extends State<SplashScreen> {
         "password": dataUser['password'],
       });
 
+      setState(() {
+        AppConfig.USER_ID = loginResponse.data!.userId!;
+      });
+
       if (AppConfig.USER_TYPE == 'reguler') {
         // ignore: use_build_context_synchronously
         log('go to homepages');
-        // navigateTo(context, const MainScreen());
-        context.pushReplacementNamed('main');
+        navigateToRep(context,  const MainScreen());
+        // context.pushReplacementNamed('main');
       } else if (AppConfig.USER_TYPE == 'kantin') {
         log('go to kantin pages');
       } else if (AppConfig.USER_TYPE == 'wirausaha') {

@@ -217,51 +217,6 @@ class _SignUpStudentScreenState extends State<SignUpStudentScreen> {
       loadButton = true;
     });
 
-    if (admissionController.text.isEmpty) {
-      setState(() {
-        checked = false;
-        loadButton = false;
-        emptyField = 'Angkatan tidak boleh kosong';
-      });
-      showToast(emptyField);
-    }
-
-    if (departementController.text.isEmpty) {
-      setState(() {
-        checked = false;
-        loadButton = false;
-        emptyField = 'Fakultas/Program Studi tidak boleh kosong';
-      });
-      showToast(emptyField);
-    }
-
-    if (selectedStudyProgramId == 0) {
-      setState(() {
-        checked = false;
-        loadButton = false;
-        emptyField = 'Pilih Program Studi';
-      });
-      showToast(emptyField);
-    }
-
-    if (majorController.text.isEmpty) {
-      setState(() {
-        checked = false;
-        loadButton = false;
-        emptyField = 'Jurusan tidak boleh kosong';
-      });
-      showToast(emptyField);
-    }
-
-    if (selectedMajorId == 0) {
-      setState(() {
-        checked = false;
-        loadButton = false;
-        emptyField = 'Pilih Jurusan';
-      });
-      showToast(emptyField);
-    }
-
     if (nimController.text.isEmpty) {
       setState(() {
         checked = false;
@@ -286,6 +241,51 @@ class _SignUpStudentScreenState extends State<SignUpStudentScreen> {
           });
         }
       });
+    }
+
+    if (admissionController.text.isEmpty) {
+      setState(() {
+        checked = false;
+        loadButton = false;
+        emptyField = 'Angkatan tidak boleh kosong';
+      });
+      showToast(emptyField);
+    }
+
+    if (majorController.text.isEmpty) {
+      setState(() {
+        checked = false;
+        loadButton = false;
+        emptyField = 'Jurusan tidak boleh kosong';
+      });
+      showToast(emptyField);
+    }
+
+    if (selectedMajorId == 0) {
+      setState(() {
+        checked = false;
+        loadButton = false;
+        emptyField = 'Pilih Jurusan';
+      });
+      showToast(emptyField);
+    }
+
+    if (departementController.text.isEmpty) {
+      setState(() {
+        checked = false;
+        loadButton = false;
+        emptyField = 'Program Studi tidak boleh kosong';
+      });
+      showToast(emptyField);
+    }
+
+    if (selectedStudyProgramId == 0) {
+      setState(() {
+        checked = false;
+        loadButton = false;
+        emptyField = 'Pilih Program Studi';
+      });
+      showToast(emptyField);
     }
 
     return checked;
@@ -479,6 +479,10 @@ class _SignUpStudentScreenState extends State<SignUpStudentScreen> {
                 selectedMajor = majorController.text;
                 selectedMajorId = _filteredMajorList[index].id!;
                 _showMajorSuggestion = false;
+
+                departementController.text = "";
+                selectedDepartment = "";
+                selectedStudyProgramId = null;
               });
               fetchStudyProgramItems();
             },

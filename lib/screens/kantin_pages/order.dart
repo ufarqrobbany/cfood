@@ -1,7 +1,6 @@
 import 'package:cfood/custom/CButtons.dart';
 import 'package:cfood/custom/CPageMover.dart';
 import 'package:cfood/custom/reload_indicator.dart';
-import 'package:cfood/custom/switch_custom.dart';
 import 'package:cfood/screens/inbox.dart';
 import 'package:cfood/style.dart';
 import 'package:cfood/utils/constant.dart';

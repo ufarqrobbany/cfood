@@ -3,7 +3,6 @@ import 'dart:developer';
 import 'package:cfood/custom/CButtons.dart';
 import 'package:cfood/custom/CPageMover.dart';
 import 'package:cfood/custom/CToast.dart';
-import 'package:cfood/model/check_verify_email_response.dart';
 import 'package:cfood/model/otp_check_response.dart';
 import 'package:cfood/model/reponse_handler.dart';
 import 'package:cfood/repository/register_repository.dart';

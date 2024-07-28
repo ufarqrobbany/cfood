@@ -518,3 +518,81 @@ import 'package:go_router/go_router.dart';
     ],
   );
 // }
+
+
+class AppRoutes{
+  Route<dynamic>? generateRoute(RouteSettings settings) {
+    switch (settings.name) {
+      case '/splash':
+        return _buildRoute(SplashScreen(), settings);
+      case '/startup':
+        return _buildRoute(StartUpScreen(), settings);
+      case '/login':
+        return _buildRoute(LoginScreen(), settings);
+      case '/register':
+        return _buildRoute(SignupScreen(), settings);
+      case '/register-student':
+        return _buildRoute(SignUpStudentScreen(), settings);
+      case '/verification':
+        return _buildRoute(VerificationScreen(), settings);
+      case '/verification-success':
+        return _buildRoute(VerificationSuccess(), settings);
+      case '/create-pass':
+        return _buildRoute(CreatePasswordScreen(), settings);
+      case '/forgot-pass':
+        return _buildRoute(ForgotPasswordScreen(), settings);
+      case '/':
+        return _buildRoute(MainScreen(), settings);
+      case '/home':
+        return _buildRoute(HomeScreen(), settings);
+      case '/cart':
+        return _buildRoute(CartScreen(), settings);
+      case '/order':
+        return _buildRoute(OrderScreen(), settings);
+      case '/order-detail':
+        return _buildRoute(OrderScreen(), settings);
+      case '/order-status':
+        return _buildRoute(OrderStatusScreen(), settings);
+      case '/inbox':
+        return _buildRoute(InboxScreen(), settings);
+      case '/chat':
+        return _buildRoute(ChatScreen(), settings);
+      case '/organization':
+        return _buildRoute(OrganizationScreen(), settings);
+      case '/see-all':
+        return _buildRoute(SeeAllItemsScreen(), settings);
+      case '/profile':
+        return _buildRoute(ProfileScreen(), settings);
+      case '/user-info':
+        return _buildRoute(UserInformationScreen(), settings);
+      case '/favorite':
+        return _buildRoute(FavoriteScreen(), settings);
+      case '/canteen':
+        return _buildRoute(CanteenScreen(), settings);
+      case '/review':
+        return _buildRoute(ReviewScreen(), settings);
+      case '/main-canteen':
+        return _buildRoute(MainScreenCanteen(), settings);
+      case '/order-canteen':
+        return _buildRoute(OrderCanteenScreen(), settings);
+      case '/transaction':
+        return _buildRoute(TransactionScreen(), settings);
+      default:
+        return null;
+    }
+  }
+
+  PageRouteBuilder _buildRoute(Widget child, RouteSettings settings) {
+    return PageRouteBuilder(
+      settings: settings,
+      pageBuilder: (context, animation, secondaryAnimation) => child,
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        return FadeTransition(
+          opacity: CurveTween(curve: Curves.easeInOutCirc).animate(animation),
+          child: child,
+        );
+      },
+      transitionDuration: const Duration(milliseconds: 200),
+    );
+  }
+}

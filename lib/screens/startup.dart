@@ -3,6 +3,7 @@ import 'package:cfood/custom/CPageMover.dart';
 import 'package:cfood/screens/login.dart';
 import 'package:cfood/style.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class StartUpScreen extends StatefulWidget {
@@ -138,12 +139,8 @@ class _StartUpScreenState extends State<StartUpScreen> {
             ),
             onPressed: () {
               if (sliderNumber == startUpItems.length - 1) {
-                // Navigator.push(
-                //   context, 
-                //   MaterialPageRoute(builder: (context) => const LoginScreen(),
-                //   ),
-                // );
-                navigateTo(context, const LoginScreen());
+                navigateToRep(context, const LoginScreen());
+                // context.pushReplacementNamed('login');
               } else {
                 // print(sliderNumber);
                 _nextPage();

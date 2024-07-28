@@ -6,7 +6,6 @@ import 'package:cfood/custom/CTextField.dart';
 import 'package:cfood/custom/CToast.dart';
 import 'package:cfood/model/add_student_response.dart';
 import 'package:cfood/model/add_user_response.dart';
-import 'package:cfood/model/check_email_response.dart';
 import 'package:cfood/model/check_verify_email_response.dart';
 import 'package:cfood/model/reponse_handler.dart';
 import 'package:cfood/repository/fetch_controller.dart';
@@ -213,6 +212,8 @@ class _CreatePasswordScreenState extends State<CreatePasswordScreen> {
             // Handle the error
             log(error.toString());
           });
+
+          
         }
 
         log('request otp');

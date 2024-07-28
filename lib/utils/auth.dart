@@ -22,13 +22,13 @@ class AuthHelper {
     prefs.setUsername(username ?? '');
     prefs.setType(type: type ?? 'reguler');
     prefs.setIsDriver(isDriver ?? 'no');
-
-    AppConfig.NAME = username!;
-    AppConfig.USER_ID = int.parse(userId!);
-    AppConfig.STUDENT_ID = int.parse(studentId!);
-    AppConfig.USER_TYPE = type ?? 'reguler';
-    AppConfig.IS_DRIVER = isDriver == 'no' ? false : true;
-    AppConfig.URL_PHOTO_PROFILE = '${AppConfig.URL_PHOTO_PROFILE}$userPhoto';
+    
+    // AppConfig.NAME = username!;
+    // AppConfig.USER_ID = int.parse(userId!);
+    // AppConfig.STUDENT_ID = int.parse(studentId!);
+    // AppConfig.USER_TYPE = type ?? 'reguler';
+    // AppConfig.IS_DRIVER = isDriver == 'no' ? false : true;
+    // AppConfig.URL_PHOTO_PROFILE = '${AppConfig.URL_PHOTO_PROFILE}$userPhoto';
   }
 
   setEmailPassword({
