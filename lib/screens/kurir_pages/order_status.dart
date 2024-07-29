@@ -3,18 +3,19 @@ import 'package:cfood/custom/CButtons.dart';
 import 'package:cfood/style.dart';
 import 'package:flutter/material.dart';
 
-class OrderStatusScreen extends StatefulWidget {
+class DriverOrderStatusScreen extends StatefulWidget {
   final int orderId;
   final String orderStatus;
 
-  const OrderStatusScreen(
+  const DriverOrderStatusScreen(
       {super.key, this.orderId = 0, this.orderStatus = 'Belum Bayar'});
 
   @override
-  State<OrderStatusScreen> createState() => _OrderStatusScreenState();
+  State<DriverOrderStatusScreen> createState() =>
+      _DriverOrderStatusScreenState();
 }
 
-class _OrderStatusScreenState extends State<OrderStatusScreen> {
+class _DriverOrderStatusScreenState extends State<DriverOrderStatusScreen> {
   Map<String, dynamic> driverInfo = {
     'id': '0000',
     'profile': '/.jpg',
@@ -36,6 +37,7 @@ class _OrderStatusScreenState extends State<OrderStatusScreen> {
   @override
   void initState() {
     super.initState();
+    onEnterPage();
   }
 
   Future<void> onEnterPage() async {
@@ -66,9 +68,13 @@ class _OrderStatusScreenState extends State<OrderStatusScreen> {
         backgroundColor: Colors.white,
         foregroundColor: Colors.white,
         scrolledUnderElevation: 0,
-        title: const Text(
+        title: Text(
           'Status Pesanan',
-          style: AppTextStyles.textRegular,
+          style: TextStyle(
+            fontSize: 25,
+            fontWeight: FontWeight.w600,
+            color: Warna.regulerFontColor,
+          ),
         ),
       ),
       backgroundColor: Warna.pageBackgroundColor,

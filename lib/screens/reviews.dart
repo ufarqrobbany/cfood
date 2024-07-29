@@ -238,6 +238,44 @@ class _ReviewScreenState extends State<ReviewScreen> {
         'respon': '',
       },
     },
+    '1': {
+      'ulasan 1': {
+        'id': '1',
+        'nama': 'nama pengguna',
+        'rate': '1',
+        'ulasan': '100',
+        'dateTime': '17 Juli 2024',
+        'image': '',
+        'respon': '',
+      },
+      'ulasan 2': {
+        'id': '1',
+        'nama': 'nama pengguna',
+        'rate': '1',
+        'ulasan': '100',
+        'dateTime': '17 Juli 2024',
+        'image': '',
+        'respon': '',
+      },
+      'ulasan 3': {
+        'id': '1',
+        'nama': 'nama pengguna',
+        'rate': '1',
+        'ulasan': '100',
+        'dateTime': '17 Juli 2024',
+        'image': '',
+        'respon': '',
+      },
+      'ulasan 4': {
+        'id': '1',
+        'nama': 'nama pengguna',
+        'rate': '1',
+        'ulasan': '100',
+        'dateTime': '17 Juli 2024',
+        'image': '',
+        'respon': '',
+      },
+    },
   };
 
   Future<void> refreshPage() async {
@@ -760,17 +798,20 @@ class _ReviewScreenState extends State<ReviewScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              const Text(
+                              Text(
                                 'Semua',
                                 style: TextStyle(
-                                    fontSize: 15, fontWeight: FontWeight.w700),
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.normal,
+                                  color: Warna.abu6,
+                                ),
                               ),
                               Text(
                                 '(0)',
                                 style: TextStyle(
                                   fontSize: 13,
-                                  fontWeight: FontWeight.w700,
-                                  color: Warna.regulerFontColor,
+                                  fontWeight: FontWeight.normal,
+                                  color: Warna.abu6,
                                 ),
                               )
                             ],
@@ -786,12 +827,12 @@ class _ReviewScreenState extends State<ReviewScreen> {
                                 starCount: int.parse(key),
                                 starSize: 16.0,
                               ),
-                              const Text(
+                              Text(
                                 '(0)',
                                 style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w700,
-                                ),
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.normal,
+                                    color: Warna.abu6),
                               )
                             ],
                           ),
@@ -823,11 +864,11 @@ class _ReviewScreenState extends State<ReviewScreen> {
                 photoProfile: '',
                 name: item['nama'],
                 rate: item['rate'],
-                reviewsText: 'COntoh Ulusan ada disini',
+                reviewsText: 'Contoh Ulasan ada disini',
                 image: '',
                 menuList: 'Bagator, rotbar, markabak',
                 dateTime: '17 juli 2024, 13.00',
-                respond: 'terimaksih banyak sudah jajan di kami',
+                respond: 'terima kasih banyak sudah jajan di kami',
               ),
             );
           },

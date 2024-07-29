@@ -29,9 +29,13 @@ class _OrderAvailableScreenState extends State<OrderAvailableScreen> {
       appBar: AppBar(
         leading: backButtonCustom(context: context),
         leadingWidth: 90,
-        title: const Text(
+        title: Text(
           'Pesanan Tersedia',
-          style: AppTextStyles.title,
+          style: TextStyle(
+            fontSize: 25,
+            fontWeight: FontWeight.w600,
+            color: Warna.regulerFontColor,
+          ),
         ),
         foregroundColor: Colors.white,
         backgroundColor: Colors.white,
@@ -67,7 +71,7 @@ class _OrderAvailableScreenState extends State<OrderAvailableScreen> {
     );
   }
 
-    Widget orderItemBox({
+  Widget orderItemBox({
     // String? imgUrl,
     int storeListIndex = 0,
     List<Map<String, dynamic>>? storeItem,
@@ -211,7 +215,6 @@ class _OrderAvailableScreenState extends State<OrderAvailableScreen> {
                   );
                 },
               ),
-
               Row(
                 mainAxisSize: MainAxisSize.max,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,

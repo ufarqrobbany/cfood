@@ -36,48 +36,64 @@ class _SplashScreenState extends State<SplashScreen> {
   // });
 
   Future<void> onStartUpAPP(BuildContext context) async {
-    // AuthHelper().setUserData();
-    Map<String, dynamic> dataUser = await AuthHelper().getkUserData();
+    try {
+      // AuthHelper().setUserData(); // Uncomment if needed
+      Map<String, dynamic> dataUser = await AuthHelper().getkUserData();
 
-    if (dataUser['userid'] != '') {
-      AppConfig.USER_ID = int.parse(dataUser['userid']);
-      AppConfig.NAME = dataUser['username'];
-      AppConfig.EMAIL = dataUser['email'];
-      AppConfig.USER_TYPE = dataUser['type'];
-      AppConfig.IS_DRIVER = dataUser['isDriver'] == 'no' ? false : true;
-    }
-
-    if (dataUser['email'] != '' &&
-        dataUser['password'] != '' &&
-        dataUser['id'] != '') {
-      LoginResponse loginResponse = await FetchController(
-        endpoint: 'users/login',
-        fromJson: (json) => LoginResponse.fromJson(json),
-      ).postData({
-        "email": dataUser['email'],
-        "password": dataUser['password'],
-      });
-
-      setState(() {
-        AppConfig.USER_ID = loginResponse.data!.userId!;
-      });
-
-      if (AppConfig.USER_TYPE == 'reguler') {
-        // ignore: use_build_context_synchronously
-        log('go to homepages');
-        navigateToRep(context, const MainScreen());
-        // context.pushReplacementNamed('main');
-      } else if (AppConfig.USER_TYPE == 'kantin') {
-        log('go to kantin pages');
-      } else if (AppConfig.USER_TYPE == 'wirausaha') {
-        log('go to wirausaha pages');
-      } else if (AppConfig.USER_TYPE == 'kurir') {
-        log('go to kurir pages');
+      if (dataUser['userid'] != '') {
+        AppConfig.USER_ID = int.parse(dataUser['userid']);
+        AppConfig.NAME = dataUser['username'];
+        AppConfig.EMAIL = dataUser['email'];
+        AppConfig.USER_TYPE = dataUser['type'];
+        AppConfig.IS_DRIVER = dataUser['isDriver'] == 'no' ? false : true;
       }
-    } else {
-      log('go to startup');
-      // context.pushReplacementNamed('startup');
-      navigateToRep(context, const StartUpScreen());
+
+      if (dataUser['email'] != '' &&
+          dataUser['password'] != '' &&
+          dataUser['id'] != '') {
+        LoginResponse loginResponse = await FetchController(
+          endpoint: 'users/login',
+          fromJson: (json) => LoginResponse.fromJson(json),
+        ).postData({
+          "email": dataUser['email'],
+          "password": dataUser['password'],
+        });
+
+        setState(() {
+          AppConfig.USER_ID = loginResponse.data!.userId!;
+        });
+
+        if (AppConfig.USER_TYPE == 'reguler') {
+          // ignore: use_build_context_synchronously
+          log('go to homepages');
+          navigateToRep(context, const MainScreen());
+          // context.pushReplacementNamed('main');
+        } else if (AppConfig.USER_TYPE == 'kantin') {
+          log('go to kantin pages');
+        } else if (AppConfig.USER_TYPE == 'wirausaha') {
+          log('go to wirausaha pages');
+        } else if (AppConfig.USER_TYPE == 'kurir') {
+          log('go to kurir pages');
+        }
+      } else {
+        log('go to startup');
+        // context.pushReplacementNamed('startup');
+        Timer(const Duration(seconds: 3), () {
+          // context.pushReplacementNamed('startup');
+          navigateToRep(context, const StartUpScreen());
+        });
+      }
+    } catch (e) {
+      // Handle error and log it
+      log('Error during startup: $e');
+      Timer(const Duration(seconds: 3), () {
+        // context.pushReplacementNamed('startup');
+        navigateToRep(context, const StartUpScreen());
+      });
+
+      // Optional: Show an error message to the user or navigate to an error page
+      // For example, you might navigate to an error page if needed:
+      // navigateToRep(context, const ErrorScreen());
     }
   }
 

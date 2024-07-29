@@ -7,16 +7,15 @@ import 'package:flutter/material.dart';
 
 // ignore: must_be_immutable
 class ChatSellerScreen extends StatefulWidget {
-  bool canBack;
-  ChatSellerScreen({super.key, this.canBack = false});
+  ChatSellerScreen({
+    super.key,
+  });
 
   @override
   State<ChatSellerScreen> createState() => _ChatSellerScreenState();
 }
 
 class _ChatSellerScreenState extends State<ChatSellerScreen> {
-  String selectedTab = 'driver';
-
   @override
   void initState() {
     super.initState();
@@ -33,16 +32,18 @@ class _ChatSellerScreenState extends State<ChatSellerScreen> {
     return Scaffold(
       appBar: AppBar(
         leadingWidth: 90,
-        automaticallyImplyLeading: widget.canBack,
-        leading: widget.canBack ? backButtonCustom(context: context) : Container(),
+        leading: backButtonCustom(context: context),
         elevation: 0,
-        centerTitle: !widget.canBack,
         backgroundColor: Colors.white,
         foregroundColor: Colors.white,
         scrolledUnderElevation: 0,
-        title: const Text(
-          'Chat',
-          style: AppTextStyles.title,
+        title: Text(
+          'Chat Pembeli',
+          style: TextStyle(
+            fontSize: 25,
+            fontWeight: FontWeight.w600,
+            color: Warna.regulerFontColor,
+          ),
         ),
       ),
       backgroundColor: Warna.pageBackgroundColor,
@@ -60,21 +61,20 @@ class _ChatSellerScreenState extends State<ChatSellerScreen> {
       shrinkWrap: true,
       // padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 0),
       itemBuilder: (context, index) {
-      return  InboxCardItems(
-        chatId: '0',
-        inboxId: '0',
-        userId: '0',
-        name: 'nama penjual',
-        lastMassage: 'sudah dikirim yah',
-        totalNewMessage: '3',
-        lastDateTime: '01-7-2024',
-        onPressed: () {
-          navigateTo(context, const ChatScreen());
-          // Navigator.push(context, MaterialPageRoute(builder: (context) => const ChatScreen(),));
-        },
-      );
-    },);
+        return InboxCardItems(
+          chatId: '0',
+          inboxId: '0',
+          userId: '0',
+          name: 'nama penjual',
+          lastMassage: 'sudah dikirim yah',
+          totalNewMessage: '3',
+          lastDateTime: '01-7-2024',
+          onPressed: () {
+            navigateTo(context, const ChatScreen());
+            // Navigator.push(context, MaterialPageRoute(builder: (context) => const ChatScreen(),));
+          },
+        );
+      },
+    );
   }
-
-
 }

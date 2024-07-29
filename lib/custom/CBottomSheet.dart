@@ -438,7 +438,7 @@ Future menuCustomeFrameSheet(
 
 Future statusOrderSheet(
   BuildContext? context, {
-  final String? orderId,
+  final int? orderId,
   final String? status,
   final bool isCashless = true,
   Map<String, dynamic>? orderInfo,
@@ -451,6 +451,7 @@ Future statusOrderSheet(
     context: context!,
     barrierColor: Colors.transparent,
     backgroundColor: Colors.white,
+    isDismissible: false,
     enableDrag: true,
     showDragHandle: true,
     isScrollControlled: true,
@@ -461,141 +462,149 @@ Future statusOrderSheet(
       ),
     ),
     builder: (context) {
-      return StatefulBuilder(
-        builder: (context, setState) {
-          return SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 25),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  status == 'Belum Bayar'
-                      ? const Center(
-                          child: Text(
-                            'Menunggu Pembayaran',
-                            style: AppTextStyles.title,
-                          ),
-                        )
-                      : Container(),
-
-                  Container(
-                    height: 50,
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(vertical: 5),
-                    child: DynamicColorButton(
-                      onPressed: onPressedStatusButton!,
-                      borderRadius: 54,
-                      text: status == 'Belum Bayar'
-                          ? 'Batalkan Pesanan'
-                          : status == 'Selesai'
-                              ? 'Konfirmasi Pesanan'
-                              : '',
-                      backgroundColor: status == 'Belum Bayar'
-                          ? Warna.like
-                          : status == 'Selesai'
-                              ? Warna.hijau
-                              : Warna.abu2,
-                    ),
-                  ),
-
-                  // Divider(
-                  //   height: 5,
-                  //   thickness: 5,
-                  //   color: Warna.abu,
-                  // ),
-
-                  ListTile(
-                    shape: Border(
-                      bottom: BorderSide(color: Warna.abu, width: 1.5),
-                      top: BorderSide(color: Warna.abu, width: 1.5),
-                    ),
-                    dense: false,
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 0,
-                      vertical: 15,
-                    ),
-                    title: Text(
-                      driverInfo!['name'].toString(),
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    subtitle: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(
-                          Icons.star,
-                        ),
-                        const SizedBox(
-                          width: 5,
-                        ),
-                        Text(
-                          driverInfo['rate'].toString(),
-                        )
-                      ],
-                    ),
-                    trailing: notifIconButton(
-                      notifCount: driverInfo['rate'].toString(),
-                      onPressed: () {},
-                      icons: UIcons.regularRounded.comment,
-                      iconColor: Warna.regulerFontColor,
-                    ),
-                  ),
-
-                  !isCashless
-                      ? SizedBox(
-                          height: 50,
-                          width: double.infinity,
-                          child: DynamicColorButton(
-                            onPressed: onPressedPay!,
-                            text: 'Bayar',
-                            backgroundColor: Warna.kuning,
-                          ),
-                        )
-                      : const SizedBox(),
-
-                  Row(
+      return DraggableScrollableSheet(
+        initialChildSize: 0.45, // Initial height when sheet is first opened
+        minChildSize: 0.1, // Minimum height when sheet is collapsed
+        maxChildSize: 0.6, // Maximum height when sheet is fully expanded
+        expand: false, // Set to false to prevent full expansion
+        builder: (context, scrollController) {
+          return StatefulBuilder(
+            builder: (context, setState) {
+              return SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 25),
+                  child: Column(
                     mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Icon(
-                        Icons.store,
-                        color: Warna.biru1,
+                      status == 'Belum Bayar'
+                          ? const Center(
+                              child: Text(
+                                'Menunggu Pembayaran',
+                                style: AppTextStyles.title,
+                              ),
+                            )
+                          : Container(),
+          
+                      Container(
+                        height: 50,
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(vertical: 5),
+                        child: DynamicColorButton(
+                          onPressed: onPressedStatusButton!,
+                          borderRadius: 54,
+                          text: status == 'Belum Bayar'
+                              ? 'Batalkan Pesanan'
+                              : status == 'Selesai'
+                                  ? 'Konfirmasi Pesanan'
+                                  : '',
+                          backgroundColor: status == 'Belum Bayar'
+                              ? Warna.like
+                              : status == 'Selesai'
+                                  ? Warna.hijau
+                                  : Warna.abu2,
+                        ),
                       ),
-                      const SizedBox(
-                        width: 8,
+          
+                      // Divider(
+                      //   height: 5,
+                      //   thickness: 5,
+                      //   color: Warna.abu,
+                      // ),
+          
+                      ListTile(
+                        shape: Border(
+                          bottom: BorderSide(color: Warna.abu, width: 1.5),
+                          top: BorderSide(color: Warna.abu, width: 1.5),
+                        ),
+                        dense: false,
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 0,
+                          vertical: 15,
+                        ),
+                        title: Text(
+                          driverInfo!['name'].toString(),
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        subtitle: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.star,
+                            ),
+                            const SizedBox(
+                              width: 5,
+                            ),
+                            Text(
+                              driverInfo['rate'].toString(),
+                            )
+                          ],
+                        ),
+                        trailing: notifIconButton(
+                          notifCount: driverInfo['rate'].toString(),
+                          onPressed: () {},
+                          icons: UIcons.regularRounded.comment,
+                          iconColor: Warna.regulerFontColor,
+                        ),
+                      ),
+          
+                      !isCashless
+                          ? SizedBox(
+                              height: 50,
+                              width: double.infinity,
+                              child: DynamicColorButton(
+                                onPressed: onPressedPay!,
+                                text: 'Bayar',
+                                backgroundColor: Warna.kuning,
+                              ),
+                            )
+                          : const SizedBox(),
+          
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Icon(
+                            Icons.store,
+                            color: Warna.biru1,
+                          ),
+                          const SizedBox(
+                            width: 8,
+                          ),
+                          Text(
+                            orderInfo!['store'],
+                          )
+                        ],
                       ),
                       Text(
-                        orderInfo!['store'],
+                          '${Constant.currencyCode}${orderInfo['price']} - ${orderInfo['method']}',
+                          style: AppTextStyles.textRegular),
+                      Text(
+                        '${orderInfo['menu_count']} Menu | ${orderInfo['items_count']}',
+                        style: AppTextStyles.textRegular,
+                      ),
+                      Text('${orderInfo['location']}',
+                          style: AppTextStyles.textRegular),
+          
+                      Container(
+                        height: 50,
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(vertical: 25),
+                        child: CBlueButton(
+                          onPressed: onPressedSeeDetail!,
+                          text: 'Lihat Detail',
+                        ),
                       )
                     ],
                   ),
-                  Text(
-                      '${Constant.currencyCode}${orderInfo['price']} - ${orderInfo['method']}',
-                      style: AppTextStyles.textRegular),
-                  Text(
-                    '${orderInfo['menu_count']} Menu | ${orderInfo['items_count']}',
-                    style: AppTextStyles.textRegular,
-                  ),
-                  Text('${orderInfo['location']}',
-                      style: AppTextStyles.textRegular),
-
-                  Container(
-                    height: 50,
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(vertical: 25),
-                    child: CBlueButton(
-                      onPressed: onPressedSeeDetail!,
-                      text: 'Lihat Detail',
-                    ),
-                  )
-                ],
-              ),
-            ),
+                ),
+              );
+            },
           );
-        },
+        }
       );
     },
   );

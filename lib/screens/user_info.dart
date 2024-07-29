@@ -263,15 +263,21 @@ class _UserInformationScreenState extends State<UserInformationScreen> {
       ),
       backgroundColor: Colors.white,
       floatingActionButton: _image != null
-          ? SizedBox(
-              height: 45,
-              child: DynamicColorButton(
-                onPressed: () {
-                  uploadPhotoProfile(context);
-                },
-                text: 'Simpan foto profil',
-                backgroundColor: Warna.biru,
-                borderRadius: 30,
+          ? Transform.translate(
+              offset: const Offset(0,
+                  -80), // Adjust the second parameter to move it up (negative values move up, positive values move down)
+              child: SizedBox(
+                height: 45,
+                child: DynamicColorButton(
+                  onPressed: () {
+                    uploadPhotoProfile(context);
+                  },
+                  icon: const Icon(Icons.save, color: Colors.white),
+                  text: 'Simpan foto profil',
+                  fontWeight: FontWeight.w500,
+                  backgroundColor: Warna.biru,
+                  borderRadius: 30,
+                ),
               ),
             )
           : null,

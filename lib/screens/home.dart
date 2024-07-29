@@ -29,12 +29,19 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    while (nama_user == '') {
-      setState(() {
-        nama_user = AppConfig.NAME;
-        first_name = nama_user.split(' ')[0];
-      });
-    }
+
+    setState(() {
+      nama_user = AppConfig.NAME;
+      // first_name = nama_user.split(' ')[0];
+      first_name = nama_user != ''
+          ? nama_user.split(' ')[0]
+          : _capitalizeFirstLetter(AppConfig.EMAIL.split('.')[0]);
+    });
+  }
+
+  String _capitalizeFirstLetter(String input) {
+    if (input.isEmpty) return input;
+    return input[0].toUpperCase() + input.substring(1).toLowerCase();
   }
 
   Future<void> refreshPage() async {

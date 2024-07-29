@@ -272,7 +272,7 @@ class _OrderScreenState extends State<OrderScreen> {
                     },
                     text: orderStatusTabMenu[index]['status'],
                     menuName: orderStatusTabMenu[index]['code'],
-                    activeColor: Warna.oranye1,
+                    activeColor: Warna.kuning,
                   );
                 },
               ),

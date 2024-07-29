@@ -1,6 +1,7 @@
 // ignore_for_file: must_be_immutable
 
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:cfood/custom/CButtons.dart';
 import 'package:cfood/custom/CPageMover.dart';
@@ -12,6 +13,9 @@ import 'package:cfood/repository/fetch_controller.dart';
 import 'package:cfood/screens/app_setting_info.dart';
 import 'package:cfood/screens/inbox.dart';
 import 'package:cfood/screens/kantin_pages/main.dart';
+import 'package:cfood/screens/kurir_pages/chat_seller.dart';
+import 'package:cfood/screens/kurir_pages/order_available.dart';
+import 'package:cfood/screens/kurir_pages/order_status.dart';
 import 'package:cfood/screens/login.dart';
 import 'package:cfood/screens/main.dart';
 import 'package:cfood/screens/user_info.dart';
@@ -23,6 +27,11 @@ import 'package:community_material_icon/community_material_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:toast/toast.dart';
 import 'package:uicons/uicons.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:path/path.dart' as path;
+import 'package:http_parser/http_parser.dart';
+import 'package:dio/dio.dart';
 
 class ProfileScreen extends StatefulWidget {
   String? userType;
@@ -38,18 +47,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
   StudentInformation? studentInfo;
   bool? isStudent;
 
+  File? _image;
+  final picker = ImagePicker();
+
   @override
   void initState() {
     super.initState();
-    // getUserData(context);
     isStudent = false;
+    getUserData(context);
     log('usertype : ${AppConfig.USER_TYPE}\n userId : ${AppConfig.USER_ID}\n${AppConfig.NAME}');
   }
 
   Future<void> refreshPage() async {
     await Future.delayed(const Duration(seconds: 10));
 
-    print('reload...');
+    log('reload...');
   }
 
   Future<void> getUserData(BuildContext context) async {
@@ -139,6 +151,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ],
       ),
       backgroundColor: Colors.white,
+      floatingActionButton: Transform.translate(
+        offset: const Offset(0,
+            -80), // Adjust the second parameter to move it up (negative values move up, positive values move down)
+        child: SizedBox(
+          height: 45,
+          child: DynamicColorButton(
+            onPressed: () {
+              uploadPhotoProfile(context);
+            },
+            icon: const Icon(Icons.save, color: Colors.white),
+            text: 'Simpan foto profil',
+            backgroundColor: Warna.biru,
+            borderRadius: 30,
+          ),
+        ),
+      ),
       body: ReloadIndicatorType1(
         onRefresh: refreshPage,
         child: SingleChildScrollView(
@@ -148,6 +176,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               profileBoxHeader(),
               joinWirausahaNotifBox(),
               studentInfo?.id != null ? joinDriverNotifBox() : Container(),
+              boxDriverTasks(),
               widget.userType == 'kantin'
                   ? sectionMenuBox(
                       title: 'Akun',
@@ -190,7 +219,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       context, const UserInformationScreen());
                                 },
                               )
-                            : menuItemContainer(),
+                            : const SizedBox.shrink(),
                         menuItemContainer(
                           icons: UIcons.solidRounded.marker,
                           showBorder: true,
@@ -296,39 +325,190 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  // Widget profileBoxHeader() {
+  //   return Padding(
+  //     padding: const EdgeInsets.symmetric(vertical: 24),
+  //     child: Column(
+  //       mainAxisSize: MainAxisSize.min,
+  //       crossAxisAlignment: CrossAxisAlignment.center,
+  //       children: [
+  //         profileBox(),
+  //         const SizedBox(
+  //           height: 10,
+  //         ),
+  //         Text(
+  //           AppConfig.NAME == '' ? '' : AppConfig.NAME,
+  //           style: const TextStyle(
+  //             fontSize: 20,
+  //             fontWeight: FontWeight.w700,
+  //           ),
+  //         ),
+  //         const SizedBox(
+  //           height: 8,
+  //         ),
+  //         Text(
+  //           AppConfig.EMAIL == '' ? '' : AppConfig.EMAIL,
+  //           style: const TextStyle(
+  //             fontSize: 16,
+  //             fontWeight: FontWeight.w400,
+  //           ),
+  //         )
+  //       ],
+  //     ),
+  //   );
+  // }
+
+  Future<void> uploadPhotoProfile(BuildContext context) async {
+    if (_image == null) return;
+
+    var dio = Dio();
+    var formData = FormData.fromMap({
+      'file': await MultipartFile.fromFile(
+        _image!.path,
+        filename: path.basename(_image!.path),
+        contentType: MediaType(
+            'image', path.extension(_image!.path).replaceAll('.', '')),
+      ),
+    });
+
+    try {
+      var response = await dio.post(
+        '${AppConfig.BASE_URL}users/${AppConfig.USER_ID}/upload-photo',
+        data: formData,
+        options: Options(
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        // Handle successful response
+        log('Photo uploaded successfully');
+        showToast('Berhasil Mengubah Foto');
+        _image = null;
+      } else {
+        // Handle error response
+        log('Failed to upload photo');
+        showToast('Gagal Mengubah Foto');
+      }
+    } catch (e) {
+      log('Error: $e');
+      showToast(e.toString());
+      _image = null;
+    }
+  }
+
+  //Image Picker function to get image from gallery
+  Future getImageFromGallery() async {
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+    setState(() {
+      if (pickedFile != null) {
+        _image = File(pickedFile.path);
+      }
+    });
+  }
+
+//Image Picker function to get image from camera
+  Future getImageFromCamera() async {
+    final pickedFile = await picker.pickImage(source: ImageSource.camera);
+
+    setState(() {
+      if (pickedFile != null) {
+        _image = File(pickedFile.path);
+      }
+    });
+  }
+
+  Future showOptionsPicker() async {
+    showCupertinoModalPopup(
+      context: context,
+      builder: (context) => CupertinoActionSheet(
+        actions: [
+          CupertinoActionSheetAction(
+            child: const Text('Photo Gallery'),
+            onPressed: () {
+              // close the options modal
+              Navigator.of(context).pop();
+              // get image from gallery
+              getImageFromGallery();
+            },
+          ),
+          CupertinoActionSheetAction(
+            child: const Text('Camera'),
+            onPressed: () {
+              // close the options modal
+              Navigator.of(context).pop();
+              // get image from camera
+              getImageFromCamera();
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget profileBoxHeader() {
-    return Padding(
+    return Container(
+      width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 24),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Container(
-            height: 80,
-            width: 80,
-            decoration: BoxDecoration(
+          InkWell(
+            onTap: () {
+              showOptionsPicker();
+            },
+            child: ClipRRect(
               borderRadius: BorderRadius.circular(80),
-              color: Warna.abu,
-            ),
-            child: Image.asset(
-              '/.jpg',
-              errorBuilder: (context, error, stackTrace) {
-                return Container(
-                  height: 80,
-                  width: 80,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(80),
-                    color: Warna.abu,
-                  ),
-                );
-              },
+              child: Container(
+                height: 80,
+                width: 80,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(80),
+                  color: Warna.abu,
+                ),
+                child: _image != null
+                    ? Image.file(
+                        _image!,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            height: 80,
+                            width: 80,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(80),
+                              color: Warna.abu,
+                            ),
+                          );
+                        },
+                      )
+                    : Image.network(
+                        dataUser?.userPhoto != null
+                            ? '${AppConfig.URL_IMAGES_PATH}${dataUser?.userPhoto}'
+                            : 'https://i.pinimg.com/originals/d9/d8/8e/d9d88e3d1f74e2b8ced3df051cecb81d.jpg',
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            height: 80,
+                            width: 80,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(80),
+                              color: Warna.abu,
+                            ),
+                          );
+                        },
+                      ),
+              ),
             ),
           ),
           const SizedBox(
             height: 10,
           ),
           Text(
-            AppConfig.NAME == '' ? '' : AppConfig.NAME,
+            dataUser?.name ?? AppConfig.NAME,
             style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w700,
@@ -338,7 +518,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             height: 8,
           ),
           Text(
-            AppConfig.EMAIL == '' ? '' : AppConfig.EMAIL,
+            dataUser?.email ?? AppConfig.EMAIL,
             style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w400,
@@ -377,6 +557,127 @@ class _ProfileScreenState extends State<ProfileScreen> {
               backgroundColor: Warna.kuning,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(50))),
+        ),
+      ),
+    );
+  }
+
+  Widget boxDriverTasks() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
+          color: Warna.kuning.withOpacity(0.10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Text(
+                'Akun',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: Warna.regulerFontColor,
+                ),
+              ),
+            ],
+          ),
+        ),
+        Container(
+            padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 9),
+            color: Warna.kuning.withOpacity(0.05),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                driverItemsMenu(
+                  onTap: () {
+                    navigateTo(context, const OrderAvailableScreen());
+                  },
+                  icons: Icons.move_to_inbox,
+                  text: 'Pesanan Tersedia',
+                  notifCount: 7,
+                ),
+                driverItemsMenu(
+                  onTap: () {
+                    navigateTo(
+                        context,
+                        const DriverOrderStatusScreen(
+                          orderId: 1,
+                        ));
+                  },
+                  icons: UIcons.solidRounded.bike,
+                  text: 'Pengantaran',
+                  notifCount: 7,
+                ),
+                driverItemsMenu(
+                  onTap: () {
+                    navigateTo(context, ChatSellerScreen());
+                  },
+                  icons: UIcons.solidRounded.comment,
+                  text: 'Chat Pembeli',
+                  notifCount: 7,
+                ),
+              ],
+            )),
+      ],
+    );
+  }
+
+  Widget driverItemsMenu(
+      {VoidCallback? onTap,
+      IconData? icons,
+      String? text,
+      int notifCount = 0}) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(8),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: InkWell(
+          onTap: onTap,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                icons,
+                size: 30,
+                color: Warna.biru,
+              ),
+              const SizedBox(
+                height: 8,
+              ),
+              Text(
+                text!,
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(
+                height: 5,
+              ),
+              Container(
+                width: 15,
+                height: 15,
+                // padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 3),
+                decoration: BoxDecoration(
+                  color: Warna.kuning,
+                  borderRadius: BorderRadius.circular(33),
+                ),
+                child: Center(
+                  child: Text(
+                    notifCount.toString(),
+                    style: const TextStyle(
+                      fontSize: 8,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
