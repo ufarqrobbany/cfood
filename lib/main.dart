@@ -133,6 +133,35 @@ class MyApp extends StatelessWidget {
             return _buildRoute(const SplashScreen(), settings);
         }
       },
+       routes: {
+        '/splash': (context) => const SplashScreen(),
+        '/startup': (context) => const StartUpScreen(),
+        '/login': (context) => const LoginScreen(),
+        '/register': (context) => const SignupScreen(),
+        '/register-student': (context) => const SignUpStudentScreen(),
+        '/verification': (context) => VerificationScreen(),
+        '/verification-success': (context) => VerificationSuccess(),
+        '/create-pass': (context) => CreatePasswordScreen(),
+        '/forgot-pass': (context) => const ForgotPasswordScreen(),
+        '/': (context) => const MainScreen(),
+        '/home': (context) => const HomeScreen(),
+        '/cart': (context) => const CartScreen(),
+        '/order': (context) => const OrderScreen(),
+        '/order-detail': (context) => const OrderDetailScreen(),
+        '/order-status': (context) => const OrderStatusScreen(),
+        '/inbox': (context) => InboxScreen(),
+        '/chat': (context) => const ChatScreen(),
+        '/organization': (context) => const OrganizationScreen(),
+        '/see-all': (context) => const SeeAllItemsScreen(),
+        '/profile': (context) => ProfileScreen(),
+        '/user-info': (context) => const UserInformationScreen(),
+        '/favorite': (context) => const FavoriteScreen(),
+        '/canteen': (context) => const CanteenScreen(),
+        '/review': (context) => const ReviewScreen(),
+        '/main-canteen': (context) => const MainScreenCanteen(),
+        '/order-canteen': (context) => const OrderCanteenScreen(),
+        '/transaction': (context) => const TransactionScreen(),
+      },
       debugShowCheckedModeBanner: false,
       title: 'C-FOOD',
       theme: ThemeData(
@@ -153,35 +182,7 @@ class MyApp extends StatelessWidget {
     // );
   }
 
-  //  routes: {
-  //       '/splash': (context) => const SplashScreen(),
-  //       '/startup': (context) => const StartUpScreen(),
-  //       '/login': (context) => const LoginScreen(),
-  //       '/register': (context) => const SignupScreen(),
-  //       '/register-student': (context) => const SignUpStudentScreen(),
-  //       '/verification': (context) => VerificationScreen(),
-  //       '/verification-success': (context) => VerificationSuccess(),
-  //       '/create-pass': (context) => CreatePasswordScreen(),
-  //       '/forgot-pass': (context) => const ForgotPasswordScreen(),
-  //       '/': (context) => const MainScreen(),
-  //       '/home': (context) => const HomeScreen(),
-  //       '/cart': (context) => const CartScreen(),
-  //       '/order': (context) => const OrderScreen(),
-  //       '/order-detail': (context) => const OrderDetailScreen(),
-  //       '/order-status': (context) => const OrderStatusScreen(),
-  //       '/inbox': (context) => InboxScreen(),
-  //       '/chat': (context) => const ChatScreen(),
-  //       '/organization': (context) => const OrganizationScreen(),
-  //       '/see-all': (context) => const SeeAllItemsScreen(),
-  //       '/profile': (context) => ProfileScreen(),
-  //       '/user-info': (context) => const UserInformationScreen(),
-  //       '/favorite': (context) => const FavoriteScreen(),
-  //       '/canteen': (context) => const CanteenScreen(),
-  //       '/review': (context) => const ReviewScreen(),
-  //       '/main-canteen': (context) => const MainScreenCanteen(),
-  //       '/order-canteen': (context) => const OrderCanteenScreen(),
-  //       '/transaction': (context) => const TransactionScreen(),
-  //     },
+  
 
    
 

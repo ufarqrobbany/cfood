@@ -81,240 +81,228 @@ class _OrderAvailableScreenState extends State<OrderAvailableScreen> {
     //                    storeItem?[storeListIndex]['status'] == 'Pesanan Sedang Disiapkan' ||
     //                    storeItem?[storeListIndex]['status'] == 'Pesanan Sedang Diantar';
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        const Row(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Text(
-              '23 Juli 2024, 13.00',
-              style: AppTextStyles.textRegular,
-            ),
-          ],
-        ),
-        const SizedBox(
-          height: 8,
-        ),
-        Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8),
-            // border: highlightStatus ? Border.all(
-            //   color: Warna.kuning,
-            //   width: 1,
-            // ) : null,
-            boxShadow: [
-              BoxShadow(
-                  blurRadius: 20,
-                  spreadRadius: 0,
-                  color: Warna.shadow.withOpacity(0.12),
-                  offset: const Offset(0, 0))
-            ],
-            color: Colors.white,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8),
+        // border: highlightStatus ? Border.all(
+        //   color: Warna.kuning,
+        //   width: 1,
+        // ) : null,
+        boxShadow: [
+          BoxShadow(
+              blurRadius: 20,
+              spreadRadius: 0,
+              color: Warna.shadow.withOpacity(0.12),
+              offset: const Offset(0, 0))
+        ],
+        color: Colors.white,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              ListView.builder(
-                itemCount: menuItems?.length,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemBuilder: (context, menuIdx) {
-                  return InkWell(
-                    onTap: () {
-                      // navigateTo(context, OrderDetailScreen(status: storeItem[storeListIndex]['status'],));
-                    },
-                    child: Container(
-                      // height: 100,
-                      // padding: const EdgeInsets.symmetric(vertical: 20),
-                      decoration: BoxDecoration(
-                        border: Border(
-                          bottom: menuIdx == menuItems!.length - 1
-                              ? BorderSide(color: Warna.abu, width: 1.5)
-                              : const BorderSide(
-                                  color: Colors.transparent, width: 1.5),
+              Icon(
+                Icons.store,
+                color: Warna.biru,
+                size: 20,
+              ),
+              const SizedBox(
+                width: 5,
+              ),
+               Text(
+                storeItem![storeListIndex]['store'].toString(),
+                // 'nama toko',
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const Spacer(),
+              const Text(
+                '23 Juli 2024, 13.00',
+                style: AppTextStyles.textRegular,
+              ),
+            ],
+          ),
+          ListView.builder(
+            itemCount: menuItems?.length,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemBuilder: (context, menuIdx) {
+              return InkWell(
+                onTap: () {
+                  // navigateTo(context, OrderDetailScreen(status: storeItem[storeListIndex]['status'],));
+                },
+                child: Container(
+                  // height: 100,
+                  // padding: const EdgeInsets.symmetric(vertical: 20),
+                  decoration: BoxDecoration(
+                    border: Border(
+                      bottom: menuIdx == menuItems!.length - 1
+                          ? BorderSide(color: Warna.abu, width: 1.5)
+                          : const BorderSide(
+                              color: Colors.transparent, width: 1.5),
+                    ),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 0),
+                    child: ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      dense: false,
+                      leading: Container(
+                        width: 60,
+                        height: 60,
+                        decoration: BoxDecoration(
+                          color: Warna.abu,
+                          borderRadius: BorderRadius.circular(8),
                         ),
+                        child: menuItems[menuIdx]['image'] == null
+                            ? const Center(
+                                child: Icon(Icons.image),
+                              )
+                            : Image.network(
+                                menuItems[menuIdx]['image'],
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Container(
+                                    width: 60,
+                                    height: 60,
+                                    decoration: BoxDecoration(
+                                      color: Warna.abu,
+                                      borderRadius:
+                                          BorderRadius.circular(8),
+                                    ),
+                                  );
+                                },
+                              ),
                       ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 0),
-                        child: ListTile(
-                          contentPadding: EdgeInsets.zero,
-                          dense: false,
-                          leading: Container(
-                            width: 60,
-                            height: 60,
-                            decoration: BoxDecoration(
-                              color: Warna.abu,
-                              borderRadius: BorderRadius.circular(8),
+                      title: Row(
+                        mainAxisSize: MainAxisSize.max,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            menuItems[menuIdx]['name'],
+                            style: const TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.w600),
+                          ),
+                          Text(
+                            '${menuItems[menuIdx]['count']}x',
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w400,
                             ),
-                            child: menuItems[menuIdx]['image'] == null
-                                ? const Center(
-                                    child: Icon(Icons.image),
-                                  )
-                                : Image.network(
-                                    menuItems[menuIdx]['image'],
-                                    errorBuilder: (context, error, stackTrace) {
-                                      return Container(
-                                        width: 60,
-                                        height: 60,
-                                        decoration: BoxDecoration(
-                                          color: Warna.abu,
-                                          borderRadius:
-                                              BorderRadius.circular(8),
-                                        ),
-                                      );
-                                    },
-                                  ),
+                          )
+                        ],
+                      ),
+                      subtitle: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            menuItems[menuIdx]['variants']
+                                .toString()
+                                .replaceAll('[', '')
+                                .replaceAll(']', ''),
                           ),
-                          title: Row(
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
                             mainAxisSize: MainAxisSize.max,
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                menuItems[menuIdx]['name'],
-                                style: const TextStyle(
-                                    fontSize: 18, fontWeight: FontWeight.w600),
-                              ),
-                              Text(
-                                '${menuItems[menuIdx]['count']}x',
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w400,
-                                ),
+                                Constant.currencyCode +
+                                    menuItems[menuIdx]['price'].toString(),
+                                style: AppTextStyles.productPrice,
                               )
                             ],
-                          ),
-                          subtitle: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                menuItems[menuIdx]['variants']
-                                    .toString()
-                                    .replaceAll('[', '')
-                                    .replaceAll(']', ''),
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                mainAxisSize: MainAxisSize.max,
-                                children: [
-                                  Text(
-                                    Constant.currencyCode +
-                                        menuItems[menuIdx]['price'].toString(),
-                                    style: AppTextStyles.productPrice,
-                                  )
-                                ],
-                              )
-                            ],
-                          ),
-                        ),
+                          )
+                        ],
                       ),
                     ),
-                  );
-                },
-              ),
-              Row(
-                mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    flex: 6,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        ListTile(
-                          contentPadding: EdgeInsets.zero,
-                          dense: false,
-                          leading: Container(
+                  ),
+                ),
+              );
+            },
+          ),
+          Row(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                flex: 6,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      dense: false,
+                      leading: Container(
+                        height: 40,
+                        width: 40,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(40),
+                          color: Warna.abu,
+                        ),
+                        child: Image.network(
+                          '/.jpg',
+                          errorBuilder: (context, error, stackTrace) =>
+                              Container(
                             height: 40,
                             width: 40,
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(40),
                               color: Warna.abu,
                             ),
-                            child: Image.network(
-                              '/.jpg',
-                              errorBuilder: (context, error, stackTrace) =>
-                                  Container(
-                                height: 40,
-                                width: 40,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(40),
-                                  color: Warna.abu,
-                                ),
-                              ),
-                            ),
                           ),
-                          title: const Text(
-                            'Pembeli\n[Username Pembeli]',
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          // subtitle: starIconBuilder(starCount: 5),
                         ),
-                      ],
+                      ),
+                      title: const Text(
+                        'Pembeli\n[Username Pembeli]',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      // subtitle: starIconBuilder(starCount: 5),
                     ),
-                  ),
-                  Expanded(
-                      flex: 5,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          const Text(
-                            'Total',
-                            style: AppTextStyles.textRegular,
-                          ),
-                          Text(
-                            '${Constant.currencyCode}10.000',
-                            style: AppTextStyles.productPrice,
-                          )
-                        ],
-                      ))
-                ],
-              )
+                  ],
+                ),
+              ),
+              Expanded(
+                  flex: 5,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      const Text(
+                        'Total',
+                        style: AppTextStyles.textRegular,
+                      ),
+                      Text(
+                        '${Constant.currencyCode}10.000',
+                        style: AppTextStyles.productPrice,
+                      )
+                    ],
+                  ))
             ],
           ),
-        ),
-        const SizedBox(
-          height: 15,
-        ),
-        Row(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            SizedBox(
-              height: 45,
-              width: 100,
-              child: DynamicColorButton(
-                onPressed: () {},
-                text: 'Tolak',
-                backgroundColor: Warna.like,
-                borderRadius: 50,
-              ),
+          const SizedBox(height: 5,),
+          SizedBox(
+            height: 45,
+            width: double.infinity,
+            child: DynamicColorButton(
+              onPressed: () {},
+              text: 'Terima',
+              backgroundColor: Warna.hijau,
+              borderRadius: 50,
             ),
-            const SizedBox(
-              width: 10,
-            ),
-            SizedBox(
-              height: 45,
-              width: 100,
-              child: DynamicColorButton(
-                onPressed: () {},
-                text: 'Terima',
-                backgroundColor: Warna.hijau,
-                borderRadius: 50,
-              ),
-            ),
-          ],
-        )
-      ],
+          ),
+        ],
+      ),
     );
   }
 

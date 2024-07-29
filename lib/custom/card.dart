@@ -710,165 +710,168 @@ class CanteenCardBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 140,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        boxShadow: [
-          BoxShadow(
-              blurRadius: 20,
-              spreadRadius: 0,
-              color: Warna.shadow.withOpacity(0.12),
-              offset: const Offset(0, 0))
-        ],
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Container(
-            width: 140,
-            height: 140,
-            decoration: BoxDecoration(
-              color: Warna.abu,
-              borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(8), bottomLeft: Radius.circular(8)),
+    return InkWell(
+      onTap: onPressed,
+      child: Container(
+        height: 140,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8),
+          boxShadow: [
+            BoxShadow(
+                blurRadius: 20,
+                spreadRadius: 0,
+                color: Warna.shadow.withOpacity(0.12),
+                offset: const Offset(0, 0))
+          ],
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Container(
+              width: 140,
+              height: 140,
+              decoration: BoxDecoration(
+                color: Warna.abu,
+                borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(8), bottomLeft: Radius.circular(8)),
+              ),
+              child: imgUrl == null
+                  ? const Center(
+                      child: Icon(Icons.image),
+                    )
+                  : Image.network(imgUrl!),
             ),
-            child: imgUrl == null
-                ? const Center(
-                    child: Icon(Icons.image),
-                  )
-                : Image.network(imgUrl!),
-          ),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Icon(
-                        type! == 'kantin'
-                            ? Icons.store
-                            : CommunityMaterialIcons.handshake,
-                        size: 15,
-                        color: type! == 'kantin' ? Warna.biru : Warna.kuning,
-                      ),
-                      const SizedBox(
-                        width: 10,
-                      ),
-                      Text(
-                        canteenName!,
-                        style: AppTextStyles.canteenName,
-                      ),
-                    ],
-                  ),
-                  const SizedBox(
-                    height: 8,
-                  ),
-                  Text(
-                    menuList!,
-                    style: AppTextStyles.productStoreName,
-                    maxLines: 1,
-                  ),
-                  const SizedBox(
-                    height: 8,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 6, vertical: 1),
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(4),
-                            border: Border.all(color: Warna.like, width: 1),
-                            color: Warna.like.withOpacity(0.10)),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.favorite,
-                              size: 10,
-                              color: Warna.like,
-                            ),
-                            Text(
-                              likes!,
-                              style: TextStyle(color: Warna.like, fontSize: 12),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(
-                        width: 8,
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 6, vertical: 1),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(4),
-                          border: Border.all(color: Warna.kuning, width: 1),
-                          color: Warna.kuning.withOpacity(0.10),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.star,
-                              size: 10,
-                              color: Warna.kuning,
-                            ),
-                            Text(
-                              rate!,
-                              style:
-                                  TextStyle(color: Warna.kuning, fontSize: 12),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const Spacer(),
-                  InkWell(
-                    onTap: onPressed,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        // Spacer(),
-                        const Text(
-                          'Lihat Menu',
-                          style: AppTextStyles.productStoreName,
+                        Icon(
+                          type! == 'kantin'
+                              ? Icons.store
+                              : CommunityMaterialIcons.handshake,
+                          size: 15,
+                          color: type! == 'kantin' ? Warna.biru : Warna.kuning,
                         ),
                         const SizedBox(
-                          width: 5,
+                          width: 10,
+                        ),
+                        Text(
+                          canteenName!,
+                          style: AppTextStyles.canteenName,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(
+                      height: 8,
+                    ),
+                    Text(
+                      menuList!,
+                      style: AppTextStyles.productStoreName,
+                      maxLines: 1,
+                    ),
+                    const SizedBox(
+                      height: 8,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 6, vertical: 1),
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(4),
+                              border: Border.all(color: Warna.like, width: 1),
+                              color: Warna.like.withOpacity(0.10)),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.favorite,
+                                size: 10,
+                                color: Warna.like,
+                              ),
+                              Text(
+                                likes!,
+                                style: TextStyle(color: Warna.like, fontSize: 12),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(
+                          width: 8,
                         ),
                         Container(
-                          height: 25,
-                          width: 25,
-                          padding: const EdgeInsets.all(5),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 6, vertical: 1),
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20),
-                            color: Warna.abu,
+                            borderRadius: BorderRadius.circular(4),
+                            border: Border.all(color: Warna.kuning, width: 1),
+                            color: Warna.kuning.withOpacity(0.10),
                           ),
-                          child: Center(
-                            child: Icon(
-                              Icons.arrow_forward_ios_rounded,
-                              color: Warna.biru,
-                              size: 13,
-                            ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.star,
+                                size: 10,
+                                color: Warna.kuning,
+                              ),
+                              Text(
+                                rate!,
+                                style:
+                                    TextStyle(color: Warna.kuning, fontSize: 12),
+                              ),
+                            ],
                           ),
                         ),
                       ],
                     ),
-                  )
-                ],
+                    const Spacer(),
+                    InkWell(
+                      onTap: onPressed,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          // Spacer(),
+                          const Text(
+                            'Lihat Menu',
+                            style: AppTextStyles.productStoreName,
+                          ),
+                          const SizedBox(
+                            width: 5,
+                          ),
+                          Container(
+                            height: 25,
+                            width: 25,
+                            padding: const EdgeInsets.all(5),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              color: Warna.abu,
+                            ),
+                            child: Center(
+                              child: Icon(
+                                Icons.arrow_forward_ios_rounded,
+                                color: Warna.biru,
+                                size: 13,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  ],
+                ),
               ),
-            ),
-          )
-        ],
+            )
+          ],
+        ),
       ),
     );
   }

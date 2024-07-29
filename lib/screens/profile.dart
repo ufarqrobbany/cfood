@@ -6,6 +6,7 @@ import 'dart:io';
 import 'package:cfood/custom/CButtons.dart';
 import 'package:cfood/custom/CPageMover.dart';
 import 'package:cfood/custom/CToast.dart';
+import 'package:cfood/custom/popup_dialog.dart';
 import 'package:cfood/custom/reload_indicator.dart';
 import 'package:cfood/model/add_driver_response.dart';
 import 'package:cfood/model/get_user_response.dart';
@@ -14,6 +15,7 @@ import 'package:cfood/screens/app_setting_info.dart';
 import 'package:cfood/screens/inbox.dart';
 import 'package:cfood/screens/kantin_pages/main.dart';
 import 'package:cfood/screens/kurir_pages/chat_seller.dart';
+import 'package:cfood/screens/kurir_pages/delivery.dart';
 import 'package:cfood/screens/kurir_pages/order_available.dart';
 import 'package:cfood/screens/kurir_pages/order_status.dart';
 import 'package:cfood/screens/login.dart';
@@ -201,7 +203,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           text: 'Keluar',
                           onTap: () {
                             // context.pushReplacementNamed('main');
-                            navigateToRep(context, const MainScreen());
+                            showMyCustomDialog(context,
+                                text:
+                                    'Apakah Anda yakin untuk keluar?\nPerlu login lagi untuk masuk',
+                                colorYes: Warna.like, onTapYes: () {
+                              navigateBack(context);
+                              tapLogOut(context);
+                            });
                           },
                         ),
                       ],
@@ -231,7 +239,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           showBorder: false,
                           text: 'Keluar',
                           onTap: () {
-                            tapLogOut(context);
+                            showMyCustomDialog(context,
+                                text:
+                                    'Apakah Anda yakin untuk keluar?\nPerlu login lagi untuk masuk',
+                                colorYes: Warna.like, onTapYes: () {
+                              navigateBack(context);
+                              tapLogOut(context);
+                            });
                           },
                         ),
                       ],
@@ -601,11 +615,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 driverItemsMenu(
                   onTap: () {
-                    navigateTo(
-                        context,
-                        const DriverOrderStatusScreen(
-                          orderId: 1,
-                        ));
+                    navigateTo(context, const DeliveryInfoScreen());
                   },
                   icons: UIcons.solidRounded.bike,
                   text: 'Pengantaran',
@@ -706,7 +716,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
         trailing: IconButton(
           onPressed: () {
-            _showMyDialog();
+            showMyCustomDialog(
+              context,
+              text: 'Apakah Anda siap menjadi kurir?',
+              onTapYes: () {
+                addDriver(context);
+                navigateBack(context);
+              },
+            );
           },
           icon: const Icon(Icons.arrow_forward_ios_rounded),
           iconSize: 18,
@@ -716,57 +733,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   borderRadius: BorderRadius.circular(50))),
         ),
       ),
-    );
-  }
-
-  Future<void> _showMyDialog() async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false, // user must tap button!
-      builder: (BuildContext context) {
-        return AlertDialog(
-          actionsPadding: const EdgeInsets.all(10),
-          title: const Text(
-            'Apakah Anda siap menjadi kurir?',
-            style: AppTextStyles.textRegular,
-            textAlign: TextAlign.center,
-          ),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
-          actionsAlignment: MainAxisAlignment.spaceAround,
-          actionsOverflowAlignment: OverflowBarAlignment.end,
-          actionsOverflowDirection: VerticalDirection.down,
-          actions: <Widget>[
-            SizedBox(
-              height: 50,
-              width: 120,
-              child: DynamicColorButton(
-                onPressed: () {
-                  navigateBack(context);
-                },
-                text: 'Tidak',
-                textColor: Warna.regulerFontColor,
-                backgroundColor: Warna.abu,
-                borderRadius: 8,
-              ),
-            ),
-            SizedBox(
-              height: 50,
-              width: 120,
-              child: DynamicColorButton(
-                onPressed: () {
-                  addDriver(context);
-                  navigateBack(context);
-                },
-                text: 'Ya',
-                backgroundColor: Warna.kuning,
-                borderRadius: 8,
-              ),
-            ),
-          ],
-        );
-      },
     );
   }
 

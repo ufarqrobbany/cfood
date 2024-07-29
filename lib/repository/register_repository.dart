@@ -205,8 +205,10 @@ class RegisterRepository {
           "nim": nim,
         }));
 
-    if (response.statusCode == 200) {
+    if (response.statusCode <= 400) {
+      CheckNimResponse data = checkNimReponseFromJson(response.body);
       log(response.body);
+      showToast(data.message!);
       return checkNimReponseFromJson(response.body);
     } else {
       CheckNimResponse data = checkNimReponseFromJson(response.body);
@@ -257,7 +259,7 @@ class RegisterRepository {
   Future<AddStudentResponse> addPostStudent(
     BuildContext? context, {
     int nim = 0,
-    int addmissionYear = 0,
+    int admissionYear = 0,
     int campusId = 0,
     int majorId = 0,
     int studyProgramId = 0,
@@ -271,7 +273,7 @@ class RegisterRepository {
         },
         body: json.encode({
           'nim': nim,
-          'addmissionYear': addmissionYear,
+          'admissionYear': admissionYear,
           'campusId': campusId,
           'majorId': majorId,
           'studyProgramId': studyProgramId,
@@ -280,8 +282,10 @@ class RegisterRepository {
 
     log("response add student: ${response.body}");
 
-    if (response.statusCode <= 300) {
+    if (response.statusCode <= 399) {
+      AddStudentResponse data = addStudentResponseFromJson(response.body);
       log(response.body);
+      showToast(data.message!);
       return addStudentResponseFromJson(response.body);
     } else if (response.statusCode <= 499) {
       Error400Response data = error400ResponseFromJson(response.body);
@@ -329,7 +333,7 @@ class RegisterRepository {
       ErrorResponse data = errorResponseFromJson(response.body);
       log(response.body);
       showToast(data.error!);
-      throw Exception(data.status);
+      throw Exception(data.error);
     }
   }
 

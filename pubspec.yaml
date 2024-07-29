@@ -41,8 +41,8 @@ dependencies:
   toast: ^0.3.0
   flutter_styled_toast: ^2.2.1
   fluttertoast: ^8.2.6
-  webview_flutter: ^4.0.4
-  web_browser: ^0.7.4
+  webview_flutter: ^4.8.0
+  # web_browser: ^0.7.4
   google_maps_flutter_web: ^0.5.8
   image_picker: ^1.1.2
 

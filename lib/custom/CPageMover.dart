@@ -14,3 +14,10 @@ void navigateBack(BuildContext? context) {
 void navigateToRep(BuildContext? context, Widget page) {
   Navigator.pushReplacement(context!, MaterialPageRoute(builder: (context) => page,));
 }
+
+void printCurrentRoutes(BuildContext context) {
+  Navigator.popUntil(context, (route) {
+    debugPrint(route.settings.name);
+    return true;
+  });
+}

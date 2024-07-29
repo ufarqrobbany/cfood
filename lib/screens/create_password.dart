@@ -80,6 +80,7 @@ class _CreatePasswordScreenState extends State<CreatePasswordScreen> {
     String emptyField = '';
     setState(() {
       loadButton = true;
+      log('load button is $loadButton');
     });
     if (pass1Controller.text.isEmpty) {
       setState(() {
@@ -116,10 +117,6 @@ class _CreatePasswordScreenState extends State<CreatePasswordScreen> {
       } else {
         addUserStudent(context);
       }
-      setState(() {
-        checked = false;
-        loadButton = false;
-      });
     }
 
     // return checked;
@@ -164,12 +161,14 @@ class _CreatePasswordScreenState extends State<CreatePasswordScreen> {
 
   Future<void> addUserStudent(BuildContext context) async {
     // Mengaktifkan indikator loading (jika diperlukan)
-    setState(() {
-      loadButton = true;
-    });
 
     try {
       log('add user');
+      setState(() {
+        loadButton = true;
+        log('load button is $loadButton');
+      });
+
       AddUserResponse userResponse = await RegisterRepository().addPostUser(
         context,
         email: widget.email!,
@@ -184,36 +183,35 @@ class _CreatePasswordScreenState extends State<CreatePasswordScreen> {
       if (dataUser != null) {
         if (widget.isStudent) {
           log('add student');
-          // await RegisterRepository().addPostStudent(
-          //   // ignore: use_build_context_synchronously
-          //   context,
-          //   userId: dataUser.id!,
-          //   campusId: widget.campusId!,
-          //   majorId: widget.majorId!,
-          //   nim: widget.nim!,
-          //   studyProgramId: widget.studyProgramId!,
-          //   addmissionYear: widget.addmissionYear!,
-          // );
-          await FetchInterceptorController(
-            context: context,
-            endpoint: 'students/',
-            fromJson: (json) => AddStudentResponse.fromJson(json),
-          ).postData({
-            'nim': widget.nim,
-            'addmissionYear': widget.addmissionYear,
-            'campusId': widget.campusId,
-            'majorId': widget.majorId,
-            'studyProgramId': widget.studyProgramId,
-            'userId': dataUser.id,
-          }).then((data) {
-            // Handle the data
-            log(data);
-          }).catchError((error) {
-            // Handle the error
-            log(error.toString());
-          });
-
-          
+          await RegisterRepository().addPostStudent(
+            // ignore: use_build_context_synchronously
+            context,
+            userId: dataUser.id!,
+            campusId: widget.campusId!,
+            // campusId: 2,
+            majorId: widget.majorId!,
+            nim: widget.nim!,
+            studyProgramId: widget.studyProgramId!,
+            admissionYear: widget.addmissionYear!,
+          );
+          // await FetchInterceptorController(
+          //   context: context,
+          //   endpoint: 'students/',
+          //   fromJson: (json) => AddStudentResponse.fromJson(json),
+          // ).postData({
+          //   'nim': widget.nim,
+          //   'addmissionYear': widget.addmissionYear,
+          //   'campusId': widget.campusId,
+          //   'majorId': widget.majorId,
+          //   'studyProgramId': widget.studyProgramId,
+          //   'userId': dataUser.id,
+          // }).then((data) {
+          //   // Handle the data
+          //   log(data);
+          // }).catchError((error) {
+          //   // Handle the error
+          //   log(error.toString());
+          // });
         }
 
         log('request otp');
@@ -225,10 +223,12 @@ class _CreatePasswordScreenState extends State<CreatePasswordScreen> {
           type: widget.forgotPass ? "RESET_PASSWORD" : "REGISTER",
         );
 
-        log('go to verification email');
         setState(() {
           loadButton = false;
+          log('load button is $loadButton');
         });
+        log('go to verification email');
+        //
         navigateTo(
             context,
             VerificationScreen(
@@ -239,8 +239,9 @@ class _CreatePasswordScreenState extends State<CreatePasswordScreen> {
       // Menonaktifkan indikator loading (jika diperlukan)
       setState(() {
         loadButton = false;
+        log('load button is $loadButton');
       });
-      showToast(e.toString());
+      showToast(e.toString().replaceAll('Exception: ', ''));
     }
   }
 

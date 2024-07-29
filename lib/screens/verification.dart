@@ -8,6 +8,7 @@ import 'package:cfood/model/reponse_handler.dart';
 import 'package:cfood/repository/register_repository.dart';
 import 'package:cfood/screens/create_password.dart';
 import 'package:cfood/screens/login.dart';
+import 'package:cfood/screens/signup.dart';
 import 'package:cfood/style.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -180,7 +181,14 @@ class _VerificationScreenState extends State<VerificationScreen> {
         centerTitle: true,
         leadingWidth: 90,
         leading: IconButton(
-          onPressed: () => navigateBack(context),
+          onPressed: widget.forgotPass ? () {
+            navigateBack(context);
+          } : () {
+            printCurrentRoutes(context);
+            navigateToRep(context, const SignupScreen());
+            // Navigator.pop(context, 'goToRegister');
+            // Navigator.popUntil(context, ModalRoute.withName('/register'),);
+          },
           icon: Icon(
             Icons.arrow_back,
             color: Warna.biru,

@@ -150,6 +150,7 @@ class _SignUpStudentScreenState extends State<SignUpStudentScreen> {
     setState(() {
       loadButton = false;
     });
+    log('data nim availalble is : ${dataNim.available}');
     return dataNim.available!;
   }
 
@@ -210,7 +211,7 @@ class _SignUpStudentScreenState extends State<SignUpStudentScreen> {
     }
   }
 
-  bool dataChecked(BuildContext context) {
+  void dataChecked(BuildContext context) {
     bool checked = true;
     String emptyField = '';
     setState(() {
@@ -228,17 +229,35 @@ class _SignUpStudentScreenState extends State<SignUpStudentScreen> {
       checkNIM(
         context,
         nim: int.parse(nimController.text),
-      ).then((emailStudentValidated) {
-        if (emailStudentValidated) {
+      ).then((nimAvailable) {
+        if (nimAvailable == false) {
           setState(() {
             loadButton = false;
             checked = true;
           });
+          log('and data nim availalble is : $nimAvailable');
+          log('stay in signup student');
         } else {
           setState(() {
             loadButton = false;
             checked = false;
           });
+          log('and data nim availalble is : $nimAvailable');
+           log('go to create pass');
+            navigateTo(
+              context,
+              CreatePasswordScreen(
+                email: widget.email,
+                name: widget.name,
+                campusId: widget.campusId,
+                nim: int.parse(nimController.text),
+                addmissionYear: int.parse(admissionController.text),
+                majorId: selectedMajorId,
+                studyProgramId: selectedStudyProgramId,
+                forgotPass: false,
+                isStudent: true,
+              ),
+            );
         }
       });
     }
@@ -288,7 +307,6 @@ class _SignUpStudentScreenState extends State<SignUpStudentScreen> {
       showToast(emptyField);
     }
 
-    return checked;
   }
 
   @override
@@ -298,9 +316,16 @@ class _SignUpStudentScreenState extends State<SignUpStudentScreen> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         centerTitle: true,
-        title: const Text(
-          'Informasi Mahasiswa',
-          style: AppTextStyles.title,
+        title: InkWell(
+          onTap: () {
+            setState(() {
+              loadButton = false;
+            });
+          },
+          child: const Text(
+            'Informasi Mahasiswa',
+            style: AppTextStyles.title,
+          ),
         ),
         leadingWidth: 90,
         leading: IconButton(
@@ -422,31 +447,21 @@ class _SignUpStudentScreenState extends State<SignUpStudentScreen> {
               child: CBlueButton(
                 isLoading: loadButton,
                 onPressed: () {
-                  // dataChecked(context);
-                 
-                  if (dataChecked(context)) {
-                    log('go to create password');
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => CreatePasswordScreen(
-                            email: widget.email,
-                            name: widget.name,
-                            campusId: widget.campusId,
-                            nim: int.parse(nimController.text),
-                            addmissionYear: int.parse(admissionController.text),
-                            majorId: selectedMajorId,
-                            studyProgramId: selectedStudyProgramId,
-                            forgotPass: false,
-                            isStudent: true,
-                          ),
-                        ));
-                   
-                  } else {
-                    setState(() {
-                      loadButton = false;
-                    });
-                  }
+                  dataChecked(context);
+
+                  // if (dataChecked(context)) {
+                  //   log('go to create password');
+                  //   Navigator.push(
+                  //       context,
+                  //       MaterialPageRoute(
+                  //         builder: (context) =>
+                  //       ));
+
+                  // } else {
+                  //   setState(() {
+                  //     loadButton = false;
+                  //   });
+                  // }
                 },
                 text: 'Lanjut',
               ),

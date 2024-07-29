@@ -1,14 +1,19 @@
+import 'dart:async';
+import 'dart:developer';
+
 import 'package:cfood/custom/CBottomSheet.dart';
 import 'package:cfood/custom/CButtons.dart';
 import 'package:cfood/style.dart';
 import 'package:flutter/material.dart';
+import 'package:uicons/uicons.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 class DriverOrderStatusScreen extends StatefulWidget {
   final int orderId;
   final String orderStatus;
 
   const DriverOrderStatusScreen(
-      {super.key, this.orderId = 0, this.orderStatus = 'Belum Bayar'});
+      {super.key, this.orderId = 0, this.orderStatus = ''});
 
   @override
   State<DriverOrderStatusScreen> createState() =>
@@ -16,6 +21,29 @@ class DriverOrderStatusScreen extends StatefulWidget {
 }
 
 class _DriverOrderStatusScreenState extends State<DriverOrderStatusScreen> {
+  WebViewController webController = WebViewController()
+  ..setJavaScriptMode(JavaScriptMode.unrestricted)
+  ..setBackgroundColor(const Color(0x00000000))
+  ..setNavigationDelegate(
+    NavigationDelegate(
+      onProgress: (int progress) {
+        // Update loading bar.
+      },
+      onPageStarted: (String url) {},
+      onPageFinished: (String url) {},
+      onHttpError: (HttpResponseError error) {},
+      onWebResourceError: (WebResourceError error) {},
+      onNavigationRequest: (NavigationRequest request) {
+        if (request.url.startsWith('https://www.youtube.com/')) {
+          return NavigationDecision.prevent;
+        }
+        return NavigationDecision.navigate;
+      },
+    ),
+  )
+  ..loadRequest(Uri.parse('https://maps.app.goo.gl/JNtBjD4qUq5VbRSM6'));
+
+  
   Map<String, dynamic> driverInfo = {
     'id': '0000',
     'profile': '/.jpg',
@@ -37,6 +65,11 @@ class _DriverOrderStatusScreenState extends State<DriverOrderStatusScreen> {
   @override
   void initState() {
     super.initState();
+    log('open bottom sheet');
+    log({
+      'orderId': widget.orderId,
+      'orderStatus': widget.orderStatus,
+    }.toString());
     onEnterPage();
   }
 
@@ -44,16 +77,7 @@ class _DriverOrderStatusScreenState extends State<DriverOrderStatusScreen> {
     if (widget.orderId != 0) {
       WidgetsBinding.instance.addPostFrameCallback(
         (_) {
-          statusOrderSheet(
-            context,
-            status: widget.orderStatus,
-            orderId: widget.orderId,
-            driverInfo: driverInfo,
-            orderInfo: orderInfo,
-            isCashless: orderInfo['method'] == 'cash' ? false : true,
-            onPressedSeeDetail: () {},
-            onPressedStatusButton: () {},
-          );
+          showStatusInfo();
         },
       );
     }
@@ -78,10 +102,70 @@ class _DriverOrderStatusScreenState extends State<DriverOrderStatusScreen> {
         ),
       ),
       backgroundColor: Warna.pageBackgroundColor,
-      body: const SizedBox(
-        height: double.infinity,
-        width: double.infinity,
+      body: webMapScreen(),
+      // body: const SizedBox(
+      //   height: double.infinity,
+      //   width: double.infinity,
+      // ),
+      floatingActionButton: IconButton(
+        onPressed: () {
+          showStatusInfo();
+        },
+        icon: Icon(
+          UIcons.solidRounded.info,
+          color: Warna.biru,
+        ),
+        iconSize: 50,
+        style: IconButton.styleFrom(
+          backgroundColor: Colors.transparent,
+        ),
       ),
     );
   }
+
+  Widget webMapScreen() {
+    return WebViewWidget(controller: webController);
+  }
+
+  Future showStatusInfo() {
+    return statusDeliverySheet(
+      context,
+      status: widget.orderStatus,
+      // status: 'Diproses',
+      orderId: widget.orderId,
+      driverInfo: driverInfo,
+      orderInfo: orderInfo,
+      orderStatusIndex: 2,
+      orderStatusProses: orderStatusProses,
+      onPressedSeeDetail: () {},
+      onPressedStatusButton: () {},
+    );
+  }
+
+  final List<Map<String, dynamic>> orderStatusProses = [
+    {
+      'status': 'Dikonfirmasi',
+      'time': '00.00',
+      'done': true,
+      'onProgress': false,
+    },
+    {
+      'status': 'Diproses',
+      'time': '00.00',
+      'done': true,
+      'onProgress': false,
+    },
+    {
+      'status': 'Diantar',
+      'time': '00.00',
+      'done': false,
+      'onProgress': true,
+    },
+    {
+      'status': 'Selesai',
+      'time': '00.00',
+      'done': false,
+      'onProgress': false,
+    },
+  ];
 }

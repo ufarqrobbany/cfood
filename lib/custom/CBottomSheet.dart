@@ -1,6 +1,7 @@
 import 'package:cfood/custom/CButtons.dart';
 import 'package:cfood/custom/CPageMover.dart';
 import 'package:cfood/custom/card.dart';
+import 'package:cfood/custom/order_status_timeline_tile.dart';
 import 'package:cfood/screens/reviews.dart';
 import 'package:cfood/style.dart';
 import 'package:cfood/utils/constant.dart';
@@ -451,8 +452,8 @@ Future statusOrderSheet(
     context: context!,
     barrierColor: Colors.transparent,
     backgroundColor: Colors.white,
-    isDismissible: false,
-    enableDrag: true,
+    // isDismissible: false,
+    // enableDrag: false,
     showDragHandle: true,
     isScrollControlled: true,
     shape: const RoundedRectangleBorder(
@@ -462,149 +463,384 @@ Future statusOrderSheet(
       ),
     ),
     builder: (context) {
-      return DraggableScrollableSheet(
-        initialChildSize: 0.45, // Initial height when sheet is first opened
-        minChildSize: 0.1, // Minimum height when sheet is collapsed
-        maxChildSize: 0.6, // Maximum height when sheet is fully expanded
-        expand: false, // Set to false to prevent full expansion
-        builder: (context, scrollController) {
-          return StatefulBuilder(
-            builder: (context, setState) {
-              return SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 25),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      status == 'Belum Bayar'
-                          ? const Center(
-                              child: Text(
-                                'Menunggu Pembayaran',
-                                style: AppTextStyles.title,
-                              ),
-                            )
-                          : Container(),
-          
-                      Container(
-                        height: 50,
-                        width: double.infinity,
-                        padding: const EdgeInsets.symmetric(vertical: 5),
-                        child: DynamicColorButton(
-                          onPressed: onPressedStatusButton!,
-                          borderRadius: 54,
-                          text: status == 'Belum Bayar'
-                              ? 'Batalkan Pesanan'
-                              : status == 'Selesai'
-                                  ? 'Konfirmasi Pesanan'
-                                  : '',
-                          backgroundColor: status == 'Belum Bayar'
-                              ? Warna.like
-                              : status == 'Selesai'
-                                  ? Warna.hijau
-                                  : Warna.abu2,
-                        ),
-                      ),
-          
-                      // Divider(
-                      //   height: 5,
-                      //   thickness: 5,
-                      //   color: Warna.abu,
-                      // ),
-          
-                      ListTile(
-                        shape: Border(
-                          bottom: BorderSide(color: Warna.abu, width: 1.5),
-                          top: BorderSide(color: Warna.abu, width: 1.5),
-                        ),
-                        dense: false,
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 0,
-                          vertical: 15,
-                        ),
-                        title: Text(
-                          driverInfo!['name'].toString(),
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        subtitle: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(
-                              Icons.star,
-                            ),
-                            const SizedBox(
-                              width: 5,
-                            ),
-                            Text(
-                              driverInfo['rate'].toString(),
-                            )
-                          ],
-                        ),
-                        trailing: notifIconButton(
-                          notifCount: driverInfo['rate'].toString(),
-                          onPressed: () {},
-                          icons: UIcons.regularRounded.comment,
-                          iconColor: Warna.regulerFontColor,
-                        ),
-                      ),
-          
-                      !isCashless
-                          ? SizedBox(
-                              height: 50,
-                              width: double.infinity,
-                              child: DynamicColorButton(
-                                onPressed: onPressedPay!,
-                                text: 'Bayar',
-                                backgroundColor: Warna.kuning,
-                              ),
-                            )
-                          : const SizedBox(),
-          
-                      Row(
+      final DraggableScrollableController scrollController =
+          DraggableScrollableController();
+      return StatefulBuilder(
+        builder: (context, setState) {
+          return GestureDetector(
+            onVerticalDragUpdate: (details) {
+              if (details.primaryDelta! > 0) {
+                // Dragging down
+                scrollController
+                    .jumpTo(0.1); // Set to minimum size (10% of screen height)
+              } else if (details.primaryDelta! < 0) {
+                // Dragging up
+                scrollController
+                    .jumpTo(0.45); // Set to initial size (45% of screen height)
+              }
+            },
+            child: DraggableScrollableSheet(
+                shouldCloseOnMinExtent: false,
+                controller: scrollController,
+                initialChildSize:
+                    0.5, // Initial height when sheet is first opened
+                minChildSize: 0.2, // Minimum height when sheet is collapsed
+                maxChildSize:
+                    0.5, // Maximum height when sheet is fully expanded
+                expand: false, // Set to false to prevent full expansion
+                builder: (context, scrollController) {
+                  return SingleChildScrollView(
+                    controller: scrollController,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 25),
+                      child: Column(
                         mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Icon(
-                            Icons.store,
-                            color: Warna.biru1,
+                          status == 'Belum Bayar'
+                              ? const Center(
+                                  child: Text(
+                                    'Menunggu Pembayaran',
+                                    style: AppTextStyles.title,
+                                  ),
+                                )
+                              : Container(),
+
+                          Container(
+                            // height: 50,
+                            width: double.infinity,
+                            // padding: const EdgeInsets.symmetric(vertical: 5),
+                            child: DynamicColorButton(
+                              onPressed: onPressedStatusButton!,
+                              borderRadius: 54,
+                              text: status == 'Belum Bayar'
+                                  ? 'Batalkan Pesanan'
+                                  : status == 'Selesai'
+                                      ? 'Konfirmasi Pesanan'
+                                      : '',
+                              backgroundColor: status == 'Belum Bayar'
+                                  ? Warna.like
+                                  : status == 'Selesai'
+                                      ? Warna.hijau
+                                      : Warna.abu2,
+                            ),
                           ),
+
+                          // Divider(
+                          //   height: 5,
+                          //   thickness: 5,
+                          //   color: Warna.abu,
+                          // ),
+
+                          ListTile(
+                            shape: Border(
+                              bottom: BorderSide(color: Warna.abu, width: 1.5),
+                              top: BorderSide(color: Warna.abu, width: 1.5),
+                            ),
+                            dense: false,
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 0,
+                              vertical: 15,
+                            ),
+                            title: Text(
+                              driverInfo!['name'].toString(),
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            subtitle: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(
+                                  Icons.star,
+                                ),
+                                const SizedBox(
+                                  width: 5,
+                                ),
+                                Text(
+                                  driverInfo['rate'].toString(),
+                                )
+                              ],
+                            ),
+                            trailing: notifIconButton(
+                              notifCount: driverInfo['notification'].toString(),
+                              onPressed: () {},
+                              icons: UIcons.regularRounded.comment,
+                              iconColor: Warna.regulerFontColor,
+                            ),
+                          ),
+
+                          !isCashless
+                              ? SizedBox(
+                                  height: 50,
+                                  width: double.infinity,
+                                  child: DynamicColorButton(
+                                    onPressed: onPressedPay!,
+                                    text: 'Bayar',
+                                    backgroundColor: Warna.kuning,
+                                  ),
+                                )
+                              : const SizedBox(),
+
                           const SizedBox(
-                            width: 8,
+                            height: 10,
                           ),
+
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Icon(
+                                Icons.store,
+                                color: Warna.biru1,
+                              ),
+                              const SizedBox(
+                                width: 8,
+                              ),
+                              Text(
+                                orderInfo?['store_name'],
+                              )
+                            ],
+                          ),
+
                           Text(
-                            orderInfo!['store'],
-                          )
+                              '${Constant.currencyCode}${orderInfo?['price']} - ${orderInfo?['method']}',
+                              style: AppTextStyles.textRegular),
+                          Text(
+                            '${orderInfo?['menu_count']} Menu | ${orderInfo?['items_count']}',
+                            style: AppTextStyles.textRegular,
+                          ),
+                          Text('${orderInfo?['location']}',
+                              style: AppTextStyles.textRegular),
+
+                          const SizedBox(
+                            height: 10,
+                          ),
+
+                          Container(
+                            height: 50,
+                            width: double.infinity,
+                            child: CBlueButton(
+                              onPressed: onPressedSeeDetail!,
+                              text: 'Lihat Detail',
+                              backgroundColor: Warna.biru,
+                            ),
+                          ),
                         ],
                       ),
-                      Text(
-                          '${Constant.currencyCode}${orderInfo['price']} - ${orderInfo['method']}',
-                          style: AppTextStyles.textRegular),
-                      Text(
-                        '${orderInfo['menu_count']} Menu | ${orderInfo['items_count']}',
-                        style: AppTextStyles.textRegular,
-                      ),
-                      Text('${orderInfo['location']}',
-                          style: AppTextStyles.textRegular),
-          
-                      Container(
-                        height: 50,
-                        width: double.infinity,
-                        padding: const EdgeInsets.symmetric(vertical: 25),
-                        child: CBlueButton(
-                          onPressed: onPressedSeeDetail!,
-                          text: 'Lihat Detail',
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-              );
-            },
+                    ),
+                  );
+                }),
           );
-        }
+        },
+      );
+    },
+  );
+}
+
+Future statusDeliverySheet(
+  BuildContext? context, {
+  final int? orderId,
+  final String? status,
+  final int? orderStatusIndex,
+  final bool isCashless = true,
+  Map<String, dynamic>? orderInfo,
+  Map<String, dynamic>? driverInfo,
+  List<Map<String, dynamic>>? orderStatusProses,
+  final VoidCallback? onPressedStatusButton,
+  final VoidCallback? onPressedSeeDetail,
+  final VoidCallback? onPressedPay,
+}) {
+  return showModalBottomSheet(
+    context: context!,
+    barrierColor: Colors.transparent,
+    backgroundColor: Colors.white,
+    // isDismissible: false,
+    // enableDrag: false,
+    showDragHandle: true,
+    isScrollControlled: true,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.only(
+        topLeft: Radius.circular(20),
+        topRight: Radius.circular(20),
+      ),
+    ),
+    builder: (context) {
+      final DraggableScrollableController scrollController =
+          DraggableScrollableController();
+      return StatefulBuilder(
+        builder: (context, setState) {
+          return GestureDetector(
+            onVerticalDragUpdate: (details) {
+              if (details.primaryDelta! > 0) {
+                // Dragging down
+                scrollController
+                    .jumpTo(0.1); // Set to minimum size (10% of screen height)
+              } else if (details.primaryDelta! < 0) {
+                // Dragging up
+                scrollController
+                    .jumpTo(0.45); // Set to initial size (45% of screen height)
+              }
+            },
+            child: DraggableScrollableSheet(
+                shouldCloseOnMinExtent: false,
+                controller: scrollController,
+                initialChildSize:
+                    0.5, // Initial height when sheet is first opened
+                minChildSize: 0.2, // Minimum height when sheet is collapsed
+                maxChildSize:
+                    0.5, // Maximum height when sheet is fully expanded
+                expand: false, // Set to false to prevent full expansion
+                builder: (context, scrollController) {
+                  return SingleChildScrollView(
+                    controller: scrollController,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 25),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            height: 130,
+                            margin: const EdgeInsets.symmetric(vertical: 10),
+                            child: StatusOrderTimeLineTileWidget(
+                              processIndex: 0,
+                              status: status,
+                              statusListMapData: orderStatusProses!,
+                            ),
+                          ),
+
+                          Container(
+                            // height: 50,
+                            width: double.infinity,
+                            // padding: const EdgeInsets.symmetric(vertical: 5),
+                            child: DynamicColorButton(
+                              onPressed: onPressedStatusButton!,
+                              borderRadius: 54,
+                              text: 'Konfirmasi Pesanan Diterima Pelanggan',
+                              backgroundColor: Warna.hijau,
+                            ),
+                          ),
+
+                          const SizedBox(
+                            height: 25,
+                          ),
+
+                          // Divider(
+                          //   height: 5,
+                          //   thickness: 5,
+                          //   color: Warna.abu,
+                          // ),
+
+                          ListTile(
+                            shape: Border(
+                              bottom: BorderSide(color: Warna.abu, width: 1.5),
+                              top: BorderSide(color: Warna.abu, width: 1.5),
+                            ),
+                            dense: false,
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 0,
+                              vertical: 15,
+                            ),
+                            leading: Container(
+                              height: 50,
+                              width: 50,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(40),
+                                color: Warna.abu,
+                              ),
+                              child: Image.asset(
+                                '',
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Container(
+                                    height: 40,
+                                    width: 40,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(40),
+                                      color: Warna.abu,
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                            title: Text(
+                              driverInfo!['name'].toString(),
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            subtitle: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(
+                                  Icons.star,
+                                ),
+                                const SizedBox(
+                                  width: 5,
+                                ),
+                                Text(
+                                  driverInfo['rate'].toString(),
+                                )
+                              ],
+                            ),
+                            trailing: notifIconButton(
+                              notifCount: driverInfo['notification'].toString(),
+                              onPressed: () {},
+                              icons: UIcons.regularRounded.comment,
+                              iconColor: Warna.regulerFontColor,
+                            ),
+                          ),
+
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Icon(
+                                Icons.store,
+                                color: Warna.biru1,
+                              ),
+                              const SizedBox(
+                                width: 8,
+                              ),
+                              Text(
+                                orderInfo?['store_name'],
+                              )
+                            ],
+                          ),
+
+                          Text(
+                              '${Constant.currencyCode}${orderInfo?['price']} - ${orderInfo?['method']}',
+                              style: AppTextStyles.textRegular),
+                          Text(
+                            '${orderInfo?['menu_count']} Menu | ${orderInfo?['items_count']}',
+                            style: AppTextStyles.textRegular,
+                          ),
+                          Text('${orderInfo?['location']}',
+                              style: AppTextStyles.textRegular),
+
+                          const SizedBox(
+                            height: 10,
+                          ),
+
+                          Container(
+                            height: 50,
+                            width: double.infinity,
+                            child: CBlueButton(
+                              onPressed: onPressedSeeDetail!,
+                              text: 'Lihat Detail',
+                              backgroundColor: Warna.biru,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }),
+          );
+        },
       );
     },
   );
