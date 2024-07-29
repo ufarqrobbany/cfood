@@ -48,6 +48,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool? isStudent;
 
   File? _image;
+  File? _image_temp;
   final picker = ImagePicker();
 
   @override
@@ -151,22 +152,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ],
       ),
       backgroundColor: Colors.white,
-      floatingActionButton: Transform.translate(
-        offset: const Offset(0,
-            -80), // Adjust the second parameter to move it up (negative values move up, positive values move down)
-        child: SizedBox(
-          height: 45,
-          child: DynamicColorButton(
-            onPressed: () {
-              uploadPhotoProfile(context);
-            },
-            icon: const Icon(Icons.save, color: Colors.white),
-            text: 'Simpan foto profil',
-            backgroundColor: Warna.biru,
-            borderRadius: 30,
-          ),
-        ),
-      ),
+      floatingActionButton: _image != null
+          ? Stack(
+              children: [
+                Positioned(
+                  bottom:
+                      80, // Adjust this value to move it up (higher values move it up)
+                  right: 0, // Adjust this value to place it at the right edge
+                  child: SizedBox(
+                    height: 45,
+                    child: DynamicColorButton(
+                      onPressed: () {
+                        uploadPhotoProfile(context);
+                      },
+                      icon: const Icon(Icons.save, color: Colors.white),
+                      text: 'Simpan foto profil',
+                      fontWeight: FontWeight.w500,
+                      backgroundColor: Warna.biru,
+                      borderRadius: 30,
+                    ),
+                  ),
+                ),
+              ],
+            )
+          : null,
       body: ReloadIndicatorType1(
         onRefresh: refreshPage,
         child: SingleChildScrollView(
@@ -175,8 +184,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
             children: [
               profileBoxHeader(),
               joinWirausahaNotifBox(),
-              studentInfo?.id != null ? joinDriverNotifBox() : Container(),
-              boxDriverTasks(),
+              studentInfo?.id != null
+                  ? AppConfig.IS_DRIVER == true
+                      ? Container()
+                      : joinDriverNotifBox()
+                  : Container(),
+              AppConfig.IS_DRIVER == true ? boxDriverTasks() : Container(),
               widget.userType == 'kantin'
                   ? sectionMenuBox(
                       title: 'Akun',
@@ -384,18 +397,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
       if (response.statusCode == 200) {
         // Handle successful response
-        log('Photo uploaded successfully');
+        // print('Photo uploaded successfully');
         showToast('Berhasil Mengubah Foto');
-        _image = null;
+        setState(() {
+          _image_temp = _image;
+          _image = null; // Reset _image to null after successful upload
+        });
       } else {
         // Handle error response
-        log('Failed to upload photo');
+        // print('Failed to upload photo');
         showToast('Gagal Mengubah Foto');
       }
     } catch (e) {
-      log('Error: $e');
-      showToast(e.toString());
-      _image = null;
+      // print('Error: $e');
+      // showToast(e.toString());
+      if (e is DioException && e.response?.statusCode == 502) {
+        showToast('Ukuran Gambar Terlalu Besar');
+      } else {
+        showToast('Gagal Mengubah Foto');
+      }
+      setState(() {
+        _image = null; // Reset _image to null after successful upload
+      });
     }
   }
 
@@ -485,22 +508,37 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           );
                         },
                       )
-                    : Image.network(
-                        dataUser?.userPhoto != null
-                            ? '${AppConfig.URL_IMAGES_PATH}${dataUser?.userPhoto}'
-                            : 'https://i.pinimg.com/originals/d9/d8/8e/d9d88e3d1f74e2b8ced3df051cecb81d.jpg',
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Container(
-                            height: 80,
-                            width: 80,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(80),
-                              color: Warna.abu,
-                            ),
-                          );
-                        },
-                      ),
+                    : _image_temp != null
+                        ? Image.file(
+                            _image_temp!,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Container(
+                                height: 80,
+                                width: 80,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(80),
+                                  color: Warna.abu,
+                                ),
+                              );
+                            },
+                          )
+                        : Image.network(
+                            dataUser?.userPhoto != null
+                                ? '${AppConfig.URL_IMAGES_PATH}${dataUser?.userPhoto}'
+                                : 'https://i.pinimg.com/originals/d9/d8/8e/d9d88e3d1f74e2b8ced3df051cecb81d.jpg',
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Container(
+                                height: 80,
+                                width: 80,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(80),
+                                  color: Warna.abu,
+                                ),
+                              );
+                            },
+                          ),
               ),
             ),
           ),
@@ -574,7 +612,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Text(
-                'Akun',
+                'Kurir',
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,

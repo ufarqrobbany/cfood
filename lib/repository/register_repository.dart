@@ -271,7 +271,7 @@ class RegisterRepository {
         },
         body: json.encode({
           'nim': nim,
-          'addmissionYear': addmissionYear,
+          'admissionYear': addmissionYear,
           'campusId': campusId,
           'majorId': majorId,
           'studyProgramId': studyProgramId,

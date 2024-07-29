@@ -773,7 +773,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 25),
             children: reviewsMaps.keys.map((String key) {
               return AnimatedContainer(
-                duration: const Duration(milliseconds: 300),
+                duration: const Duration(milliseconds: 0),
                 decoration: BoxDecoration(
                   border: key == selectedTab
                       ? Border(
@@ -802,16 +802,24 @@ class _ReviewScreenState extends State<ReviewScreen> {
                                 'Semua',
                                 style: TextStyle(
                                   fontSize: 15,
-                                  fontWeight: FontWeight.normal,
-                                  color: Warna.abu6,
+                                  fontWeight: selectedTab == key
+                                      ? FontWeight.w500
+                                      : FontWeight.normal,
+                                  color: selectedTab == key
+                                      ? Warna.regulerFontColor
+                                      : Warna.abu6,
                                 ),
                               ),
                               Text(
                                 '(0)',
                                 style: TextStyle(
                                   fontSize: 13,
-                                  fontWeight: FontWeight.normal,
-                                  color: Warna.abu6,
+                                  fontWeight: selectedTab == key
+                                      ? FontWeight.w700
+                                      : FontWeight.normal,
+                                  color: selectedTab == key
+                                      ? Warna.regulerFontColor
+                                      : Warna.abu6,
                                 ),
                               )
                             ],
@@ -830,9 +838,14 @@ class _ReviewScreenState extends State<ReviewScreen> {
                               Text(
                                 '(0)',
                                 style: TextStyle(
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.normal,
-                                    color: Warna.abu6),
+                                  fontSize: 13,
+                                  fontWeight: selectedTab == key
+                                      ? FontWeight.w700
+                                      : FontWeight.normal,
+                                  color: selectedTab == key
+                                      ? Warna.regulerFontColor
+                                      : Warna.abu6,
+                                ),
                               )
                             ],
                           ),

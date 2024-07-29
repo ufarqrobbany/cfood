@@ -179,62 +179,58 @@ class _CreatePasswordScreenState extends State<CreatePasswordScreen> {
       );
 
       DataAddUser? dataUser = userResponse.data;
-      log(dataUser.toString());
+      log(dataUser!.id.toString());
 
-      if (dataUser != null) {
-        if (widget.isStudent) {
-          log('add student');
-          // await RegisterRepository().addPostStudent(
-          //   // ignore: use_build_context_synchronously
-          //   context,
-          //   userId: dataUser.id!,
-          //   campusId: widget.campusId!,
-          //   majorId: widget.majorId!,
-          //   nim: widget.nim!,
-          //   studyProgramId: widget.studyProgramId!,
-          //   addmissionYear: widget.addmissionYear!,
-          // );
-          await FetchInterceptorController(
-            context: context,
-            endpoint: 'students/',
-            fromJson: (json) => AddStudentResponse.fromJson(json),
-          ).postData({
-            'nim': widget.nim,
-            'addmissionYear': widget.addmissionYear,
-            'campusId': widget.campusId,
-            'majorId': widget.majorId,
-            'studyProgramId': widget.studyProgramId,
-            'userId': dataUser.id,
-          }).then((data) {
-            // Handle the data
-            log(data);
-          }).catchError((error) {
-            // Handle the error
-            log(error.toString());
-          });
-
-          
-        }
-
-        log('request otp');
-        await RegisterRepository().sendPostOtp(
-          context,
-          userId: dataUser.id!,
-          name: dataUser.name,
-          to: dataUser.email,
-          type: widget.forgotPass ? "RESET_PASSWORD" : "REGISTER",
-        );
-
-        log('go to verification email');
-        setState(() {
-          loadButton = false;
+      if (widget.isStudent) {
+        log('add student');
+        // await RegisterRepository().addPostStudent(
+        //   // ignore: use_build_context_synchronously
+        //   context,
+        //   nim: widget.nim!,
+        //   addmissionYear: widget.addmissionYear!,
+        //   campusId: widget.campusId!,
+        //   majorId: widget.majorId!,
+        //   studyProgramId: widget.studyProgramId!,
+        //   userId: dataUser.id!,
+        // );
+        await FetchInterceptorController(
+          context: context,
+          endpoint: 'students/',
+          fromJson: (json) => AddStudentResponse.fromJson(json),
+        ).postData({
+          'nim': widget.nim,
+          'admissionYear': widget.addmissionYear,
+          'campusId': widget.campusId,
+          'majorId': widget.majorId,
+          'studyProgramId': widget.studyProgramId,
+          'userId': dataUser.id,
+        }).then((data) {
+          // Handle the data
+          log(data.toString());
+        }).catchError((error) {
+          // Handle the error
+          log(error.toString());
         });
-        navigateTo(
-            context,
-            VerificationScreen(
-              userId: dataUser.id!,
-            ));
       }
+
+      log('request otp');
+      await RegisterRepository().sendPostOtp(
+        context,
+        userId: dataUser.id!,
+        name: dataUser.name,
+        to: dataUser.email,
+        type: widget.forgotPass ? "RESET_PASSWORD" : "REGISTER",
+      );
+
+      log('go to verification email');
+      setState(() {
+        loadButton = false;
+      });
+      navigateTo(
+          context,
+          VerificationScreen(
+            userId: dataUser.id!,
+          ));
     } on Exception catch (e) {
       // Menonaktifkan indikator loading (jika diperlukan)
       setState(() {

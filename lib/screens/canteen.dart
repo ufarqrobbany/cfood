@@ -606,8 +606,8 @@ class _CanteenScreenState extends State<CanteenScreen>
             ),
       floatingActionButton: widget.isOwner!
           ? Padding(
-            padding: const EdgeInsets.only(bottom: 100),
-            child: IconButton(
+              padding: const EdgeInsets.only(bottom: 100),
+              child: IconButton(
                 onPressed: () {},
                 icon: Icon(
                   UIcons.solidRounded.plus_small,
@@ -618,7 +618,7 @@ class _CanteenScreenState extends State<CanteenScreen>
                   backgroundColor: Warna.hijau,
                 ),
               ),
-          )
+            )
           : storeMenuCountInfo(),
       floatingActionButtonLocation: widget.isOwner!
           ? FloatingActionButtonLocation.endDocked
@@ -692,31 +692,36 @@ class _CanteenScreenState extends State<CanteenScreen>
     );
   }
 
-    Widget tabMenuItem({VoidCallback? onPressed, String? text, IconData? icons, String? menuName, Color? activeColor}) {
+  Widget tabMenuItem(
+      {VoidCallback? onPressed,
+      String? text,
+      IconData? icons,
+      String? menuName,
+      Color? activeColor}) {
     return Container(
       decoration: BoxDecoration(
-        border: menuName == selectedTab ? Border(bottom: BorderSide(color: activeColor!, width: 2)) : null,
+        border: menuName == selectedTab
+            ? Border(bottom: BorderSide(color: activeColor!, width: 2))
+            : null,
       ),
       child: TextButton(
-        onPressed: onPressed, 
+        onPressed: onPressed,
         style: TextButton.styleFrom(
           elevation: 0,
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              icons,
-              size: 20,
-              color: menuName == selectedTab ? activeColor : Warna.abu6,
-            ),
-            const SizedBox(width: 10,),
             Text(
               text!,
               style: TextStyle(
-                color: menuName == selectedTab ? Warna.regulerFontColor : Warna.abu6,
+                color: menuName == selectedTab
+                    ? Warna.regulerFontColor
+                    : Warna.abu6,
                 fontSize: 15,
-                fontWeight: menuName == selectedTab ? FontWeight.w700 : FontWeight.normal,
+                fontWeight: menuName == selectedTab
+                    ? FontWeight.w700
+                    : FontWeight.normal,
               ),
             )
           ],
@@ -739,34 +744,44 @@ class _CanteenScreenState extends State<CanteenScreen>
             physics: const BouncingScrollPhysics(),
             padding: const EdgeInsets.symmetric(horizontal: 25),
             children: menuMaps.keys.map((String key) {
-              return AnimatedContainer(
-                duration: const Duration(milliseconds: 300),
-                decoration: BoxDecoration(
-                  border: key == selectedTab
-                      ? Border(
-                          bottom: BorderSide(
-                              color: Warna.kuning,
-                              width: 2,
-                              style: BorderStyle.solid),
-                        )
-                      : null,
-                ),
-                child: TextButton(
-                  onPressed: () {
-                    setState(() {
-                      selectedTab = key;
-                    });
-                    log(selectedTab);
-                  },
-                  child: Text(
-                    key,
-                    style: TextStyle(
-                      fontSize: key == selectedTab ? 16 : 14,
-                      color: key == selectedTab ? Warna.kuning : Warna.biru,
-                    ),
-                  ),
-                ),
+              return tabMenuItem(
+                onPressed: () {
+                  setState(() {
+                    selectedTab = key;
+                  });
+                },
+                text: key,
+                menuName: key,
+                activeColor: Warna.kuning,
               );
+              // return AnimatedContainer(
+              //   duration: const Duration(milliseconds: 300),
+              //   decoration: BoxDecoration(
+              //     border: key == selectedTab
+              //         ? Border(
+              //             bottom: BorderSide(
+              //                 color: Warna.kuning,
+              //                 width: 2,
+              //                 style: BorderStyle.solid),
+              //           )
+              //         : null,
+              //   ),
+              //   child: TextButton(
+              //     onPressed: () {
+              //       setState(() {
+              //         selectedTab = key;
+              //       });
+              //       log(selectedTab);
+              //     },
+              //     child: Text(
+              //       key,
+              //       style: TextStyle(
+              //         fontSize: key == selectedTab ? 16 : 14,
+              //         color: key == selectedTab ? Warna.kuning : Warna.biru,
+              //       ),
+              //     ),
+              //   ),
+              // );
             }).toList(),
           ),
         ),
