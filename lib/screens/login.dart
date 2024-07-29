@@ -76,8 +76,18 @@ class _LoginScreenState extends State<LoginScreen> {
         password: passController.text,
       );
 
-      if (loginResponse.status == 'error') {
-        if (loginResponse.data!.verified == false) {
+      // showToast(loginResponse.message.toString());
+
+      if (loginResponse.status.toString() == 'error') {
+        // log(loginResponse.message.toString());
+        if (loginResponse.message.toString() == 'Password salah') {
+          showToast(loginResponse.message.toString());
+          setState(() {
+            buttonLoadState = false;
+            checked = false;
+            loadState = false;
+          });
+        } else if (loginResponse.data!.verified == false) {
           log('go to verification');
           setState(() {
             loadState = false;
@@ -122,7 +132,11 @@ class _LoginScreenState extends State<LoginScreen> {
         checked = false;
         loadState = false;
       });
+      // if() {
+      //   showToast("Password salah");
+      // }
       showToast(e.toString().replaceAll('Exception: ', ''));
+      // showToast(e.toString().)
       log('Error: $e');
 
       setState(() {

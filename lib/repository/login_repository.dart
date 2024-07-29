@@ -6,7 +6,8 @@ import 'package:http/http.dart' as http;
 import 'package:cfood/utils/constant.dart';
 import 'package:flutter/cupertino.dart';
 
-LoginResponse loginResponseFromJson(String str) => LoginResponse.fromJson(json.decode(str));
+LoginResponse loginResponseFromJson(String str) =>
+    LoginResponse.fromJson(json.decode(str));
 
 class LoginResponse {
   int? statusCode;
@@ -20,7 +21,7 @@ class LoginResponse {
     statusCode = json['statusCode'];
     status = json['status'];
     message = json['message'];
-    data = json['data'] != null ?  DataLogin.fromJson(json['data']) : null;
+    data = json['data'] != null ? DataLogin.fromJson(json['data']) : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -57,9 +58,8 @@ class DataLogin {
   }
 }
 
-
-class LoginRepository{
-    Future<LoginResponse> loginUser(
+class LoginRepository {
+  Future<LoginResponse> loginUser(
     BuildContext? context, {
     String email = '',
     String password = '',
@@ -80,15 +80,18 @@ class LoginRepository{
     if (response.statusCode <= 499) {
       LoginResponse data = loginResponseFromJson(response.body);
       log(response.body);
-      showToast(data.message!);
+      if (data.message != null) {
+        showToast(data.message!);
+      }
+      // log(data.message!);
       return loginResponseFromJson(response.body);
-    } 
+    }
     // else if (response.statusCode <= 499) {
     //   Error400Response data = error400ResponseFromJson(response.body);
     //   log(response.body);
     //   showToast(data.message!);
     //   throw Exception(data.message);
-    // } 
+    // }
     else {
       Error400Response data = error400ResponseFromJson(response.body);
       log(response.body);

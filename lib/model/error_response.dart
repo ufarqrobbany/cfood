@@ -1,6 +1,7 @@
 import 'dart:convert';
 
-ErrorResponse errorResponseFromJson(String str) => ErrorResponse.fromJson(json.decode(str));
+ErrorResponse errorResponseFromJson(String str) =>
+    ErrorResponse.fromJson(json.decode(str));
 
 class ErrorResponse {
   String? timestamp;
@@ -27,7 +28,8 @@ class ErrorResponse {
   }
 }
 
-Error400Response error400ResponseFromJson(String str) => Error400Response.fromJson(json.decode(str));
+Error400Response error400ResponseFromJson(String str) =>
+    Error400Response.fromJson(json.decode(str));
 
 class Error400Response {
   int? statusCode;
@@ -35,7 +37,11 @@ class Error400Response {
   String? message;
   // Null? data;
 
-  Error400Response({this.statusCode, this.status, this.message,});
+  Error400Response({
+    this.statusCode,
+    this.status,
+    this.message,
+  });
 
   Error400Response.fromJson(Map<String, dynamic> json) {
     statusCode = json['statusCode'];

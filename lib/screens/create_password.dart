@@ -178,7 +178,7 @@ class _CreatePasswordScreenState extends State<CreatePasswordScreen> {
       );
 
       DataAddUser? dataUser = userResponse.data;
-      log(dataUser.toString());
+      log(dataUser!.id.toString());
 
       if (dataUser != null) {
         if (widget.isStudent) {
@@ -235,6 +235,25 @@ class _CreatePasswordScreenState extends State<CreatePasswordScreen> {
               userId: dataUser.id!,
             ));
       }
+
+      log('request otp');
+      await RegisterRepository().sendPostOtp(
+        context,
+        userId: dataUser.id!,
+        name: dataUser.name,
+        to: dataUser.email,
+        type: widget.forgotPass ? "RESET_PASSWORD" : "REGISTER",
+      );
+
+      log('go to verification email');
+      setState(() {
+        loadButton = false;
+      });
+      navigateTo(
+          context,
+          VerificationScreen(
+            userId: dataUser.id!,
+          ));
     } on Exception catch (e) {
       // Menonaktifkan indikator loading (jika diperlukan)
       setState(() {

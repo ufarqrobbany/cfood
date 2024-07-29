@@ -33,6 +33,7 @@ class _UserInformationScreenState extends State<UserInformationScreen> {
   StudyProgram? studentStudyProgram;
 
   File? _image;
+  File? _image_temp;
   final picker = ImagePicker();
 
   @override
@@ -101,18 +102,28 @@ class _UserInformationScreenState extends State<UserInformationScreen> {
 
       if (response.statusCode == 200) {
         // Handle successful response
-        print('Photo uploaded successfully');
+        // print('Photo uploaded successfully');
         showToast('Berhasil Mengubah Foto');
-        _image = null;
+        setState(() {
+          _image_temp = _image;
+          _image = null; // Reset _image to null after successful upload
+        });
       } else {
         // Handle error response
-        print('Failed to upload photo');
+        // print('Failed to upload photo');
         showToast('Gagal Mengubah Foto');
       }
     } catch (e) {
-      print('Error: $e');
-      showToast(e.toString());
-      _image = null;
+      // print('Error: $e');
+      // showToast(e.toString());
+       if (e is DioException && e.response?.statusCode == 502) {
+        showToast('Ukuran Gambar Terlalu Besar');
+      } else {
+        showToast('Gagal Mengubah Foto');
+      }
+      setState(() {
+        _image = null; // Reset _image to null after successful upload
+      });
     }
   }
 
@@ -202,22 +213,37 @@ class _UserInformationScreenState extends State<UserInformationScreen> {
                           );
                         },
                       )
-                    : Image.network(
-                        dataUser?.userPhoto != null
-                            ? '${AppConfig.URL_IMAGES_PATH}${dataUser?.userPhoto}'
-                            : 'https://i.pinimg.com/originals/d9/d8/8e/d9d88e3d1f74e2b8ced3df051cecb81d.jpg',
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Container(
-                            height: 80,
-                            width: 80,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(80),
-                              color: Warna.abu,
-                            ),
-                          );
-                        },
-                      ),
+                    : _image_temp != null
+                        ? Image.file(
+                            _image_temp!,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Container(
+                                height: 80,
+                                width: 80,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(80),
+                                  color: Warna.abu,
+                                ),
+                              );
+                            },
+                          )
+                        : Image.network(
+                            dataUser?.userPhoto != null
+                                ? '${AppConfig.URL_IMAGES_PATH}${dataUser?.userPhoto}'
+                                : 'https://i.pinimg.com/originals/d9/d8/8e/d9d88e3d1f74e2b8ced3df051cecb81d.jpg',
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Container(
+                                height: 80,
+                                width: 80,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(80),
+                                  color: Warna.abu,
+                                ),
+                              );
+                            },
+                          ),
               ),
             ),
           ),
@@ -263,21 +289,17 @@ class _UserInformationScreenState extends State<UserInformationScreen> {
       ),
       backgroundColor: Colors.white,
       floatingActionButton: _image != null
-          ? Transform.translate(
-              offset: const Offset(0,
-                  -80), // Adjust the second parameter to move it up (negative values move up, positive values move down)
-              child: SizedBox(
-                height: 45,
-                child: DynamicColorButton(
-                  onPressed: () {
-                    uploadPhotoProfile(context);
-                  },
-                  icon: const Icon(Icons.save, color: Colors.white),
-                  text: 'Simpan foto profil',
-                  fontWeight: FontWeight.w500,
-                  backgroundColor: Warna.biru,
-                  borderRadius: 30,
-                ),
+          ? SizedBox(
+              height: 45,
+              child: DynamicColorButton(
+                onPressed: () {
+                  uploadPhotoProfile(context);
+                },
+                icon: const Icon(Icons.save, color: Colors.white),
+                text: 'Simpan foto profil',
+                fontWeight: FontWeight.w500,
+                backgroundColor: Warna.biru,
+                borderRadius: 30,
               ),
             )
           : null,
