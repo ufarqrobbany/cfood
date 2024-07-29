@@ -27,7 +27,7 @@ class AppTextStyles {
     color: Color(0xFF353535),
   );
 
-   static const TextStyle subTitle = TextStyle(
+  static const TextStyle subTitle = TextStyle(
     fontSize: 18,
     fontWeight: FontWeight.w800,
     color: Color(0xFF353535),
@@ -115,5 +115,11 @@ class AppTextStyles {
     fontSize: 16,
     fontWeight: FontWeight.w600,
     color: Color(0xFF353535),
+  );
+
+  static TextStyle appBarTitle = TextStyle(
+    fontSize: 25,
+    fontWeight: FontWeight.w600,
+    color: Warna.regulerFontColor,
   );
 }

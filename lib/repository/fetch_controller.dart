@@ -1,7 +1,9 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:cfood/custom/CToast.dart';
 import 'package:cfood/model/error_response.dart';
 import 'package:cfood/model/reponse_handler.dart';
+import 'package:dio/dio.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:cfood/utils/constant.dart';
@@ -110,6 +112,77 @@ class FetchController {
       log(response.body);
       showToast(data.error!);
       throw Exception(data.status);
+    }
+  }
+
+  // Method to upload file and text data
+  Future<dynamic> postMultipartData({
+    required String dataKeyName,
+    required Map<String, dynamic> data,
+    required File file,
+    required String fileKeyName,
+    // required List<MultipartFile> files,
+  }) async {
+    try {
+      Dio dio = Dio();
+      Uri url = getUrl();
+
+      // FormData formData = FormData();
+
+      // // Add text fields
+      // formData.fields.add(MapEntry(
+      //   dataKeyName,
+      //   json.encode(data),
+      // ));
+
+      // log(json.encode(data).toString());
+
+      //  // Add single file
+      // String fileName = file.path.split('/').last;
+      // formData.files.add(MapEntry(
+      //   fileKeyName,
+      //   await MultipartFile.fromFile(file.path, filename: fileName),
+      // ));
+
+      // FormData creation
+      FormData formData = FormData.fromMap({
+        dataKeyName: json.encode(data),
+        fileKeyName: await MultipartFile.fromFile(file.path,
+            filename: file.path.split('/').last),
+      });
+
+      log("Request URL: $url");
+      log("Request Headers: $headers");
+      log("FormData: ${formData.fields}, ${formData.files}");
+
+      Response response = await dio.post(
+        url.toString(),
+        data: formData,
+        options: Options(
+          headers: headers,
+        ),
+      );
+      
+      log("Response URI: ${response.statusCode}");
+      log("Response URI: ${response.realUri}");
+      log("Response data: ${response.data}");
+
+      if (response.statusCode! <= 499) {
+        log(response.data.toString());
+        return fromJson(response.data);
+      } else {
+        ErrorResponse data = errorResponseFromJson(response.data);
+        log(response.data.toString());
+        showToast(data.error!);
+        return {
+          'status': 'error',
+          'message': data.error
+        }; // Return error without throwing exception
+      }
+    } catch (e) {
+      log(e.toString());
+      showToast("An error occurred");
+      throw Exception("Failed to upload data");
     }
   }
 

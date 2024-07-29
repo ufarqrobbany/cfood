@@ -21,6 +21,7 @@ import 'package:cfood/screens/kurir_pages/order_status.dart';
 import 'package:cfood/screens/login.dart';
 import 'package:cfood/screens/main.dart';
 import 'package:cfood/screens/user_info.dart';
+import 'package:cfood/screens/wirausaha_pages/signup_wirausaha.dart';
 import 'package:cfood/style.dart';
 import 'package:cfood/utils/auth.dart';
 import 'package:cfood/utils/constant.dart';
@@ -191,6 +192,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ? Container()
                       : joinDriverNotifBox()
                   : Container(),
+              studentInfo?.id != null && dataUser?.isPenjual == 'wirausaha'
+                  ? boxMerchantTaks()
+                  : Container(),
+              const SizedBox(
+                height: 10,
+              ),
+              // boxMerchantTaks(),
               AppConfig.IS_DRIVER == true ? boxDriverTasks() : Container(),
               widget.userType == 'kantin'
                   ? sectionMenuBox(
@@ -409,6 +417,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
       );
 
+      log("formdata file: ${formData.files}");
+
       if (response.statusCode == 200) {
         // Handle successful response
         // print('Photo uploaded successfully');
@@ -602,7 +612,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
           style: TextStyle(fontWeight: FontWeight.w400),
         ),
         trailing: IconButton(
-          onPressed: () {},
+          onPressed: () {
+            navigateTo(context, const SignupWirausahaScreen());
+          },
           icon: const Icon(Icons.arrow_forward_ios_rounded),
           iconSize: 18,
           style: IconButton.styleFrom(
@@ -657,6 +669,84 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   },
                   icons: UIcons.solidRounded.bike,
                   text: 'Pengantaran',
+                  notifCount: 7,
+                ),
+                driverItemsMenu(
+                  onTap: () {
+                    navigateTo(context, ChatSellerScreen());
+                  },
+                  icons: UIcons.solidRounded.comment,
+                  text: 'Chat Pembeli',
+                  notifCount: 7,
+                ),
+              ],
+            )),
+      ],
+    );
+  }
+
+  Widget boxMerchantTaks() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
+          color: Warna.kuning.withOpacity(0.10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Text(
+                'Wirausaha',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: Warna.regulerFontColor,
+                ),
+              ),
+              const Spacer(),
+              SizedBox(
+                height: 30,
+                child: DynamicColorButton(
+                  onPressed: () {},
+                  text: 'Lihat Akun Wirausaha  >',
+                  textStyle: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    color: Warna.regulerFontColor,
+                  ),
+                  borderRadius: 16,
+                  backgroundColor: Warna.kuning,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 2,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        Container(
+            padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 9),
+            color: Warna.kuning.withOpacity(0.05),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                driverItemsMenu(
+                  onTap: () {
+                    // navigateTo(context, const OrderAvailableScreen());
+                  },
+                  icons: Icons.move_to_inbox,
+                  text: 'Pesanan Masuk',
+                  notifCount: 7,
+                ),
+                driverItemsMenu(
+                  onTap: () {
+                    // navigateTo(context, const DeliveryInfoScreen());
+                  },
+                  icons: UIcons.regularRounded.receipt,
+                  text: 'Transaksi',
                   notifCount: 7,
                 ),
                 driverItemsMenu(

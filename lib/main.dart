@@ -165,6 +165,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'C-FOOD',
       theme: ThemeData(
+        fontFamily: 'Lato',
         colorScheme: ColorScheme.fromSeed(seedColor: Warna.biru),
         useMaterial3: true,
       ),
