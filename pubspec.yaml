@@ -36,6 +36,7 @@ dependencies:
   shimmer: ^3.0.0
   shimmer_animation: ^2.2.1
   timelines: ^0.1.0
+  mobkit_dashed_border: ^0.0.6
 
   # HELPER
   toast: ^0.3.0
@@ -45,6 +46,7 @@ dependencies:
   # web_browser: ^0.7.4
   google_maps_flutter_web: ^0.5.8
   image_picker: ^1.1.2
+  mime: ^1.0.5
 
   # CONFIG
   shared_preferences: ^2.2.3
@@ -93,15 +95,23 @@ flutter:
     - assets/order_timeline_status_image/
 
   # example:
-  # fonts:
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
-  #       - asset: fonts/Schyler-Italic.ttf
-  #         style: italic
-  #   - family: Trajan Pro
-  #     fonts:
-  #       - asset: fonts/TrajanPro.ttf
-  #       - asset: fonts/TrajanPro_Bold.ttf
-  #         weight: 700
+  fonts:
+    - family: Lato
+      fonts:
+        - asset: assets/fonts/Lato/Lato-Black.ttf
+        - asset: assets/fonts/Lato/Lato-BlackItalic.ttf
+        - asset: assets/fonts/Lato/Lato-Bold.ttf
+        - asset: assets/fonts/Lato/Lato-BoldItalic.ttf
+        - asset: assets/fonts/Lato/Lato-Italic.ttf
+        - asset: assets/fonts/Lato/Lato-Light.ttf
+        - asset: assets/fonts/Lato/Lato-LightItalic.ttf
+        - asset: assets/fonts/Lato/Lato-Regular.ttf
+        - asset: assets/fonts/Lato/Lato-Thin.ttf
+        - asset: assets/fonts/Lato/Lato-ThinItalic.ttf
+          # style: italic
+    # - family: Trajan Pro
+    #   fonts:
+    #     - asset: fonts/TrajanPro.ttf
+    #     - asset: fonts/TrajanPro_Bold.ttf
+    #       weight: 700
 

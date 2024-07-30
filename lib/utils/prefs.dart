@@ -96,4 +96,16 @@ class SessionManager {
     String? isDriver = pref.getString('is_driver');
     return isDriver ?? 'no';
   }
+
+      // Merchant id
+  Future<void> setMerchantId(String merchantId) async {
+    final SharedPreferences pref = await SharedPreferences.getInstance();
+    pref.setString('merchant_id', merchantId);
+  }
+
+  Future<String?> getMerchantId() async {
+    final SharedPreferences pref = await SharedPreferences.getInstance();
+    String? merchantId = pref.getString('merchant_id');
+    return merchantId ?? '0';
+  }
 }

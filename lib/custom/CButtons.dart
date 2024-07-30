@@ -96,6 +96,7 @@ class DynamicColorButton extends StatefulWidget {
   final double elevation;
   final Widget? icon;
   final bool isLoading;
+  final TextStyle? textStyle;
 
   const DynamicColorButton({
     super.key,
@@ -110,6 +111,7 @@ class DynamicColorButton extends StatefulWidget {
     this.elevation = 0,
     this.icon,
     this.isLoading = false,
+    this.textStyle,
   });
 
   @override
@@ -140,7 +142,7 @@ class _DynamicColorButtonState extends State<DynamicColorButton> {
                 const SizedBox(width: 8.0),
                 Text(
                   widget.text,
-                  style: TextStyle(
+                  style: widget.textStyle ?? TextStyle(
                     color: widget.textColor,
                     fontSize: widget.fontSize,
                     fontWeight: widget.fontWeight,
@@ -155,7 +157,7 @@ class _DynamicColorButtonState extends State<DynamicColorButton> {
                   color: Warna.biru, size: 30)
               : Text(
                   widget.text,
-                  style: TextStyle(
+                  style: widget.textStyle ?? TextStyle(
                     color: widget.textColor,
                     fontSize: widget.fontSize,
                     fontWeight: widget.fontWeight,

@@ -41,4 +41,18 @@ class AppConfig {
 
   static String URL_PHOTO_PROFILE = '';
 
+  // MERCHANT || CANTEEN SECTION
+
+  static int MERCHANT_ID = 0;
+
+  static String MERCHANT_NAME = '';
+
+  static String MERCHANT_PHOTO = "${BASE_URL}images/";
+
+  static String MERCHANT_DESC = '';
+
+  static String MERCHANT_TYPE = "WIRAUSAHA";
+
+  static bool MERCHANT_OPEN = false;
+
 }

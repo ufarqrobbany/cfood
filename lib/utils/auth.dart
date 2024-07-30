@@ -6,23 +6,24 @@ import 'package:cfood/utils/prefs.dart';
 class AuthHelper {
   SessionManager prefs = SessionManager();
 
-  setUserData(
-    {String? token,
+  setUserData({
+    String? token,
     String? userId,
     String? studentId,
     String? username,
     String? type,
     String? isDriver,
     String? userPhoto,
-    }
-  ) {
+    String? merchantId,
+  }) {
     prefs.setIsloggedIn('yes');
     prefs.setToken(token ?? '');
     prefs.setUserId(userId ?? '');
     prefs.setUsername(username ?? '');
     prefs.setType(type: type ?? 'reguler');
     prefs.setIsDriver(isDriver ?? 'no');
-    
+    prefs.setMerchantId(merchantId ?? '');
+
     // AppConfig.NAME = username!;
     // AppConfig.USER_ID = int.parse(userId!);
     // AppConfig.STUDENT_ID = int.parse(studentId!);
@@ -34,9 +35,15 @@ class AuthHelper {
   setEmailPassword({
     String? email,
     String? password,
-  }){
+  }) {
     prefs.setEmail(email ?? '');
     prefs.setPassword(password ?? '');
+  }
+
+  setMerchantId({
+    String? id,
+  }) {
+    prefs.setMerchantId(id!);
   }
 
   clearUserData() {
@@ -48,6 +55,7 @@ class AuthHelper {
     prefs.setPassword('');
     prefs.setType(type: '');
     prefs.setIsDriver('no');
+    prefs.setMerchantId('');
 
     AppConfig.NAME = '';
     AppConfig.EMAIL = '';
@@ -56,6 +64,7 @@ class AuthHelper {
     AppConfig.USER_TYPE = 'reguler';
     AppConfig.IS_DRIVER = false;
     AppConfig.URL_PHOTO_PROFILE = '';
+    AppConfig.MERCHANT_ID = 0;
   }
 
   Future<void> chackUserData() async {
@@ -66,6 +75,7 @@ class AuthHelper {
     String? password = await SessionManager().getPassword();
     String? type = await SessionManager().getType();
     String? isDriver = await SessionManager().getIsDriver();
+    String? merchantId = await SessionManager().getMerchantId();
 
     log('''
       token : $token
@@ -75,8 +85,8 @@ class AuthHelper {
       password : $password
       type : $type 
       isDriver : $isDriver
+      merhandId : $merchantId
       ''');
-
   }
 
   Future<Map<String, dynamic>> getkUserData() async {
@@ -87,6 +97,7 @@ class AuthHelper {
     String? password = await SessionManager().getPassword();
     String? type = await SessionManager().getType();
     String? isDriver = await SessionManager().getIsDriver();
+    String? merchantId = await SessionManager().getMerchantId();
 
     log('''
       token : $token
@@ -94,16 +105,17 @@ class AuthHelper {
       email : $email
       username : $username
       password : $password
-      type : $type
-      isDriver: $isDriver
+      type : $type 
+      isDriver : $isDriver
+      merhandId : $merchantId
       ''');
 
     return {
-     'token' : token,
-      'userid' : userId,
-      'email' : email,
-      'username' : username,
-      'password' : password,
+      'token': token,
+      'userid': userId,
+      'email': email,
+      'username': username,
+      'password': password,
       'type': type,
       'isDriver': isDriver,
     };

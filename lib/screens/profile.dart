@@ -10,6 +10,7 @@ import 'package:cfood/custom/popup_dialog.dart';
 import 'package:cfood/custom/reload_indicator.dart';
 import 'package:cfood/model/add_driver_response.dart';
 import 'package:cfood/model/get_user_response.dart';
+import 'package:cfood/model/open_close_store_response.dart';
 import 'package:cfood/repository/fetch_controller.dart';
 import 'package:cfood/screens/app_setting_info.dart';
 import 'package:cfood/screens/inbox.dart';
@@ -21,6 +22,8 @@ import 'package:cfood/screens/kurir_pages/order_status.dart';
 import 'package:cfood/screens/login.dart';
 import 'package:cfood/screens/main.dart';
 import 'package:cfood/screens/user_info.dart';
+import 'package:cfood/screens/wirausaha_pages/signup_wirausaha.dart';
+import 'package:cfood/screens/wirausaha_pages/update_merchant.dart';
 import 'package:cfood/style.dart';
 import 'package:cfood/utils/auth.dart';
 import 'package:cfood/utils/constant.dart';
@@ -47,7 +50,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   DataUser? dataUser;
   DataUserCampus? userCampus;
   StudentInformation? studentInfo;
+  MerchantInformation? merchantInformation;
   bool? isStudent;
+  bool storeIsOpen = true;
 
   File? _image;
   File? _image_temp;
@@ -58,11 +63,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
     super.initState();
     isStudent = false;
     getUserData(context);
-    log('usertype : ${AppConfig.USER_TYPE}\n userId : ${AppConfig.USER_ID}\n${AppConfig.NAME}');
+    log('usertype : ${AppConfig.USER_TYPE}\n userId : ${AppConfig.USER_ID}\n${AppConfig.NAME}\nMerchnat id: ${AppConfig.MERCHANT_ID}');
   }
 
   Future<void> refreshPage() async {
-    await Future.delayed(const Duration(seconds: 10));
+    await Future.delayed(const Duration(seconds: 1));
+    // ignore: use_build_context_synchronously
+    getUserData(context);
 
     log('reload...');
   }
@@ -77,6 +84,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       dataUser = userResponse.data;
       userCampus = dataUser!.campus;
       studentInfo = dataUser!.studentInformation;
+      merchantInformation = dataUser!.merchantInformation;
 
       if (studentInfo != null) {
         isStudent = true;
@@ -84,6 +92,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
         isStudent = false;
       }
     });
+
+    if (merchantInformation != null) {
+      setState(() {
+        AppConfig.MERCHANT_ID = merchantInformation!.merchantId!;
+        AppConfig.MERCHANT_TYPE = merchantInformation!.merchantType!;
+        AppConfig.MERCHANT_PHOTO = AppConfig.URL_IMAGES_PATH + merchantInformation!.merchantPhoto!;
+      });
+    }
   }
 
   void tapLogOut(BuildContext context) {
@@ -111,6 +127,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
         SessionManager().setIsDriver('yes');
       });
     }
+  }
+
+  Future<void> merchantStatusOpen(bool value) async {
+    setState(() {
+      // storeIsOpen = !storeIsOpen;
+      AppConfig.MERCHANT_OPEN = value;
+    });
+    await FetchController(
+      // endpoint: 'merchants/${AppConfig.MERCHANT_ID}/status?isOpen=$value',
+      endpoint: 'merchants/4/status?isOpen=$value',
+      fromJson: (json) => OpenCloseStoreResponse.fromJson(json),
+    ).putData({});
   }
 
   @override
@@ -191,6 +219,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ? Container()
                       : joinDriverNotifBox()
                   : Container(),
+              studentInfo?.id != null && dataUser?.isPenjual == 'wirausaha'
+                  ? boxMerchantTaks()
+                  : Container(),
+              const SizedBox(
+                height: 10,
+              ),
+              // boxMerchantTaks(),
               AppConfig.IS_DRIVER == true ? boxDriverTasks() : Container(),
               widget.userType == 'kantin'
                   ? sectionMenuBox(
@@ -409,6 +444,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
       );
 
+      log("formdata file: ${formData.files}");
+
       if (response.statusCode == 200) {
         // Handle successful response
         // print('Photo uploaded successfully');
@@ -507,24 +544,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   borderRadius: BorderRadius.circular(80),
                   color: Warna.abu,
                 ),
-                child: _image != null
-                    ? Image.file(
-                        _image!,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Container(
-                            height: 80,
-                            width: 80,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(80),
-                              color: Warna.abu,
-                            ),
-                          );
-                        },
-                      )
-                    : _image_temp != null
+                child:
+                    // AppConfig.URL_PHOTO_PROFILE != AppConfig.URL_IMAGES_PATH ? :
+                    _image != null
                         ? Image.file(
-                            _image_temp!,
+                            _image!,
                             fit: BoxFit.cover,
                             errorBuilder: (context, error, stackTrace) {
                               return Container(
@@ -537,22 +561,39 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               );
                             },
                           )
-                        : Image.network(
-                            dataUser?.userPhoto != null
-                                ? '${AppConfig.URL_IMAGES_PATH}${dataUser?.userPhoto}'
-                                : 'https://i.pinimg.com/originals/d9/d8/8e/d9d88e3d1f74e2b8ced3df051cecb81d.jpg',
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
-                              return Container(
-                                height: 80,
-                                width: 80,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(80),
-                                  color: Warna.abu,
-                                ),
-                              );
-                            },
-                          ),
+                        : _image_temp != null
+                            ? Image.file(
+                                _image_temp!,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Container(
+                                    height: 80,
+                                    width: 80,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(80),
+                                      color: Warna.abu,
+                                    ),
+                                  );
+                                },
+                              )
+                            : Image.network(
+                                dataUser?.userPhoto != null
+                                    ?
+                                    // '${AppConfig.URL_IMAGES_PATH}${dataUser?.userPhoto}'
+                                    '${AppConfig.URL_PHOTO_PROFILE}}'
+                                    : 'https://i.pinimg.com/originals/d9/d8/8e/d9d88e3d1f74e2b8ced3df051cecb81d.jpg',
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Container(
+                                    height: 80,
+                                    width: 80,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(80),
+                                      color: Warna.abu,
+                                    ),
+                                  );
+                                },
+                              ),
               ),
             ),
           ),
@@ -602,7 +643,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
           style: TextStyle(fontWeight: FontWeight.w400),
         ),
         trailing: IconButton(
-          onPressed: () {},
+          onPressed: () {
+            navigateTo(context, const SignupWirausahaScreen());
+          },
           icon: const Icon(Icons.arrow_forward_ios_rounded),
           iconSize: 18,
           style: IconButton.styleFrom(
@@ -657,6 +700,92 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   },
                   icons: UIcons.solidRounded.bike,
                   text: 'Pengantaran',
+                  notifCount: 7,
+                ),
+                driverItemsMenu(
+                  onTap: () {
+                    navigateTo(context, ChatSellerScreen());
+                  },
+                  icons: UIcons.solidRounded.comment,
+                  text: 'Chat Pembeli',
+                  notifCount: 7,
+                ),
+              ],
+            )),
+      ],
+    );
+  }
+
+  Widget boxMerchantTaks() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
+          color: Warna.kuning.withOpacity(0.10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Text(
+                'Wirausaha',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: Warna.regulerFontColor,
+                ),
+              ),
+              const Spacer(),
+              switchOpenCLoseStore(),
+              SizedBox(
+                height: 30,
+                child: DynamicColorButton(
+                  onPressed: () {
+                    navigateTo(
+                      context,
+                      UpdateMerchantScreen(
+                        merchantId: AppConfig.MERCHANT_ID,
+                      ),
+                    );
+                  },
+                  text: 'Lihat Akun Wirausaha  >',
+                  textStyle: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    color: Warna.regulerFontColor,
+                  ),
+                  borderRadius: 16,
+                  backgroundColor: Warna.kuning,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 2,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        Container(
+            padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 9),
+            color: Warna.kuning.withOpacity(0.05),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                driverItemsMenu(
+                  onTap: () {
+                    // navigateTo(context, const OrderAvailableScreen());
+                  },
+                  icons: Icons.move_to_inbox,
+                  text: 'Pesanan Masuk',
+                  notifCount: 7,
+                ),
+                driverItemsMenu(
+                  onTap: () {
+                    // navigateTo(context, const DeliveryInfoScreen());
+                  },
+                  icons: UIcons.regularRounded.receipt,
+                  text: 'Transaksi',
                   notifCount: 7,
                 ),
                 driverItemsMenu(
@@ -848,4 +977,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
     );
   }
+
+  Widget switchOpenCLoseStore() => Transform.scale(
+        scale: 1,
+        child: Switch(
+          value: storeIsOpen,
+          onChanged: (value) {
+            setState(() {
+              storeIsOpen = value;
+            });
+            merchantStatusOpen(value);
+          },
+          activeColor: Warna.kuning,
+          activeTrackColor: Warna.kuning.withOpacity(0.14),
+          inactiveThumbColor: Colors.transparent,
+          inactiveTrackColor: Colors.transparent,
+          splashRadius: 50.0,
+        ),
+      );
 }
