@@ -79,9 +79,20 @@ class _CanteenScreenState extends State<CanteenScreen>
   }
 
   Future<void> fetchDetailDataMerchant() async {
+    log(widget.isOwner.toString());
+    log(widget.merchantId.toString());
+    int merchId = 0;
+    if (widget.isOwner!) {
+      setState(() {
+        merchId = AppConfig.MERCHANT_ID;
+      });
+    } else {
+      setState(() {
+        merchId = widget.merchantId!;
+      });
+    }
     merchantDataResponse = await FetchController(
-      endpoint:
-          'merchants/${widget.merchantId}/detail?userId=${AppConfig.USER_ID}',
+      endpoint: 'merchants/$merchId/detail?userId=${AppConfig.USER_ID}',
       fromJson: (json) => GetDetailMerchantResponse.fromJson(json),
     ).getData();
 
@@ -335,49 +346,52 @@ class _CanteenScreenState extends State<CanteenScreen>
                                       ),
                                     ),
                                   ),
-                                  Positioned(
-                                    bottom: 0,
-                                    right: 25,
-                                    child: Container(
-                                      width: 62,
-                                      height: 62,
-                                      padding: const EdgeInsets.all(5),
-                                      decoration: BoxDecoration(
-                                        borderRadius: const BorderRadius.only(
-                                          topLeft: Radius.circular(60),
-                                          topRight: Radius.circular(60),
+                                  widget.isOwner!
+                                      ? Container()
+                                      : Positioned(
+                                          bottom: 0,
+                                          right: 25,
+                                          child: Container(
+                                            width: 62,
+                                            height: 62,
+                                            padding: const EdgeInsets.all(5),
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  const BorderRadius.only(
+                                                topLeft: Radius.circular(60),
+                                                topRight: Radius.circular(60),
+                                              ),
+                                              color: Warna.pageBackgroundColor,
+                                            ),
+                                            child: IconButton(
+                                              onPressed: () {
+                                                tapFollow(context);
+                                                // setState(() {
+                                                //   favorited = !favorited;
+                                                // });
+                                              },
+                                              icon: Icon(
+                                                Icons.favorite,
+                                                color: Warna.abu2,
+                                              ),
+                                              selectedIcon: const Icon(
+                                                Icons.favorite,
+                                                color: Colors.white,
+                                              ),
+                                              iconSize: 20,
+                                              isSelected: favorited,
+                                              style: IconButton.styleFrom(
+                                                backgroundColor: favorited
+                                                    ? Warna.like
+                                                    : Colors.white,
+                                                shadowColor: Warna.shadow,
+                                                elevation: 2.5,
+                                              ),
+                                              disabledColor: Warna.abu2,
+                                              focusColor: Colors.white,
+                                            ),
+                                          ),
                                         ),
-                                        color: Warna.pageBackgroundColor,
-                                      ),
-                                      child: IconButton(
-                                        onPressed: () {
-                                          tapFollow(context);
-                                          // setState(() {
-                                          //   favorited = !favorited;
-                                          // });
-                                        },
-                                        icon: Icon(
-                                          Icons.favorite,
-                                          color: Warna.abu2,
-                                        ),
-                                        selectedIcon: const Icon(
-                                          Icons.favorite,
-                                          color: Colors.white,
-                                        ),
-                                        iconSize: 20,
-                                        isSelected: favorited,
-                                        style: IconButton.styleFrom(
-                                          backgroundColor: favorited
-                                              ? Warna.like
-                                              : Colors.white,
-                                          shadowColor: Warna.shadow,
-                                          elevation: 2.5,
-                                        ),
-                                        disabledColor: Warna.abu2,
-                                        focusColor: Colors.white,
-                                      ),
-                                    ),
-                                  ),
                                 ],
                               ),
                             ),
@@ -387,7 +401,44 @@ class _CanteenScreenState extends State<CanteenScreen>
                               [
                                 bodyCanteenInfo(),
                                 dataMerchant?.danusInformation == null
-                                    ? Container()
+                                    ? Padding(
+                                        padding: const EdgeInsets.only(top: 15),
+                                        child: ListTile(
+                                          // contentPadding: EdgeInsets.zero,
+                                          contentPadding:
+                                              const EdgeInsets.symmetric(
+                                                  horizontal: 25, vertical: 10),
+                                          tileColor:
+                                              Warna.kuning.withOpacity(0.10),
+
+                                          title: const Text(
+                                            // dataMerchant!
+                                            //     .danusInformation!.organizationName!
+                                            //     .toString(),
+                                            "Lagi Danusan?",
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.w700),
+                                          ),
+                                          subtitle: const Text(
+                                            'Prioritaskan menu kamu agar mudah ditemukan pembeli',
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.w400),
+                                          ),
+                                          trailing: IconButton(
+                                            onPressed: () {},
+                                            icon: const Icon(Icons
+                                                .arrow_forward_ios_rounded),
+                                            iconSize: 18,
+                                            style: IconButton.styleFrom(
+                                              backgroundColor: Warna.kuning,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(50),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      )
                                     : Padding(
                                         padding: const EdgeInsets.only(top: 15),
                                         child: ListTile(

@@ -98,12 +98,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
     });
 
     if (merchantInformation != null) {
+      log('save merchant info');
       setState(() {
         AppConfig.MERCHANT_ID = merchantInformation!.merchantId!;
         AppConfig.MERCHANT_TYPE = merchantInformation!.merchantType!;
         AppConfig.MERCHANT_PHOTO =
             AppConfig.URL_IMAGES_PATH + merchantInformation!.merchantPhoto!;
       });
+      log('merchant id : ${AppConfig.MERCHANT_ID}');
     }
   }
 
@@ -836,57 +838,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               const Spacer(),
               // switchOpenCLoseStore(),
-              IconButton(
-                onPressed: () {
+              InkWell(
+                onTap: () {
                   setState(() {
                     AppConfig.ON_DASHBOARD = false;
                   });
                   navigateToRep(context, const MainScreen());
                 },
-                icon: const Icon(Icons.arrow_circle_right_rounded),
-                iconSize: 10,
-                padding: EdgeInsets.zero,
-                style: IconButton.styleFrom(
-                    backgroundColor: Warna.kuning,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50))),
+                child: Icon(Icons.arrow_circle_right_rounded, color: Warna.kuning, size: 25,),
               ),
             ],
           ),
         ),
-        Container(
-            padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 9),
-            color: Warna.kuning.withOpacity(0.05),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                driverItemsMenu(
-                  onTap: () {
-                    // navigateTo(context, const OrderAvailableScreen());
-                  },
-                  icons: Icons.move_to_inbox,
-                  text: 'Pesanan Masuk',
-                  notifCount: 7,
-                ),
-                driverItemsMenu(
-                  onTap: () {
-                    // navigateTo(context, const DeliveryInfoScreen());
-                  },
-                  icons: UIcons.regularRounded.receipt,
-                  text: 'Transaksi',
-                  notifCount: 7,
-                ),
-                driverItemsMenu(
-                  onTap: () {
-                    navigateTo(context, ChatSellerScreen());
-                  },
-                  icons: UIcons.solidRounded.comment,
-                  text: 'Chat Pembeli',
-                  notifCount: 7,
-                ),
-              ],
-            )),
       ],
     );
   }

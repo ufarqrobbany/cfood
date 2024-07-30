@@ -4,6 +4,7 @@ import 'package:cfood/screens/profile.dart';
 import 'package:cfood/screens/wirausaha_pages/order.dart';
 import 'package:cfood/screens/wirausaha_pages/transaction.dart';
 import 'package:cfood/style.dart';
+import 'package:cfood/utils/constant.dart';
 import 'package:community_material_icon/community_material_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:toast/toast.dart';
@@ -19,8 +20,9 @@ class MainScreenMerchant extends StatefulWidget {
 List<dynamic> _pageMenuCanteen = [
   const OrderWirausahaScreen(),
   const TransactionWirausahaScreen(),
-  const CanteenScreen(
+  CanteenScreen(
     isOwner: true,
+    merchantId: AppConfig.MERCHANT_ID,
   ),
   ProfileScreen(
     userType: 'wirausaha',

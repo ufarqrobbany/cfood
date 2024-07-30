@@ -157,7 +157,7 @@ class DanusInformation {
     activityId = json['activityId'];
     activityName = json['activityName'];
   }
-s
+
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['organizationId'] = this.organizationId;
