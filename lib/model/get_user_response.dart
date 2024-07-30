@@ -33,6 +33,7 @@ class DataUser {
   DataUserCampus? campus;
   StudentInformation? studentInformation;
   dynamic isPenjual;
+  MerchantInformation? merchantInformation;
   bool? kurir;
 
   DataUser({
@@ -43,6 +44,7 @@ class DataUser {
     this.campus,
     this.studentInformation,
     this.isPenjual,
+    this.merchantInformation,
     this.kurir,
   });
 
@@ -54,6 +56,7 @@ class DataUser {
     campus: json["campus"] == null ? null : DataUserCampus.fromJson(json["campus"]),
     studentInformation: json["studentInformation"] == null ? null : StudentInformation.fromJson(json["studentInformation"]),
     isPenjual: json["isPenjual"],
+    merchantInformation: json["merchantInformation"] == null ? null : MerchantInformation.fromJson(json["merchantInformation"]),
     kurir: json["kurir"],
   );
 
@@ -65,6 +68,7 @@ class DataUser {
     "campus": campus?.toJson(),
     "studentInformation": studentInformation?.toJson(),
     "isPenjual": isPenjual,
+    "merchantInformation": merchantInformation,
     "kurir": kurir,
   };
 }
@@ -150,4 +154,37 @@ class StudyProgram {
     "id": id,
     "programName": programName,
   };
+}
+
+class MerchantInformation {
+  int? merchantId;
+  String? merchantName;
+  String? merchantPhoto;
+  String? merchantDesc;
+  String? merchantType;
+
+  MerchantInformation(
+      {this.merchantId,
+      this.merchantName,
+      this.merchantPhoto,
+      this.merchantDesc,
+      this.merchantType,});
+
+  MerchantInformation.fromJson(Map<String, dynamic> json) {
+    merchantId = json['id'];
+    merchantName = json['merchantName'];
+    merchantPhoto = json['merchantPhoto'];
+    merchantDesc = json['merchantDesc'];
+    merchantType = json['merchantType'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['merchantId'] = this.merchantId;
+    data['merchantName'] = this.merchantName;
+    data['merchantPhoto'] = this.merchantPhoto;
+    data['merchantDesc'] = this.merchantDesc;
+    data['merchantType'] = this.merchantType;
+    return data;
+  }
 }

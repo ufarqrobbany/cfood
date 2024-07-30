@@ -71,7 +71,8 @@ class _SplashScreenState extends State<SplashScreen> {
         } else if (AppConfig.USER_TYPE == 'kantin') {
           log('go to kantin pages');
         } else if (AppConfig.USER_TYPE == 'wirausaha') {
-          log('go to wirausaha pages');
+          log('go as wirausahawan');
+          navigateToRep(context, const MainScreen());
         } else if (AppConfig.USER_TYPE == 'kurir') {
           log('go to kurir pages');
         }

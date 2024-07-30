@@ -1,7 +1,11 @@
+import 'dart:developer';
+
 import 'package:cfood/custom/CButtons.dart';
 import 'package:cfood/custom/CPageMover.dart';
 import 'package:cfood/custom/card.dart';
 import 'package:cfood/custom/reload_indicator.dart';
+import 'package:cfood/model/getl_all_merchant_response.dart';
+import 'package:cfood/repository/fetch_controller.dart';
 import 'package:cfood/screens/canteen.dart';
 import 'package:cfood/screens/favorite.dart';
 import 'package:cfood/screens/inbox.dart';
@@ -26,9 +30,18 @@ class _HomeScreenState extends State<HomeScreen> {
   String nama_user = '';
   String first_name = '';
 
+  GetAllMerchantsResponse? dataMerchantsResponse;
+  DataGetMerchant? dataMerchants;
+  MerchantItems? merchantListItems;
+
   @override
   void initState() {
     super.initState();
+
+    if(dataMerchantsResponse == null) {
+      log('load all merchants');
+      getAllMerchants(context);
+    }
 
     setState(() {
       nama_user = AppConfig.NAME;
@@ -53,6 +66,17 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void dispose() {
     super.dispose();
+  }
+
+  Future<void> getAllMerchants(BuildContext context) async {
+    dataMerchantsResponse = await FetchController(
+      endpoint: 'merchants/all?page=1&size=10&type=all&isOpen=all&searchName=',
+      fromJson: (json)=> GetAllMerchantsResponse.fromJson(json),
+    ).getData();
+
+    setState(() {
+      dataMerchants = dataMerchantsResponse?.data;
+    });
   }
 
   @override
@@ -382,7 +406,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       context,
                       const CanteenScreen(
                         menuId: '0',
-                        storeId: '1',
+                        merchantId: 1,
                       ),
                     );
                   },
@@ -436,7 +460,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       context,
                       const CanteenScreen(
                         menuId: '0',
-                        storeId: '1',
+                        merchantId: 1,
                       ),
                     );
                   },
@@ -508,22 +532,30 @@ class _HomeScreenState extends State<HomeScreen> {
             textAlign: TextAlign.left,
           ),
         ),
+        dataMerchants?.merchants == null ? Container() :
         ListView.builder(
-          itemCount: 10,
+          itemCount: dataMerchants?.merchants?.length,
           physics: const NeverScrollableScrollPhysics(),
           shrinkWrap: true,
           padding: const EdgeInsets.fromLTRB(25, 15, 25, 40),
           itemBuilder: (context, index) {
+            MerchantItems? items = dataMerchants?.merchants![index];
             return Container(
               // margin: const EdgeInsets.only(top: 25, bottom: 10, left: 25, right: 25),
               padding: const EdgeInsets.symmetric(vertical: 10),
               child: CanteenCardBox(
-                canteenName: '[Canteen Name]',
-                menuList: 'Rendang, Ayam Geprek, Nasgor ...',
-                likes: '200',
-                rate: '4.4',
-                type: 'kantin',
-                onPressed: () => navigateTo(context, const CanteenScreen()),
+                imgUrl: '${AppConfig.URL_IMAGES_PATH}${items?.merchantPhoto}',
+                canteenName: items?.merchantName,
+                menuList: 'kosong',
+                likes: '0',
+                rate: '${items?.rating}',
+                type: items?.merchantType,
+                onPressed: () => navigateTo(context, CanteenScreen(
+                  merchantId: items?.merchantId,
+                  isOwner: false,
+                  merchantType: items!.merchantType!,
+                  itsDanusan: items.danus,
+                )),
               ),
             );
           },

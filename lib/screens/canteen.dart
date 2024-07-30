@@ -6,24 +6,27 @@ import 'package:cfood/custom/CPageMover.dart';
 import 'package:cfood/custom/CTextField.dart';
 import 'package:cfood/custom/card.dart';
 import 'package:cfood/custom/reload_indicator.dart';
+import 'package:cfood/model/add_merchants_response.dart';
+import 'package:cfood/model/follow_merchant_response.dart';
+import 'package:cfood/model/get_detail_merchant_response.dart';
+import 'package:cfood/repository/fetch_controller.dart';
 import 'package:cfood/screens/reviews.dart';
 import 'package:cfood/style.dart';
+import 'package:cfood/utils/constant.dart';
 import 'package:flutter/material.dart';
 import 'package:uicons/uicons.dart';
 
 class CanteenScreen extends StatefulWidget {
-  final String? storeId;
+  final int? merchantId;
   final String? menuId;
-  final bool? itsCanteen;
-  final bool? itsBusiness;
+  final String merchantType;
   final bool? itsDanusan;
   final bool? isOwner;
   const CanteenScreen({
     super.key,
-    this.storeId,
+    this.merchantId,
     this.menuId,
-    this.itsCanteen = true,
-    this.itsBusiness = false,
+    this.merchantType = 'WIRAUSAHA',
     this.itsDanusan = false,
     this.isOwner = false,
   });
@@ -42,6 +45,10 @@ class _CanteenScreenState extends State<CanteenScreen>
   late TabController categoryTabController;
   TextEditingController searchTextController = TextEditingController();
   List<Map<String, dynamic>> orderMenuCount = [];
+
+  GetDetailMerchantResponse? merchantDataResponse;
+  String? photoMerchant;
+
   Map<String, Map<String, Map<String, dynamic>>> menuMaps = {
     'Semua': {
       'menu 1': {
@@ -321,6 +328,7 @@ class _CanteenScreenState extends State<CanteenScreen>
   }
 
   Future<void> onEnterPage() async {
+    fetchDetailDataMerchant();
     if (widget.menuId != null) {
       WidgetsBinding.instance.addPostFrameCallback(
         (_) {
@@ -334,6 +342,31 @@ class _CanteenScreenState extends State<CanteenScreen>
     await Future.delayed(const Duration(seconds: 10));
 
     print('reload...');
+  }
+
+  Future<void> fetchDetailDataMerchant() async {
+    merchantDataResponse = await FetchController(
+      endpoint: 'merchants/${widget.merchantId}/detail?userId=${AppConfig.USER_ID}',
+      fromJson: (json) => GetDetailMerchantResponse.fromJson(json),
+    ).getData();
+
+    setState(() {
+      photoMerchant = AppConfig.URL_IMAGES_PATH +
+          merchantDataResponse!.data!.merchantPhoto!;
+    });
+    log(
+      {
+        "photo": photoMerchant,
+      }.toString(),
+    );
+  }
+
+  Future<void> followMerchants(BuildContext context) async {
+    await FetchController(
+      endpoint:
+          'merchants/${widget.merchantId}/follow?userId=${AppConfig.USER_ID}',
+      fromJson: (json) => FollowMerchantResponse.fromJson(json),
+    ).postData({});
   }
 
   Future<void> addOrderMenu({

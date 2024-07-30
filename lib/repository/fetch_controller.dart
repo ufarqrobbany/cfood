@@ -5,8 +5,10 @@ import 'package:cfood/model/error_response.dart';
 import 'package:cfood/model/reponse_handler.dart';
 import 'package:dio/dio.dart';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 import 'package:flutter/material.dart';
 import 'package:cfood/utils/constant.dart';
+import 'package:path/path.dart' as path;
 
 class FetchController {
   final String baseUrl;
@@ -38,7 +40,9 @@ class FetchController {
     log('response: ${response.body}');
 
     if (response.statusCode <= 300) {
+      dynamic data = fromJson(json.decode(response.body));
       log(response.body);
+      // showToast(data.message);
       return fromJson(json.decode(response.body));
     } else {
       ErrorResponse data = errorResponseFromJson(response.body);
@@ -51,7 +55,7 @@ class FetchController {
   Future<dynamic> postData(Map<String, dynamic> body) async {
     Uri url = getUrl();
     final response =
-        await http.post(url, headers: headers, body: json.encode(body));
+        await http.post(url, headers: headers, body: body == {} ? null : json.encode(body));
 
     log("data : $body");
 
@@ -79,12 +83,14 @@ class FetchController {
 
   Future<dynamic> putData(Map<String, dynamic> body) async {
     Uri url = getUrl();
-    final response =
-        await http.put(url, headers: headers, body: json.encode(body));
+    final response = await http.put(url,
+        headers: headers, body: body == {} ? null : json.encode(body));
 
     log("response: ${response.body}");
     if (response.statusCode <= 300) {
+      dynamic data = fromJson(json.decode(response.body));
       log(response.body);
+      showToast(data.message!);
       return fromJson(json.decode(response.body));
     } else if (response.statusCode <= 499) {
       ResponseHendler data = responseHendlerFromJson(response.body);
@@ -127,33 +133,25 @@ class FetchController {
       Dio dio = Dio();
       Uri url = getUrl();
 
-      // FormData formData = FormData();
-
-      // // Add text fields
-      // formData.fields.add(MapEntry(
-      //   dataKeyName,
-      //   json.encode(data),
-      // ));
-
-      // log(json.encode(data).toString());
-
-      //  // Add single file
-      // String fileName = file.path.split('/').last;
-      // formData.files.add(MapEntry(
-      //   fileKeyName,
-      //   await MultipartFile.fromFile(file.path, filename: fileName),
-      // ));
-
       // FormData creation
       FormData formData = FormData.fromMap({
-        dataKeyName: json.encode(data),
-        fileKeyName: await MultipartFile.fromFile(file.path,
-            filename: file.path.split('/').last),
+        // dataKeyName: json.encode(data),
+        dataKeyName: MultipartFile.fromString(
+          json.encode(data),
+          contentType: MediaType.parse('application/json'),
+        ),
+        fileKeyName: await MultipartFile.fromFile(
+          file.path,
+          filename: path.basename(file.path),
+          contentType:
+              MediaType('image', path.extension(file.path).replaceAll('.', '')),
+        ),
       });
 
       log("Request URL: $url");
       log("Request Headers: $headers");
-      log("FormData: ${formData.fields}, ${formData.files}");
+      log("FormData Fields: ${formData.fields}");
+      log("FormData Files: ${formData.files}");
 
       Response response = await dio.post(
         url.toString(),
@@ -162,7 +160,85 @@ class FetchController {
           headers: headers,
         ),
       );
-      
+
+      log("Response URI: ${response.statusCode}");
+      log("Response URI: ${response.realUri}");
+      log("Response data: ${response.data}");
+
+      if (response.statusCode! <= 499) {
+        log(response.data.toString());
+        return fromJson(response.data);
+      } else {
+        ErrorResponse data = errorResponseFromJson(response.data);
+        log(response.data.toString());
+        showToast(data.error!);
+        return {
+          'status': 'error',
+          'message': data.error
+        }; // Return error without throwing exception
+      }
+    } catch (e) {
+      log(e.toString());
+      showToast("An error occurred");
+      throw Exception("Failed to upload data");
+    }
+  }
+
+  Future<dynamic> puttMultipartData({
+    required String dataKeyName,
+    required Map<String, dynamic> data,
+    required File? file,
+    required String fileKeyName,
+    required bool? withImage,
+    // required List<MultipartFile> files,
+  }) async {
+    try {
+      Dio dio = Dio();
+      Uri url = getUrl();
+
+
+      log('Data: ${json.encode(data)}');
+      log('File: ${file?.path}');
+      String dataEncode = json.encode(data);
+      FormData formData = withImage == false
+          ? FormData.fromMap({
+              dataKeyName: MultipartFile.fromString(
+                dataEncode,
+                contentType: MediaType.parse('application/json'),
+              ),
+            })
+          : FormData.fromMap({
+              dataKeyName: MultipartFile.fromString(
+                dataEncode,
+                contentType: MediaType.parse('application/json'),
+              ),
+              fileKeyName: await MultipartFile.fromFile(
+                file!.path,
+                filename: path.basename(file.path),
+                contentType: MediaType(
+                    'image', path.extension(file.path).replaceAll('.', '')),
+              ),
+            });
+
+      // Log formData content to debug
+      for (var field in formData.fields) {
+        log("FormData Field: ${field.key} = ${field.value}");
+      }
+      for (var file in formData.files) {
+        log("FormData File: ${file.key} = ${file.value.filename}");
+      }
+
+      log("Request URL: $url");
+      log("Request Headers: $headers");
+
+      Response response = await dio.put(
+        url.toString(),
+        data: formData,
+        options: Options(
+          headers: headers,
+        ),
+      );
+
       log("Response URI: ${response.statusCode}");
       log("Response URI: ${response.realUri}");
       log("Response data: ${response.data}");

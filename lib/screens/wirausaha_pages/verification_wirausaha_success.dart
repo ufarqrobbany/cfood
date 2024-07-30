@@ -59,7 +59,8 @@ class VerificatioWirausahanSuccess extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 25),
                 child: CBlueButton(
                   onPressed: () {
-                   navigateTo(context, const MainScreenCanteen());
+                  //  navigateTo(context, const MainScreenCanteen());
+                  navigateBack(context);
                   },
                   text: 'Masuk ke laman Wirausaha',
                 ),

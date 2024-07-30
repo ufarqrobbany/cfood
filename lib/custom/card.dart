@@ -729,19 +729,23 @@ class CanteenCardBox extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Container(
-              width: 140,
-              height: 140,
-              decoration: BoxDecoration(
-                color: Warna.abu,
-                borderRadius: const BorderRadius.only(
+            ClipRRect(
+               borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(8), bottomLeft: Radius.circular(8)),
+              child: Container(
+                width: 140,
+                height: 140,
+                decoration: BoxDecoration(
+                  color: Warna.abu,
+                  borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(8), bottomLeft: Radius.circular(8)),
+                ),
+                child: imgUrl == null
+                    ? const Center(
+                        child: Icon(Icons.image),
+                      )
+                    : Image.network(imgUrl!, fit: BoxFit.cover,),
               ),
-              child: imgUrl == null
-                  ? const Center(
-                      child: Icon(Icons.image),
-                    )
-                  : Image.network(imgUrl!),
             ),
             Expanded(
               child: Padding(

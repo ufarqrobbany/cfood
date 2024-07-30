@@ -9,6 +9,7 @@ import 'package:cfood/model/add_merchants_response.dart';
 import 'package:cfood/repository/fetch_controller.dart';
 import 'package:cfood/screens/wirausaha_pages/verification_wirausaha_success.dart';
 import 'package:cfood/style.dart';
+import 'package:cfood/utils/auth.dart';
 import 'package:cfood/utils/constant.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -68,11 +69,13 @@ class _SignupWirausahaScreenState extends State<SignupWirausahaScreen> {
     }
 
     try {
-      AddMerchantResponse response = await FetchController(
+      AddMerchantResponse response = 
+      await FetchController(
         endpoint: 'merchants/',
         headers: {
-          "Content-type": 'multipart/form-data',
+          "Content-Type": 'multipart/form-data',
           "Accept": "*/*",
+          // "Accept-Encoding": 'gzip, deflate, br',
         },
         fromJson: (json) => AddMerchantResponse.fromJson(json),
       ).postMultipartData(
@@ -87,11 +90,24 @@ class _SignupWirausahaScreenState extends State<SignupWirausahaScreen> {
         file: _image!,
       );
 
+      DataMerchant dataMerchant = response.data!;
+      log(dataMerchant.toString());
+
+       AuthHelper().setMerchantId(id: dataMerchant.merchantId.toString());
+      setState(() {
+        AppConfig.MERCHANT_ID = dataMerchant.merchantId!;
+        AppConfig.MERCHANT_NAME = dataMerchant.merchantName!;
+        AppConfig.MERCHANT_DESC = dataMerchant.merchantDesc!;
+        AppConfig.MERCHANT_OPEN = dataMerchant.open!;
+        AppConfig.MERCHANT_TYPE = dataMerchant.merchantType!;
+        AppConfig.MERCHANT_PHOTO += dataMerchant.merchantPhoto!;
+      });
+
       setState(() {
         buttonLoad = false;
       });
       log('go to verification success');
-      // navigateTo(context, const VerificatioWirausahanSuccess());
+      navigateToRep(context, const VerificatioWirausahanSuccess());
     } on Exception catch (e) {
       setState(() {
         buttonLoad = false;
@@ -187,6 +203,7 @@ class _SignupWirausahaScreenState extends State<SignupWirausahaScreen> {
                 controller: descriptionController,
                 hintText: '',
                 labelText: 'Deskripsi',
+                subLabelText: '  ${descriptionController.text.length}/100 karakter',
                 minLines: 5,
               ),
               const SizedBox(

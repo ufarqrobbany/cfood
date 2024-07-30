@@ -46,6 +46,7 @@ dependencies:
   # web_browser: ^0.7.4
   google_maps_flutter_web: ^0.5.8
   image_picker: ^1.1.2
+  mime: ^1.0.5
 
   # CONFIG
   shared_preferences: ^2.2.3
