@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:uicons/uicons.dart';
 
 class OrganizationScreen extends StatefulWidget {
-  final String? id;
+  final int? id;
   const OrganizationScreen({
     super.key,
     this.id,
@@ -415,9 +415,9 @@ class _OrganizationScreenState extends State<OrganizationScreen>
                 padding: const EdgeInsets.symmetric(vertical: 10),
                 child: OrganizationCardBox(
                   organizationName: item['nama'],
-                  menuList: item['menuList'],
-                  likes: item['likes'],
-                  rate: item['rate'],
+                  // menuList: item['menuList'],
+                  // likes: item['likes'],
+                  // rate: item['rate'],
                 ),
               ),
             );

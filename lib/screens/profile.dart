@@ -837,15 +837,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ),
               const Spacer(),
-              // switchOpenCLoseStore(),
-              InkWell(
-                onTap: () {
-                  setState(() {
-                    AppConfig.ON_DASHBOARD = false;
-                  });
-                  navigateToRep(context, const MainScreen());
-                },
-                child: Icon(Icons.arrow_circle_right_rounded, color: Warna.kuning, size: 25,),
+              SizedBox(
+                width: 30, // Sesuaikan ukuran yang diinginkan
+                height: 30, // Sesuaikan ukuran yang diinginkan
+                child: IconButton(
+                  onPressed: () {
+                    setState(() {
+                      AppConfig.ON_DASHBOARD = false;
+                    });
+                    navigateToRep(context, const MainScreen());
+                  },
+                  icon: const Icon(Icons.arrow_forward_ios_rounded),
+                  iconSize: 10,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(
+                    minWidth: 10, // Sesuaikan ukuran minimal yang diinginkan
+                    minHeight: 10, // Sesuaikan ukuran minimal yang diinginkan
+                  ),
+                  style: IconButton.styleFrom(
+                    backgroundColor: Warna.kuning,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(50),
+                    ),
+                  ),
+                ),
               ),
             ],
           ),

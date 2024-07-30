@@ -1,7 +1,5 @@
 import 'dart:convert';
 
-
-
 class GetDetailMerchantResponse {
   int? statusCode;
   String? status;
@@ -15,7 +13,9 @@ class GetDetailMerchantResponse {
     statusCode = json['statusCode'];
     status = json['status'];
     message = json['message'];
-    data = json['data'] != null ? new DataDetailMerchant.fromJson(json['data']) : null;
+    data = json['data'] != null
+        ? new DataDetailMerchant.fromJson(json['data'])
+        : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -103,6 +103,7 @@ class StudentInformation {
   int? studentId;
   int? userId;
   String? userName;
+  String? userPhoto;
   String? campusName;
   String? majorName;
   String? studyProgramName;
@@ -111,6 +112,7 @@ class StudentInformation {
       {this.studentId,
       this.userId,
       this.userName,
+      this.userPhoto,
       this.campusName,
       this.majorName,
       this.studyProgramName});
@@ -119,6 +121,7 @@ class StudentInformation {
     studentId = json['studentId'];
     userId = json['userId'];
     userName = json['userName'];
+    userPhoto = json['userPhoto'];
     campusName = json['campusName'];
     majorName = json['majorName'];
     studyProgramName = json['studyProgramName'];
@@ -129,6 +132,7 @@ class StudentInformation {
     data['studentId'] = this.studentId;
     data['userId'] = this.userId;
     data['userName'] = this.userName;
+    data['userPhoto'] = this.userPhoto;
     data['campusName'] = this.campusName;
     data['majorName'] = this.majorName;
     data['studyProgramName'] = this.studyProgramName;

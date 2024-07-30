@@ -31,7 +31,7 @@ List<dynamic> _pageMenuCanteen = [
 
 List<String> _pageMenuNameCanteen = [
   'Pesanan',
-  'Transakasi',
+  'Transaksi',
   'Wirausaha',
   'Opsi',
 ];
@@ -104,8 +104,8 @@ class _MainScreenMerchantState extends State<MainScreenMerchant> {
               buttonMenu(
                 page: _pageMenuCanteen[0],
                 pageName: _pageMenuNameCanteen[0],
-                iconsON: UIcons.solidRounded.home,
-                iconsOff: UIcons.regularRounded.home,
+                iconsON: UIcons.solidRounded.utensils,
+                iconsOff: UIcons.regularRounded.utensils,
               ),
               buttonMenu(
                   page: _pageMenuCanteen[1],

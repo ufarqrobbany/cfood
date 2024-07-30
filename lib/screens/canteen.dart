@@ -479,9 +479,6 @@ class _CanteenScreenState extends State<CanteenScreen>
                                             ),
                                           ),
                                           title: const Text(
-                                            // dataMerchant!
-                                            //     .danusInformation!.organizationName!
-                                            //     .toString(),
                                             "Sedang Danusan",
                                             style: TextStyle(
                                                 fontWeight: FontWeight.w700),
@@ -582,36 +579,61 @@ class _CanteenScreenState extends State<CanteenScreen>
           //   style: AppTextStyles.textRegular,
           // ),
           const SizedBox(
-            height: 8,
+            height: 16,
           ),
           storeReviewContainer(),
           const SizedBox(
-            height: 8,
+            height: 16,
           ),
-          Wrap(
-            textDirection: TextDirection.ltr,
-            // verticalDirection: VerticalDirection.down,
-            children: [
-              Icon(
-                UIcons.solidRounded.user,
-                color: Warna.biru,
-                size: 16,
+          Container(
+            width: double.infinity,
+            child: ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: ClipRRect(
+                borderRadius: BorderRadius.circular(50),
+                child: Container(
+                  height: 40,
+                  width: 40,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(50),
+                    color: Warna.abu2,
+                  ),
+                  child: Image.network(
+                    '${AppConfig.URL_IMAGES_PATH}${dataMerchant?.studentInformation?.userPhoto}', // userPhoto
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        height: 40,
+                        width: 40,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(50),
+                          color: Warna.abu2,
+                        ),
+                      );
+                    },
+                  ),
+                ),
               ),
-              const SizedBox(
-                width: 8,
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('${dataMerchant?.studentInformation?.userName}',
+                      style: const TextStyle(fontWeight: FontWeight.w700)),
+                  Text('${dataMerchant?.studentInformation?.studyProgramName}',
+                      style: const TextStyle(fontSize: 12)),
+                ],
               ),
-              Text(
-                '${dataMerchant!.studentInformation!.userName} - ${dataMerchant!.studentInformation!.studyProgramName}',
-                style: AppTextStyles.textRegular,
-              ),
-            ],
+            ),
           ),
           const SizedBox(
-            height: 8,
+            height: 16,
           ),
           Text(
             '${dataMerchant!.merchantDesc}',
             style: AppTextStyles.textRegular,
+          ),
+          const SizedBox(
+            height: 8,
           ),
         ],
       ),
@@ -875,6 +897,34 @@ class _CanteenScreenState extends State<CanteenScreen>
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
+        dataMerchant!.open == true
+            ? Container()
+            : Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(4),
+                    border: Border.all(color: Warna.like, width: 1),
+                    color: Warna.like.withOpacity(0.10)),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      UIcons.solidRounded.time_oclock,
+                      size: 13,
+                      color: Warna.like,
+                    ),
+                    const Text(
+                      ' Tutup',
+                      style: TextStyle(fontSize: 12),
+                    ),
+                  ],
+                ),
+              ),
+        dataMerchant!.open == true
+            ? Container()
+            : const SizedBox(
+                width: 8,
+              ),
         dataMerchant!.location == null
             ? Container()
             : Container(
@@ -901,9 +951,11 @@ class _CanteenScreenState extends State<CanteenScreen>
                   ],
                 ),
               ),
-        const SizedBox(
-          width: 8,
-        ),
+        dataMerchant!.location == null
+            ? Container()
+            : const SizedBox(
+                width: 8,
+              ),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
           decoration: BoxDecoration(
@@ -944,12 +996,10 @@ class _CanteenScreenState extends State<CanteenScreen>
                 size: 15,
                 color: Warna.kuning,
               ),
-              dataMerchant!.rating == 0.0
-                  ? Container()
-                  : Text(
-                      dataMerchant!.rating!.toString(),
-                      style: TextStyle(fontSize: 12),
-                    ),
+              Text(
+                dataMerchant!.rating!.toString(),
+                style: TextStyle(fontSize: 12),
+              ),
             ],
           ),
         ),
