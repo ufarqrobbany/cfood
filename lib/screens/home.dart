@@ -38,7 +38,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
 
-    if(dataMerchantsResponse == null) {
+    if (dataMerchantsResponse == null) {
       log('load all merchants');
       getAllMerchants(context);
     }
@@ -71,7 +71,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> getAllMerchants(BuildContext context) async {
     dataMerchantsResponse = await FetchController(
       endpoint: 'merchants/all?page=1&size=10&type=all&isOpen=all&searchName=',
-      fromJson: (json)=> GetAllMerchantsResponse.fromJson(json),
+      fromJson: (json) => GetAllMerchantsResponse.fromJson(json),
     ).getData();
 
     setState(() {
@@ -341,7 +341,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   onTap: () => navigateTo(
                     context,
                     const SeeAllItemsScreen(
-                      type: 'Wirausaha',
+                      typeName: 'Wirausaha',
+                      typeCode: 'wirausaha',
                     ),
                   ),
                   icons: CommunityMaterialIcons.handshake,
@@ -355,7 +356,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   onTap: () => navigateTo(
                     context,
                     const SeeAllItemsScreen(
-                      type: 'Kantin',
+                      typeName: 'Kantin',
+                      typeCode: 'kantin',
                     ),
                   ),
                   icons: Icons.store,
@@ -436,7 +438,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   onPressed: () => navigateTo(
                         context,
                         const SeeAllItemsScreen(
-                          type: 'Pre-Order',
+                          typeName: 'Pre-Order',
+                          typeCode: 'pre-order',
                         ),
                       ),
                   text: 'Lihat Semua'),
@@ -490,7 +493,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   onPressed: () => navigateTo(
                         context,
                         const SeeAllItemsScreen(
-                          type: 'Organisasi',
+                          typeName: 'Organisasi',
+                          typeCode: 'organisasi',
                         ),
                       ),
                   text: 'Lihat Semua'),
@@ -532,34 +536,41 @@ class _HomeScreenState extends State<HomeScreen> {
             textAlign: TextAlign.left,
           ),
         ),
-        dataMerchants?.merchants == null ? Container() :
-        ListView.builder(
-          itemCount: dataMerchants?.merchants?.length,
-          physics: const NeverScrollableScrollPhysics(),
-          shrinkWrap: true,
-          padding: const EdgeInsets.fromLTRB(25, 15, 25, 40),
-          itemBuilder: (context, index) {
-            MerchantItems? items = dataMerchants?.merchants![index];
-            return Container(
-              // margin: const EdgeInsets.only(top: 25, bottom: 10, left: 25, right: 25),
-              padding: const EdgeInsets.symmetric(vertical: 10),
-              child: CanteenCardBox(
-                imgUrl: '${AppConfig.URL_IMAGES_PATH}${items?.merchantPhoto}',
-                canteenName: items?.merchantName,
-                menuList: 'kosong',
-                likes: '0',
-                rate: '${items?.rating}',
-                type: items?.merchantType,
-                onPressed: () => navigateTo(context, CanteenScreen(
-                  merchantId: items?.merchantId,
-                  isOwner: false,
-                  merchantType: items!.merchantType!,
-                  itsDanusan: items.danus,
-                )),
+        dataMerchants?.merchants == null
+            ? Container()
+            : ListView.builder(
+                itemCount: dataMerchants?.merchants?.length,
+                physics: const NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
+                padding: const EdgeInsets.fromLTRB(25, 15, 25, 40),
+                itemBuilder: (context, index) {
+                  MerchantItems? items = dataMerchants?.merchants![index];
+                  return Container(
+                    // margin: const EdgeInsets.only(top: 25, bottom: 10, left: 25, right: 25),
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    child: CanteenCardBox(
+                      imgUrl:
+                          '${AppConfig.URL_IMAGES_PATH}${items?.merchantPhoto}',
+                      canteenName: items?.merchantName,
+                      // menuList: 'kosong',
+                      // likes: ' 0',
+                      likes: ' ${items?.followers}',
+                      rate: '${items?.rating}',
+                      type: items?.merchantType,
+                      open: items!.open!,
+                      danus: items.danus!,
+                      onPressed: () => navigateTo(
+                          context,
+                          CanteenScreen(
+                            merchantId: items.merchantId,
+                            isOwner: false,
+                            merchantType: items.merchantType!,
+                            itsDanusan: items.danus,
+                          )),
+                    ),
+                  );
+                },
               ),
-            );
-          },
-        ),
 
         const SizedBox(
           height: 100,

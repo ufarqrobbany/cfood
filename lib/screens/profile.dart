@@ -22,6 +22,7 @@ import 'package:cfood/screens/kurir_pages/order_status.dart';
 import 'package:cfood/screens/login.dart';
 import 'package:cfood/screens/main.dart';
 import 'package:cfood/screens/user_info.dart';
+import 'package:cfood/screens/wirausaha_pages/main.dart';
 import 'package:cfood/screens/wirausaha_pages/signup_wirausaha.dart';
 import 'package:cfood/screens/wirausaha_pages/update_merchant.dart';
 import 'package:cfood/style.dart';
@@ -86,6 +87,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
       studentInfo = dataUser!.studentInformation;
       merchantInformation = dataUser!.merchantInformation;
 
+      AppConfig.URL_PHOTO_PROFILE =
+          AppConfig.URL_IMAGES_PATH + dataUser!.userPhoto!;
+
       if (studentInfo != null) {
         isStudent = true;
       } else {
@@ -97,7 +101,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       setState(() {
         AppConfig.MERCHANT_ID = merchantInformation!.merchantId!;
         AppConfig.MERCHANT_TYPE = merchantInformation!.merchantType!;
-        AppConfig.MERCHANT_PHOTO = AppConfig.URL_IMAGES_PATH + merchantInformation!.merchantPhoto!;
+        AppConfig.MERCHANT_PHOTO =
+            AppConfig.URL_IMAGES_PATH + merchantInformation!.merchantPhoto!;
       });
     }
   }
@@ -213,18 +218,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
           child: Column(
             children: [
               profileBoxHeader(),
-              joinWirausahaNotifBox(),
+              studentInfo?.id != null && dataUser?.isPenjual == null
+                  ? joinWirausahaNotifBox()
+                  : Container(),
+              studentInfo?.id != null && dataUser?.isPenjual == 'wirausaha'
+                  ? AppConfig.ON_DASHBOARD
+                      ? goToConsumenMode()
+                      : boxMerchantTaks()
+                  : Container(),
+              const SizedBox(
+                height: 10,
+              ),
               studentInfo?.id != null
                   ? AppConfig.IS_DRIVER == true
                       ? Container()
                       : joinDriverNotifBox()
                   : Container(),
-              studentInfo?.id != null && dataUser?.isPenjual == 'wirausaha'
-                  ? boxMerchantTaks()
-                  : Container(),
-              const SizedBox(
-                height: 10,
-              ),
+
               // boxMerchantTaks(),
               AppConfig.IS_DRIVER == true ? boxDriverTasks() : Container(),
               widget.userType == 'kantin'
@@ -578,9 +588,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               )
                             : Image.network(
                                 dataUser?.userPhoto != null
-                                    ?
-                                    // '${AppConfig.URL_IMAGES_PATH}${dataUser?.userPhoto}'
-                                    '${AppConfig.URL_PHOTO_PROFILE}}'
+                                    ? '${AppConfig.URL_IMAGES_PATH}${dataUser?.userPhoto}'
+                                    // '${AppConfig.URL_PHOTO_PROFILE}}'
                                     : 'https://i.pinimg.com/originals/d9/d8/8e/d9d88e3d1f74e2b8ced3df051cecb81d.jpg',
                                 fit: BoxFit.cover,
                                 errorBuilder: (context, error, stackTrace) {
@@ -736,17 +745,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ),
               const Spacer(),
-              switchOpenCLoseStore(),
+              // switchOpenCLoseStore(),
               SizedBox(
                 height: 30,
                 child: DynamicColorButton(
                   onPressed: () {
-                    navigateTo(
-                      context,
-                      UpdateMerchantScreen(
-                        merchantId: AppConfig.MERCHANT_ID,
-                      ),
-                    );
+                    setState(() {
+                      AppConfig.ON_DASHBOARD = true;
+                    });
+                    navigateToRep(context, const MainScreenMerchant());
+                    // navigateTo(
+                    //   context,
+                    //   UpdateMerchantScreen(
+                    //     merchantId: AppConfig.MERCHANT_ID,
+                    //   ),
+                    // );
                   },
                   text: 'Lihat Akun Wirausaha  >',
                   textStyle: TextStyle(
@@ -761,6 +774,82 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     vertical: 2,
                   ),
                 ),
+              ),
+            ],
+          ),
+        ),
+        Container(
+            padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 9),
+            color: Warna.kuning.withOpacity(0.05),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                driverItemsMenu(
+                  onTap: () {
+                    // navigateTo(context, const OrderAvailableScreen());
+                  },
+                  icons: Icons.move_to_inbox,
+                  text: 'Pesanan Masuk',
+                  notifCount: 7,
+                ),
+                driverItemsMenu(
+                  onTap: () {
+                    // navigateTo(context, const DeliveryInfoScreen());
+                  },
+                  icons: UIcons.regularRounded.receipt,
+                  text: 'Transaksi',
+                  notifCount: 7,
+                ),
+                driverItemsMenu(
+                  onTap: () {
+                    navigateTo(context, ChatSellerScreen());
+                  },
+                  icons: UIcons.solidRounded.comment,
+                  text: 'Chat Pembeli',
+                  notifCount: 7,
+                ),
+              ],
+            )),
+      ],
+    );
+  }
+
+  Widget goToConsumenMode() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
+          color: Warna.kuning.withOpacity(0.10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Text(
+                'Masuk ke mode konsumen',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: Warna.regulerFontColor,
+                ),
+              ),
+              const Spacer(),
+              // switchOpenCLoseStore(),
+              IconButton(
+                onPressed: () {
+                  setState(() {
+                    AppConfig.ON_DASHBOARD = false;
+                  });
+                  navigateToRep(context, const MainScreen());
+                },
+                icon: const Icon(Icons.arrow_circle_right_rounded),
+                iconSize: 10,
+                padding: EdgeInsets.zero,
+                style: IconButton.styleFrom(
+                    backgroundColor: Warna.kuning,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(50))),
               ),
             ],
           ),

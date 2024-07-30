@@ -54,8 +54,8 @@ class FetchController {
 
   Future<dynamic> postData(Map<String, dynamic> body) async {
     Uri url = getUrl();
-    final response =
-        await http.post(url, headers: headers, body: body == {} ? null : json.encode(body));
+    final response = await http.post(url,
+        headers: headers, body: body == {} ? null : json.encode(body));
 
     log("data : $body");
 
@@ -106,13 +106,20 @@ class FetchController {
     }
   }
 
-  Future<void> deleteData() async {
+  Future<dynamic> deleteData() async {
     Uri url = getUrl();
     final response = await http.delete(url, headers: headers);
 
-    if (response.statusCode <= 300) {
+    log(response.body);
+
+    if (response.statusCode <= 399) {
       log(response.body);
       return fromJson(json.decode(response.body));
+    } else if (response.statusCode <= 499) {
+      Error400Response data = error400ResponseFromJson(response.body);
+      log(response.body);
+      showToast(data.status!);
+      throw Exception(data.status);
     } else {
       ErrorResponse data = errorResponseFromJson(response.body);
       log(response.body);
@@ -195,7 +202,6 @@ class FetchController {
     try {
       Dio dio = Dio();
       Uri url = getUrl();
-
 
       log('Data: ${json.encode(data)}');
       log('File: ${file?.path}');

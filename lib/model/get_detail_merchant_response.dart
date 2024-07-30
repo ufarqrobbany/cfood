@@ -139,26 +139,30 @@ class StudentInformation {
 class DanusInformation {
   int? organizationId;
   String? organizationName;
+  String? organizationPhoto;
   int? activityId;
   String? activityName;
 
   DanusInformation(
       {this.organizationId,
       this.organizationName,
+      this.organizationPhoto,
       this.activityId,
       this.activityName});
 
   DanusInformation.fromJson(Map<String, dynamic> json) {
     organizationId = json['organizationId'];
     organizationName = json['organizationName'];
+    organizationPhoto = json['organizationPhoto'];
     activityId = json['activityId'];
     activityName = json['activityName'];
   }
-
+s
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['organizationId'] = this.organizationId;
     data['organizationName'] = this.organizationName;
+    data['organizationPhoto'] = this.organizationPhoto;
     data['activityId'] = this.activityId;
     data['activityName'] = this.activityName;
     return data;

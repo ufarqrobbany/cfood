@@ -4,6 +4,7 @@ import 'package:cfood/custom/CBottomSheet.dart';
 import 'package:cfood/custom/CButtons.dart';
 import 'package:cfood/custom/CPageMover.dart';
 import 'package:cfood/custom/CTextField.dart';
+import 'package:cfood/custom/CToast.dart';
 import 'package:cfood/custom/card.dart';
 import 'package:cfood/custom/reload_indicator.dart';
 import 'package:cfood/model/add_merchants_response.dart';
@@ -13,7 +14,10 @@ import 'package:cfood/repository/fetch_controller.dart';
 import 'package:cfood/screens/reviews.dart';
 import 'package:cfood/style.dart';
 import 'package:cfood/utils/constant.dart';
+import 'package:community_material_icon/community_material_icon.dart';
 import 'package:flutter/material.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:toast/toast.dart';
 import 'package:uicons/uicons.dart';
 
 class CanteenScreen extends StatefulWidget {
@@ -47,278 +51,8 @@ class _CanteenScreenState extends State<CanteenScreen>
   List<Map<String, dynamic>> orderMenuCount = [];
 
   GetDetailMerchantResponse? merchantDataResponse;
+  DataDetailMerchant? dataMerchant;
   String? photoMerchant;
-
-  Map<String, Map<String, Map<String, dynamic>>> menuMaps = {
-    'Semua': {
-      'menu 1': {
-        'id': '1',
-        'nama': 'nama menu',
-        'rate': '4.0',
-        'likes': '100',
-        'price': 10000,
-        'count': 0,
-        'sold': 100,
-        'custom': true,
-      },
-      'menu 2': {
-        'id': '2',
-        'nama': 'nama menu',
-        'rate': '4.0',
-        'likes': '100',
-        'price': 10000,
-        'count': 0,
-        'sold': 100,
-        'custom': false,
-      },
-      'menu 3': {
-        'id': '3',
-        'nama': 'nama menu',
-        'rate': '4.0',
-        'likes': '100',
-        'price': 10000,
-        'count': 0,
-        'sold': 100,
-        'custom': false,
-      },
-      'menu 4': {
-        'id': '4',
-        'nama': 'nama menu',
-        'rate': '4.0',
-        'likes': '100',
-        'price': 10000,
-        'count': 0,
-        'sold': 100,
-        'custom': false,
-      },
-      'menu 5': {
-        'id': '5',
-        'nama': 'nama menu',
-        'rate': '4.0',
-        'likes': '100',
-        'price': 10000,
-        'count': 0,
-        'sold': 100,
-        'custom': false,
-      },
-      'menu 6': {
-        'id': '6',
-        'nama': 'nama menu',
-        'rate': '4.0',
-        'likes': '100',
-        'price': 10000,
-        'count': 0,
-        'sold': 100,
-        'custom': false,
-      },
-    },
-    'kategori 1': {
-      'menu 1': {
-        'id': '7',
-        'nama': 'nama menu kategori 1',
-        'rate': '4.0',
-        'likes': '100',
-        'price': 10000,
-        'count': 0,
-        'sold': 100,
-        'custom': false,
-      },
-      'menu 2': {
-        'id': '8',
-        'nama': 'nama menu',
-        'rate': '4.0',
-        'likes': '100',
-        'price': 10000,
-        'count': 0,
-        'sold': 100,
-        'custom': false,
-      },
-      'menu 3': {
-        'id': '9',
-        'nama': 'nama menu',
-        'rate': '4.0',
-        'likes': '100',
-        'price': 10000,
-        'count': 0,
-        'sold': 100,
-        'custom': false,
-      },
-      'menu 4': {
-        'id': '10',
-        'nama': 'nama menu',
-        'rate': '4.0',
-        'likes': '100',
-        'price': 10000,
-        'count': 0,
-        'sold': 100,
-        'custom': false,
-      },
-    },
-    'kategori 2': {
-      'menu 1': {
-        'id': '11',
-        'nama': 'nama menu kategori 2',
-        'rate': '4.0',
-        'likes': '100',
-        'price': 10000,
-        'count': 0,
-        'sold': 100,
-        'custom': false,
-      },
-      'menu 2': {
-        'id': '12',
-        'nama': 'nama menu',
-        'rate': '4.0',
-        'likes': '100',
-        'price': 10000,
-        'count': 0,
-        'sold': 100,
-        'custom': false,
-      },
-      'menu 3': {
-        'id': '13',
-        'nama': 'nama menu',
-        'rate': '4.0',
-        'likes': '100',
-        'price': 10000,
-        'count': 0,
-        'sold': 100,
-        'custom': false,
-      },
-      'menu 4': {
-        'id': '14',
-        'nama': 'nama menu',
-        'rate': '4.0',
-        'likes': '100',
-        'price': 10000,
-        'count': 0,
-        'sold': 100,
-        'custom': false,
-      },
-    },
-    'kategori 3': {
-      'menu 1': {
-        'id': '15',
-        'nama': 'nama menu kategori 3',
-        'rate': '4.0',
-        'likes': '100',
-        'price': 10000,
-        'count': 0,
-        'sold': 100,
-        'custom': false,
-      },
-      'menu 2': {
-        'id': '16',
-        'nama': 'nama menu',
-        'rate': '4.0',
-        'likes': '100',
-        'price': 10000,
-        'count': 0,
-        'sold': 100,
-        'custom': false,
-      },
-      'menu 3': {
-        'id': '17',
-        'nama': 'nama menu',
-        'rate': '4.0',
-        'likes': '100',
-        'price': 10000,
-        'count': 0,
-        'sold': 100,
-        'custom': false,
-      },
-      'menu 4': {
-        'id': '18',
-        'nama': 'nama menu',
-        'rate': '4.0',
-        'likes': '100',
-        'price': 10000,
-        'count': 0,
-        'sold': 100,
-        'custom': false,
-      },
-    },
-    'kategori 4': {
-      'menu 1': {
-        'id': '19',
-        'nama': 'nama menu kategori 4',
-        'rate': '4.0',
-        'likes': '100',
-        'price': 10000,
-        'count': 0,
-        'sold': 100,
-        'custom': false,
-      },
-      'menu 2': {
-        'id': '20',
-        'nama': 'nama menu',
-        'rate': '4.0',
-        'likes': '100',
-        'price': 10000,
-        'count': 0,
-        'sold': 100,
-        'custom': false,
-      },
-      'menu 3': {
-        'id': '21',
-        'nama': 'nama menu',
-        'rate': '4.0',
-        'likes': '100',
-        'price': 10000,
-        'count': 0,
-        'sold': 100,
-        'custom': false,
-      },
-      'menu 4': {
-        'id': '22',
-        'nama': 'nama menu',
-        'rate': '4.0',
-        'likes': '100',
-        'price': 10000,
-        'count': 0,
-        'sold': 100,
-        'custom': false,
-      },
-    }
-  };
-
-  List<Map<String, dynamic>> variantMenuTypeList = [
-    {
-      'name': 'koclat',
-      'variants': [
-        {
-          'name': 'coclat deme',
-          'cost': 1000,
-          'selected': false,
-        },
-        {
-          'name': 'keju deme',
-          'cost': 1000,
-          'selected': false,
-        },
-      ],
-    },
-    {
-      'name': 'tiramusi',
-      'variants': [
-        {
-          'name': 'coclat tiramese',
-          'cost': 1000,
-          'selected': false,
-        },
-      ],
-    },
-    {
-      'name': 'vanila',
-      'variants': [
-        {
-          'name': 'vanila tiramese',
-          'cost': 1000,
-          'selected': false,
-        },
-      ],
-    },
-  ];
 
   @override
   void initState() {
@@ -339,33 +73,80 @@ class _CanteenScreenState extends State<CanteenScreen>
   }
 
   Future<void> refreshPage() async {
-    await Future.delayed(const Duration(seconds: 10));
-
+    await Future.delayed(const Duration(seconds: 1));
+    fetchDetailDataMerchant();
     print('reload...');
   }
 
   Future<void> fetchDetailDataMerchant() async {
     merchantDataResponse = await FetchController(
-      endpoint: 'merchants/${widget.merchantId}/detail?userId=${AppConfig.USER_ID}',
+      endpoint:
+          'merchants/${widget.merchantId}/detail?userId=${AppConfig.USER_ID}',
       fromJson: (json) => GetDetailMerchantResponse.fromJson(json),
     ).getData();
 
     setState(() {
+      dataMerchant = merchantDataResponse!.data;
+      favorited = merchantDataResponse!.data!.follow!;
       photoMerchant = AppConfig.URL_IMAGES_PATH +
           merchantDataResponse!.data!.merchantPhoto!;
     });
-    log(
-      {
-        "photo": photoMerchant,
-      }.toString(),
-    );
+    log("$dataMerchant");
+  }
+
+  void tapFollow(BuildContext context) {
+    if (favorited) {
+      log('tap unfollow merchnat');
+      unFollowMerchants(context);
+    } else {
+      log('tap follow merchant');
+      followMerchants(context);
+    }
   }
 
   Future<void> followMerchants(BuildContext context) async {
-    await FetchController(
+    FollowMerchantResponse response = await FetchController(
       endpoint:
           'merchants/${widget.merchantId}/follow?userId=${AppConfig.USER_ID}',
       fromJson: (json) => FollowMerchantResponse.fromJson(json),
+    ).postData({});
+
+    if (response.statusCode == 201 || response.status == 'success') {
+      setState(() {
+        favorited = true;
+      });
+      log('tap follow merchant');
+    } else {
+      // Handle error here
+      log('Failed to follow merchant');
+      showToast('Gagal Follow ${dataMerchant!.merchantName}');
+    }
+  }
+
+  Future<void> unFollowMerchants(BuildContext context) async {
+    UnfollowMerchantResponse response = await FetchController(
+      endpoint:
+          'merchants/${widget.merchantId}/unfollow?userId=${AppConfig.USER_ID}',
+      fromJson: (json) => UnfollowMerchantResponse.fromJson(json),
+    ).deleteData();
+
+    if (response.statusCode == 200 || response.status == 'success') {
+      setState(() {
+        favorited = false;
+      });
+      log('tap unfollow merchant');
+    } else {
+      // Handle error here
+      log('Failed to unfollow merchant');
+      showToast('Gagal Unfollow ${dataMerchant!.merchantName}');
+    }
+  }
+
+  Future<void> isFollowMerchants(BuildContext context) async {
+    await FetchController(
+      endpoint:
+          'merchants/${widget.merchantId}/is-follow?userId=${AppConfig.USER_ID}',
+      fromJson: (json) => IsFollowMerchantResponse.fromJson(json),
     ).postData({});
   }
 
@@ -416,6 +197,7 @@ class _CanteenScreenState extends State<CanteenScreen>
 
   @override
   Widget build(BuildContext context) {
+    ToastContext().init(context);
     return Scaffold(
       appBar: widget.isOwner!
           ? null
@@ -494,147 +276,199 @@ class _CanteenScreenState extends State<CanteenScreen>
               child: SizedBox(
                 width: double.infinity,
                 height: double.infinity,
-                child: CustomScrollView(
-                  physics: const BouncingScrollPhysics(
-                    parent: AlwaysScrollableScrollPhysics(),
-                  ),
-                  slivers: [
-                    // SliverAppBar(
-                    //   pinned: true,
-
-                    // ),
-                    SliverList(
-                        delegate: SliverChildListDelegate([
-                      Container(
-                        height: 225,
-                        width: double.infinity,
-                        color: Warna.pageBackgroundColor,
-                        padding: const EdgeInsets.only(bottom: 0),
-                        child: Stack(
-                          children: [
-                            Container(
-                              width: double.infinity,
-                              height: 225,
-                              padding: const EdgeInsets.only(bottom: 25),
-                              child: Image.network(
-                                '/.jpg',
-                                errorBuilder: (context, error, stackTrace) =>
-                                    Container(
-                                  height: 200,
-                                  width: double.infinity,
-                                  color: Warna.abu4,
-                                ),
-                              ),
-                            ),
-                            Positioned(
-                              bottom: 0,
-                              right: 25,
-                              child: Container(
-                                width: 62,
-                                height: 62,
-                                padding: const EdgeInsets.all(5),
-                                decoration: BoxDecoration(
-                                  borderRadius: const BorderRadius.only(
-                                    topLeft: Radius.circular(60),
-                                    topRight: Radius.circular(60),
-                                  ),
-                                  color: Warna.pageBackgroundColor,
-                                ),
-                                child: IconButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      favorited = !favorited;
-                                    });
-                                  },
-                                  icon: Icon(
-                                    Icons.favorite,
-                                    color: Warna.abu2,
-                                  ),
-                                  selectedIcon: const Icon(
-                                    Icons.favorite,
-                                    color: Colors.white,
-                                  ),
-                                  iconSize: 20,
-                                  isSelected: favorited,
-                                  style: IconButton.styleFrom(
-                                    backgroundColor:
-                                        favorited ? Warna.like : Colors.white,
-                                    shadowColor: Warna.shadow,
-                                    elevation: 2.5,
-                                  ),
-                                  disabledColor: Warna.abu2,
-                                  focusColor: Colors.white,
-                                ),
-                              ),
-                            ),
-                          ],
+                child: dataMerchant == null
+                    ? Container()
+                    : CustomScrollView(
+                        physics: const BouncingScrollPhysics(
+                          parent: AlwaysScrollableScrollPhysics(),
                         ),
-                      ),
-                    ])),
-                    SliverList(
-                      delegate: SliverChildListDelegate(
-                        [
-                          bodyCanteenInfo(),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 15),
-                            child: ListTile(
-                              // contentPadding: EdgeInsets.zero,
-                              contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 25, vertical: 10),
-                              tileColor: Warna.kuning.withOpacity(0.10),
-                              leading: ClipRRect(
-                                borderRadius: BorderRadius.circular(40),
-                                child: Image.network(
-                                  '/.jpg',
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return Container(
-                                      height: 40,
-                                      width: 40,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(40),
+                        slivers: [
+                          // SliverAppBar(
+                          //   pinned: true,
+
+                          // ),
+                          SliverList(
+                              delegate: SliverChildListDelegate([
+                            Container(
+                              height: 225,
+                              width: double.infinity,
+                              color: Warna.pageBackgroundColor,
+                              padding: const EdgeInsets.only(bottom: 0),
+                              child: Stack(
+                                children: [
+                                  Container(
+                                    width: double.infinity,
+                                    height: 225,
+                                    padding: const EdgeInsets.only(bottom: 25),
+                                    child: Image.network(
+                                      photoMerchant!,
+                                      fit: BoxFit.cover,
+                                      loadingBuilder:
+                                          (context, child, loadingProgress) {
+                                        if (loadingProgress == null) {
+                                          // Jika loadingProgress null, itu berarti gambar sudah selesai dimuat
+                                          return child;
+                                        } else {
+                                          // Tampilkan loading indicator selama gambar belum selesai dimuat
+                                          return Container(
+                                            height: 200,
+                                            width: double.infinity,
+                                            color: Warna.abu2,
+                                            child: Center(
+                                              child: SizedBox(
+                                                width: 50,
+                                                child: LoadingAnimationWidget
+                                                    .staggeredDotsWave(
+                                                        color: Warna.biru,
+                                                        size: 30),
+                                              ),
+                                            ),
+                                          );
+                                        }
+                                      },
+                                      errorBuilder:
+                                          (context, error, stackTrace) =>
+                                              Container(
+                                        height: 200,
+                                        width: double.infinity,
                                         color: Warna.abu2,
                                       ),
-                                    );
-                                  },
-                                ),
-                              ),
-                              title: const Text(
-                                'Sedang Danusan',
-                                style: TextStyle(fontWeight: FontWeight.w700),
-                              ),
-                              subtitle: const Text(
-                                'Kegiatan [Nama Kegiatan]\n[Nama Organisasi]',
-                                style: TextStyle(fontWeight: FontWeight.w400),
-                              ),
-                              trailing: IconButton(
-                                onPressed: () {},
-                                icon:
-                                    const Icon(Icons.arrow_forward_ios_rounded),
-                                iconSize: 18,
-                                style: IconButton.styleFrom(
-                                    backgroundColor: Warna.kuning,
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(50))),
+                                    ),
+                                  ),
+                                  Positioned(
+                                    bottom: 0,
+                                    right: 25,
+                                    child: Container(
+                                      width: 62,
+                                      height: 62,
+                                      padding: const EdgeInsets.all(5),
+                                      decoration: BoxDecoration(
+                                        borderRadius: const BorderRadius.only(
+                                          topLeft: Radius.circular(60),
+                                          topRight: Radius.circular(60),
+                                        ),
+                                        color: Warna.pageBackgroundColor,
+                                      ),
+                                      child: IconButton(
+                                        onPressed: () {
+                                          tapFollow(context);
+                                          // setState(() {
+                                          //   favorited = !favorited;
+                                          // });
+                                        },
+                                        icon: Icon(
+                                          Icons.favorite,
+                                          color: Warna.abu2,
+                                        ),
+                                        selectedIcon: const Icon(
+                                          Icons.favorite,
+                                          color: Colors.white,
+                                        ),
+                                        iconSize: 20,
+                                        isSelected: favorited,
+                                        style: IconButton.styleFrom(
+                                          backgroundColor: favorited
+                                              ? Warna.like
+                                              : Colors.white,
+                                          shadowColor: Warna.shadow,
+                                          elevation: 2.5,
+                                        ),
+                                        disabledColor: Warna.abu2,
+                                        focusColor: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
+                          ])),
+                          SliverList(
+                            delegate: SliverChildListDelegate(
+                              [
+                                bodyCanteenInfo(),
+                                dataMerchant?.danusInformation == null
+                                    ? Container()
+                                    : Padding(
+                                        padding: const EdgeInsets.only(top: 15),
+                                        child: ListTile(
+                                          // contentPadding: EdgeInsets.zero,
+                                          contentPadding:
+                                              const EdgeInsets.symmetric(
+                                                  horizontal: 25, vertical: 10),
+                                          tileColor:
+                                              Warna.kuning.withOpacity(0.10),
+                                          leading: ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(50),
+                                            child: Container(
+                                              height: 50,
+                                              width: 50,
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(50),
+                                                color: Warna.abu2,
+                                              ),
+                                              child: Image.network(
+                                                '${AppConfig.URL_IMAGES_PATH}${dataMerchant?.danusInformation?.organizationPhoto}',
+                                                fit: BoxFit.cover,
+                                                errorBuilder: (context, error,
+                                                    stackTrace) {
+                                                  return Container(
+                                                    height: 50,
+                                                    width: 50,
+                                                    decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              50),
+                                                      color: Warna.abu2,
+                                                    ),
+                                                  );
+                                                },
+                                              ),
+                                            ),
+                                          ),
+                                          title: const Text(
+                                            // dataMerchant!
+                                            //     .danusInformation!.organizationName!
+                                            //     .toString(),
+                                            "Sedang Danusan",
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.w700),
+                                          ),
+                                          subtitle: Text(
+                                            'Kegiatan ${dataMerchant?.danusInformation?.activityName}\n${dataMerchant?.danusInformation?.organizationName}',
+                                            style: const TextStyle(
+                                                fontWeight: FontWeight.w400),
+                                          ),
+                                          trailing: IconButton(
+                                            onPressed: () {},
+                                            icon: const Icon(Icons
+                                                .arrow_forward_ios_rounded),
+                                            iconSize: 18,
+                                            style: IconButton.styleFrom(
+                                                backgroundColor: Warna.kuning,
+                                                shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            50))),
+                                          ),
+                                        ),
+                                      ),
+                                const SizedBox(
+                                  height: 25,
+                                ),
+                              ],
+                            ),
                           ),
-                          const SizedBox(
-                            height: 25,
-                          ),
+                          SliverList(
+                            delegate: SliverChildListDelegate(
+                              [
+                                bodyProductList(),
+                              ],
+                            ),
+                          )
                         ],
                       ),
-                    ),
-                    SliverList(
-                      delegate: SliverChildListDelegate(
-                        [
-                          bodyProductList(),
-                        ],
-                      ),
-                    )
-                  ],
-                ),
               ),
             ),
       floatingActionButton: widget.isOwner!
@@ -671,25 +505,31 @@ class _CanteenScreenState extends State<CanteenScreen>
             mainAxisAlignment: MainAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(
-                Icons.store,
-                color: Warna.biru.withOpacity(0.70),
-                size: 35,
-              ),
+              dataMerchant!.merchantType! == 'WIRAUSAHA'
+                  ? Icon(
+                      CommunityMaterialIcons.handshake,
+                      color: Warna.kuning,
+                      size: 35,
+                    )
+                  : Icon(
+                      Icons.store,
+                      color: Warna.biru.withOpacity(0.70),
+                      size: 35,
+                    ),
               const SizedBox(
                 width: 15,
               ),
-              const Text(
-                '[Nama Kantin]',
+              Text(
+                dataMerchant!.merchantName!,
                 style: AppTextStyles.title,
                 maxLines: 2,
               ),
             ],
           ),
-          const Text(
-            '[List Kategori Kantin]',
-            style: AppTextStyles.textRegular,
-          ),
+          // const Text(
+          //   '[List Kategori Kantin]',
+          //   style: AppTextStyles.textRegular,
+          // ),
           const SizedBox(
             height: 8,
           ),
@@ -697,7 +537,9 @@ class _CanteenScreenState extends State<CanteenScreen>
           const SizedBox(
             height: 8,
           ),
-          Row(
+          Wrap(
+            textDirection: TextDirection.ltr,
+            // verticalDirection: VerticalDirection.down,
             children: [
               Icon(
                 UIcons.solidRounded.user,
@@ -707,8 +549,8 @@ class _CanteenScreenState extends State<CanteenScreen>
               const SizedBox(
                 width: 8,
               ),
-              const Text(
-                'Nama Mahasiswa - Prodi dan Jurusan',
+              Text(
+                '${dataMerchant!.studentInformation!.userName} - ${dataMerchant!.studentInformation!.studyProgramName}',
                 style: AppTextStyles.textRegular,
               ),
             ],
@@ -716,8 +558,8 @@ class _CanteenScreenState extends State<CanteenScreen>
           const SizedBox(
             height: 8,
           ),
-          const Text(
-            '[Deskripsi kantin/wirausaha]',
+          Text(
+            '${dataMerchant!.merchantDesc}',
             style: AppTextStyles.textRegular,
           ),
         ],
@@ -982,29 +824,32 @@ class _CanteenScreenState extends State<CanteenScreen>
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(4),
-            border: Border.all(color: Warna.hijau.withOpacity(0.60), width: 1),
-            color: Warna.hijau.withOpacity(0.10),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Icons.location_pin,
-                size: 15,
-                color: Warna.hijau,
+        dataMerchant!.location == null
+            ? Container()
+            : Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(4),
+                  border: Border.all(
+                      color: Warna.hijau.withOpacity(0.60), width: 1),
+                  color: Warna.hijau.withOpacity(0.10),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.location_pin,
+                      size: 15,
+                      color: Warna.hijau,
+                    ),
+                    Text(
+                      dataMerchant!.location!,
+                      style: const TextStyle(fontSize: 12),
+                    ),
+                  ],
+                ),
               ),
-              const Text(
-                'Lokasi',
-                style: TextStyle(fontSize: 12),
-              ),
-            ],
-          ),
-        ),
         const SizedBox(
           width: 8,
         ),
@@ -1023,9 +868,9 @@ class _CanteenScreenState extends State<CanteenScreen>
                 size: 15,
                 color: Warna.like,
               ),
-              const Text(
-                '100',
-                style: TextStyle(fontSize: 12),
+              Text(
+                dataMerchant!.followers!.toString(),
+                style: const TextStyle(fontSize: 12),
               ),
             ],
           ),
@@ -1048,10 +893,12 @@ class _CanteenScreenState extends State<CanteenScreen>
                 size: 15,
                 color: Warna.kuning,
               ),
-              const Text(
-                '4.1',
-                style: TextStyle(fontSize: 12),
-              ),
+              dataMerchant!.rating == 0.0
+                  ? Container()
+                  : Text(
+                      dataMerchant!.rating!.toString(),
+                      style: TextStyle(fontSize: 12),
+                    ),
             ],
           ),
         ),
@@ -1490,4 +1337,275 @@ class _CanteenScreenState extends State<CanteenScreen>
       ),
     );
   }
+
+  Map<String, Map<String, Map<String, dynamic>>> menuMaps = {
+    'Semua': {
+      'menu 1': {
+        'id': '1',
+        'nama': 'nama menu',
+        'rate': '4.0',
+        'likes': '100',
+        'price': 10000,
+        'count': 0,
+        'sold': 100,
+        'custom': true,
+      },
+      'menu 2': {
+        'id': '2',
+        'nama': 'nama menu',
+        'rate': '4.0',
+        'likes': '100',
+        'price': 10000,
+        'count': 0,
+        'sold': 100,
+        'custom': false,
+      },
+      'menu 3': {
+        'id': '3',
+        'nama': 'nama menu',
+        'rate': '4.0',
+        'likes': '100',
+        'price': 10000,
+        'count': 0,
+        'sold': 100,
+        'custom': false,
+      },
+      'menu 4': {
+        'id': '4',
+        'nama': 'nama menu',
+        'rate': '4.0',
+        'likes': '100',
+        'price': 10000,
+        'count': 0,
+        'sold': 100,
+        'custom': false,
+      },
+      'menu 5': {
+        'id': '5',
+        'nama': 'nama menu',
+        'rate': '4.0',
+        'likes': '100',
+        'price': 10000,
+        'count': 0,
+        'sold': 100,
+        'custom': false,
+      },
+      'menu 6': {
+        'id': '6',
+        'nama': 'nama menu',
+        'rate': '4.0',
+        'likes': '100',
+        'price': 10000,
+        'count': 0,
+        'sold': 100,
+        'custom': false,
+      },
+    },
+    'kategori 1': {
+      'menu 1': {
+        'id': '7',
+        'nama': 'nama menu kategori 1',
+        'rate': '4.0',
+        'likes': '100',
+        'price': 10000,
+        'count': 0,
+        'sold': 100,
+        'custom': false,
+      },
+      'menu 2': {
+        'id': '8',
+        'nama': 'nama menu',
+        'rate': '4.0',
+        'likes': '100',
+        'price': 10000,
+        'count': 0,
+        'sold': 100,
+        'custom': false,
+      },
+      'menu 3': {
+        'id': '9',
+        'nama': 'nama menu',
+        'rate': '4.0',
+        'likes': '100',
+        'price': 10000,
+        'count': 0,
+        'sold': 100,
+        'custom': false,
+      },
+      'menu 4': {
+        'id': '10',
+        'nama': 'nama menu',
+        'rate': '4.0',
+        'likes': '100',
+        'price': 10000,
+        'count': 0,
+        'sold': 100,
+        'custom': false,
+      },
+    },
+    'kategori 2': {
+      'menu 1': {
+        'id': '11',
+        'nama': 'nama menu kategori 2',
+        'rate': '4.0',
+        'likes': '100',
+        'price': 10000,
+        'count': 0,
+        'sold': 100,
+        'custom': false,
+      },
+      'menu 2': {
+        'id': '12',
+        'nama': 'nama menu',
+        'rate': '4.0',
+        'likes': '100',
+        'price': 10000,
+        'count': 0,
+        'sold': 100,
+        'custom': false,
+      },
+      'menu 3': {
+        'id': '13',
+        'nama': 'nama menu',
+        'rate': '4.0',
+        'likes': '100',
+        'price': 10000,
+        'count': 0,
+        'sold': 100,
+        'custom': false,
+      },
+      'menu 4': {
+        'id': '14',
+        'nama': 'nama menu',
+        'rate': '4.0',
+        'likes': '100',
+        'price': 10000,
+        'count': 0,
+        'sold': 100,
+        'custom': false,
+      },
+    },
+    'kategori 3': {
+      'menu 1': {
+        'id': '15',
+        'nama': 'nama menu kategori 3',
+        'rate': '4.0',
+        'likes': '100',
+        'price': 10000,
+        'count': 0,
+        'sold': 100,
+        'custom': false,
+      },
+      'menu 2': {
+        'id': '16',
+        'nama': 'nama menu',
+        'rate': '4.0',
+        'likes': '100',
+        'price': 10000,
+        'count': 0,
+        'sold': 100,
+        'custom': false,
+      },
+      'menu 3': {
+        'id': '17',
+        'nama': 'nama menu',
+        'rate': '4.0',
+        'likes': '100',
+        'price': 10000,
+        'count': 0,
+        'sold': 100,
+        'custom': false,
+      },
+      'menu 4': {
+        'id': '18',
+        'nama': 'nama menu',
+        'rate': '4.0',
+        'likes': '100',
+        'price': 10000,
+        'count': 0,
+        'sold': 100,
+        'custom': false,
+      },
+    },
+    'kategori 4': {
+      'menu 1': {
+        'id': '19',
+        'nama': 'nama menu kategori 4',
+        'rate': '4.0',
+        'likes': '100',
+        'price': 10000,
+        'count': 0,
+        'sold': 100,
+        'custom': false,
+      },
+      'menu 2': {
+        'id': '20',
+        'nama': 'nama menu',
+        'rate': '4.0',
+        'likes': '100',
+        'price': 10000,
+        'count': 0,
+        'sold': 100,
+        'custom': false,
+      },
+      'menu 3': {
+        'id': '21',
+        'nama': 'nama menu',
+        'rate': '4.0',
+        'likes': '100',
+        'price': 10000,
+        'count': 0,
+        'sold': 100,
+        'custom': false,
+      },
+      'menu 4': {
+        'id': '22',
+        'nama': 'nama menu',
+        'rate': '4.0',
+        'likes': '100',
+        'price': 10000,
+        'count': 0,
+        'sold': 100,
+        'custom': false,
+      },
+    }
+  };
+
+  List<Map<String, dynamic>> variantMenuTypeList = [
+    {
+      'name': 'koclat',
+      'variants': [
+        {
+          'name': 'coclat deme',
+          'cost': 1000,
+          'selected': false,
+        },
+        {
+          'name': 'keju deme',
+          'cost': 1000,
+          'selected': false,
+        },
+      ],
+    },
+    {
+      'name': 'tiramusi',
+      'variants': [
+        {
+          'name': 'coclat tiramese',
+          'cost': 1000,
+          'selected': false,
+        },
+      ],
+    },
+    {
+      'name': 'vanila',
+      'variants': [
+        {
+          'name': 'vanila tiramese',
+          'cost': 1000,
+          'selected': false,
+        },
+      ],
+    },
+  ];
 }

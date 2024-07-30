@@ -1,18 +1,28 @@
+import 'dart:developer';
+
 import 'package:cfood/custom/CButtons.dart';
+import 'package:cfood/custom/CPageMover.dart';
 import 'package:cfood/custom/CTextField.dart';
 import 'package:cfood/custom/card.dart';
+import 'package:cfood/custom/page_item_void.dart';
 import 'package:cfood/custom/reload_indicator.dart';
+import 'package:cfood/model/getl_all_merchant_response.dart';
+import 'package:cfood/repository/fetch_controller.dart';
+import 'package:cfood/screens/canteen.dart';
 import 'package:cfood/style.dart';
+import 'package:cfood/utils/constant.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 class SeeAllItemsScreen extends StatefulWidget {
-  final String? type;
+  final String? typeName;
+  final String? typeCode;
   final bool? listGrid;
   const SeeAllItemsScreen({
     super.key,
     this.listGrid = false,
-    this.type = 'Kantin', // Kantin | Organiasi | Pre-Order | Wirausaha
+    this.typeName = 'Kantin', // Kantin | Organiasi | Pre-Order | Wirausaha
+    this.typeCode = 'kantin',
   });
 
   @override
@@ -21,34 +31,40 @@ class SeeAllItemsScreen extends StatefulWidget {
 
 class _SeeAllItemsScreenState extends State<SeeAllItemsScreen> {
   TextEditingController searchTextController = TextEditingController();
+  GetAllMerchantsResponse? dataMerchantsResponse;
+  DataGetMerchant? dataMerchants;
+  MerchantItems? merchantListItems;
 
   @override
   void initState() {
     super.initState();
+    fetchData();
   }
 
-  Future<void> refreshCanteenBody() async {
-    await Future.delayed(const Duration(seconds: 10));
-
-    print('reload...');
+  Future<void> fetchData() async {
+    log('get data type : ${widget.typeCode}');
+    if (widget.typeCode == 'wirausaha' || widget.typeCode == 'kantin') {
+      getAllMerchants(context);
+    }
   }
 
-  Future<void> refreshOrganizationBody() async {
-    await Future.delayed(const Duration(seconds: 10));
+  Future<void> getAllMerchants(BuildContext context,
+      {String searchItem = ''}) async {
+    dataMerchantsResponse = await FetchController(
+      endpoint:
+          'merchants/all?page=1&size=10&type=${widget.typeCode}&isOpen=all&searchName=$searchItem',
+      fromJson: (json) => GetAllMerchantsResponse.fromJson(json),
+    ).getData();
 
-    print('reload...');
+    setState(() {
+      dataMerchants = dataMerchantsResponse?.data;
+    });
   }
 
-  Future<void> refreshPreOrderBody() async {
-    await Future.delayed(const Duration(seconds: 10));
-
-    print('reload...');
-  }
-
-  Future<void> refreshWirausahaBody() async {
-    await Future.delayed(const Duration(seconds: 10));
-
-    print('reload...');
+  void onSearch({String searchItem = ''}) {
+    if (widget.typeCode == 'wirausaha' || widget.typeCode == 'kantin') {
+      getAllMerchants(context, searchItem: searchItem);
+    }
   }
 
   @override
@@ -58,7 +74,7 @@ class _SeeAllItemsScreenState extends State<SeeAllItemsScreen> {
         leadingWidth: 90,
         leading: backButtonCustom(context: context),
         title: Text(
-          widget.type!,
+          widget.typeName!,
           style: AppTextStyles.title,
         ),
         foregroundColor: Colors.white,
@@ -78,13 +94,17 @@ class _SeeAllItemsScreenState extends State<SeeAllItemsScreen> {
                         horizontal: 25, vertical: 15),
                     child: CTextField(
                       controller: searchTextController,
-                      hintText: 'Cari ${widget.type}',
+                      hintText: 'Cari ${widget.typeName}',
                       borderColor: Warna.abu4,
                       borderRadius: 58,
                       maxLines: 1,
                       textInputAction: TextInputAction.done,
-                      onSubmitted: (p0) {},
-                      onChanged: (p0) {},
+                      onSubmitted: (p0) {
+                        onSearch(searchItem: p0);
+                      },
+                      onChanged: (p0) {
+                        onSearch(searchItem: p0);
+                      },
                       prefixIcon: IconButton(
                           onPressed: () {},
                           padding: EdgeInsets.zero,
@@ -100,13 +120,13 @@ class _SeeAllItemsScreenState extends State<SeeAllItemsScreen> {
             )),
       ),
       backgroundColor: Colors.white,
-      body: widget.type == 'Kantin'
+      body: widget.typeCode == 'kantin'
           ? onCanteenBody()
-          : widget.type == 'Wirausaha'
+          : widget.typeCode == 'wirausaha'
               ? onWirausahaBody()
-              : widget.type == 'Organisasi'
+              : widget.typeCode == 'organisasi'
                   ? onOrganizationBody()
-                  : widget.type == 'Pre-Order'
+                  : widget.typeCode == 'pre-order'
                       ? onPreOrderBody()
                       : onPreOrderBody(),
     );
@@ -114,63 +134,97 @@ class _SeeAllItemsScreenState extends State<SeeAllItemsScreen> {
 
   Widget onCanteenBody() {
     return ReloadIndicatorType1(
-      onRefresh: refreshCanteenBody,
+      onRefresh: fetchData,
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
-        child: ListView.builder(
-          itemCount: 10,
-          physics: const NeverScrollableScrollPhysics(),
-          shrinkWrap: true,
-          padding: const EdgeInsets.fromLTRB(25, 25, 25, 20),
-          itemBuilder: (context, index) {
-            return Container(
-              // margin: const EdgeInsets.only(top: 25, bottom: 10, left: 25, right: 25),
-              padding: const EdgeInsets.symmetric(vertical: 10),
-              child: const CanteenCardBox(
-                canteenName: '[Canteen Name]',
-                menuList: 'Rendang, Ayam Geprek, Nasgor ...',
-                likes: '200',
-                rate: '4.4',
-                type: 'kantin',
-              ),
-            );
-          },
-        ),
+        child: dataMerchants?.merchants == null
+            ? Container()
+            : dataMerchants?.totalElements == 0
+                ? itemsEmptyBody(context)
+                : ListView.builder(
+                    itemCount: dataMerchants?.merchants?.length,
+                    physics: const NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    padding: const EdgeInsets.fromLTRB(25, 15, 25, 40),
+                    itemBuilder: (context, index) {
+                      MerchantItems? items = dataMerchants?.merchants![index];
+                      return Container(
+                        // margin: const EdgeInsets.only(top: 25, bottom: 10, left: 25, right: 25),
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        child: CanteenCardBox(
+                          imgUrl:
+                              '${AppConfig.URL_IMAGES_PATH}${items?.merchantPhoto}',
+                          canteenName: items?.merchantName,
+                          // menuList: 'kosong',
+                          likes: ' ${items?.followers}',
+                          rate: '${items?.rating}',
+                          type: items?.merchantType,
+                          open: items!.open!,
+                          danus: items.danus!,
+                          onPressed: () => navigateTo(
+                              context,
+                              CanteenScreen(
+                                merchantId: items?.merchantId,
+                                isOwner: false,
+                                merchantType: items!.merchantType!,
+                                itsDanusan: items.danus,
+                              )),
+                        ),
+                      );
+                    },
+                  ),
       ),
     );
   }
 
   Widget onWirausahaBody() {
     return ReloadIndicatorType1(
-      onRefresh: refreshWirausahaBody,
+      onRefresh: fetchData,
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
-        child: ListView.builder(
-          itemCount: 10,
-          physics: const NeverScrollableScrollPhysics(),
-          shrinkWrap: true,
-          padding: const EdgeInsets.fromLTRB(25, 25, 25, 20),
-          itemBuilder: (context, index) {
-            return Container(
-              // margin: const EdgeInsets.only(top: 25, bottom: 10, left: 25, right: 25),
-              padding: const EdgeInsets.symmetric(vertical: 10),
-              child: const CanteenCardBox(
-                canteenName: '[Canteen Name]',
-                menuList: 'Rendang, Ayam Geprek, Nasgor ...',
-                likes: '200',
-                rate: '4.4',
-                type: 'wirausaha',
-              ),
-            );
-          },
-        ),
+        child: dataMerchants?.merchants == null
+            ? Container()
+            : dataMerchants?.totalElements == 0
+                ? itemsEmptyBody(context)
+                : ListView.builder(
+                    itemCount: dataMerchants?.merchants?.length,
+                    physics: const NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    padding: const EdgeInsets.fromLTRB(25, 15, 25, 40),
+                    itemBuilder: (context, index) {
+                      MerchantItems? items = dataMerchants?.merchants![index];
+                      return Container(
+                        // margin: const EdgeInsets.only(top: 25, bottom: 10, left: 25, right: 25),
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        child: CanteenCardBox(
+                          imgUrl:
+                              '${AppConfig.URL_IMAGES_PATH}${items?.merchantPhoto}',
+                          canteenName: items?.merchantName,
+                          // menuList: 'kosong',
+                          likes: ' ${items?.followers}',
+                          rate: '${items?.rating}',
+                          type: items?.merchantType,
+                          open: items!.open!,
+                          danus: items.danus!,
+                          onPressed: () => navigateTo(
+                              context,
+                              CanteenScreen(
+                                merchantId: items?.merchantId,
+                                isOwner: false,
+                                merchantType: items!.merchantType!,
+                                itsDanusan: items.danus,
+                              )),
+                        ),
+                      );
+                    },
+                  ),
       ),
     );
   }
 
   Widget onOrganizationBody() {
     return ReloadIndicatorType1(
-      onRefresh: refreshOrganizationBody,
+      onRefresh: fetchData,
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
         child: ListView.builder(
@@ -197,7 +251,7 @@ class _SeeAllItemsScreenState extends State<SeeAllItemsScreen> {
 
   Widget onPreOrderBody() {
     return ReloadIndicatorType1(
-      onRefresh: refreshPreOrderBody,
+      onRefresh: fetchData,
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
         child: MasonryGridView.count(

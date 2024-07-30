@@ -695,6 +695,8 @@ class CanteenCardBox extends StatelessWidget {
   final String? menuList;
   final String? type;
   final VoidCallback? onPressed;
+  final bool open;
+  final bool danus;
   const CanteenCardBox({
     super.key,
     this.canteenId,
@@ -706,6 +708,8 @@ class CanteenCardBox extends StatelessWidget {
     this.menuList,
     this.type = 'kantin',
     this.onPressed,
+    this.open = false,
+    this.danus = false,
   });
 
   @override
@@ -713,7 +717,7 @@ class CanteenCardBox extends StatelessWidget {
     return InkWell(
       onTap: onPressed,
       child: Container(
-        height: 140,
+        height: 120,
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(8),
@@ -730,21 +734,25 @@ class CanteenCardBox extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             ClipRRect(
-               borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(8), bottomLeft: Radius.circular(8)),
+              borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(8), bottomLeft: Radius.circular(8)),
               child: Container(
-                width: 140,
-                height: 140,
+                width: 120,
+                height: 120,
                 decoration: BoxDecoration(
                   color: Warna.abu,
                   borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(8), bottomLeft: Radius.circular(8)),
+                      topLeft: Radius.circular(8),
+                      bottomLeft: Radius.circular(8)),
                 ),
                 child: imgUrl == null
                     ? const Center(
                         child: Icon(Icons.image),
                       )
-                    : Image.network(imgUrl!, fit: BoxFit.cover,),
+                    : Image.network(
+                        imgUrl!,
+                        fit: BoxFit.cover,
+                      ),
               ),
             ),
             Expanded(
@@ -775,17 +783,81 @@ class CanteenCardBox extends StatelessWidget {
                     const SizedBox(
                       height: 8,
                     ),
-                    Text(
-                      menuList!,
-                      style: AppTextStyles.productStoreName,
-                      maxLines: 1,
-                    ),
+                    menuList == null
+                        ? Container()
+                        : Text(
+                            menuList!,
+                            style: AppTextStyles.productStoreName,
+                            maxLines: 1,
+                          ),
                     const SizedBox(
                       height: 8,
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
+                        danus
+                            ? Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 6, vertical: 1),
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(4),
+                                    border:
+                                        Border.all(color: Warna.like, width: 1),
+                                    color: Warna.like.withOpacity(0.10)),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      UIcons.regularRounded.money,
+                                      size: 15,
+                                      color: Warna.like,
+                                    ),
+                                    Text(
+                                      ' Danusan',
+                                      style: TextStyle(
+                                          color: Warna.like, fontSize: 12),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            : Container(),
+                        danus
+                            ? const SizedBox(
+                                width: 8,
+                              )
+                            : Container(),
+                        open
+                            ? Container()
+                            : Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 6, vertical: 1),
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(4),
+                                    border:
+                                        Border.all(color: Warna.like, width: 1),
+                                    color: Warna.like.withOpacity(0.10)),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      UIcons.solidRounded.time_oclock,
+                                      size: 13,
+                                      color: Warna.like,
+                                    ),
+                                    Text(
+                                      ' Tutup',
+                                      style: TextStyle(
+                                          color: Warna.like, fontSize: 12),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                        open
+                            ? Container()
+                            : const SizedBox(
+                                width: 8,
+                              ),
                         Container(
                           padding: const EdgeInsets.symmetric(
                               horizontal: 6, vertical: 1),
@@ -803,7 +875,8 @@ class CanteenCardBox extends StatelessWidget {
                               ),
                               Text(
                                 likes!,
-                                style: TextStyle(color: Warna.like, fontSize: 12),
+                                style:
+                                    TextStyle(color: Warna.like, fontSize: 12),
                               ),
                             ],
                           ),
@@ -829,8 +902,8 @@ class CanteenCardBox extends StatelessWidget {
                               ),
                               Text(
                                 rate!,
-                                style:
-                                    TextStyle(color: Warna.kuning, fontSize: 12),
+                                style: TextStyle(
+                                    color: Warna.kuning, fontSize: 12),
                               ),
                             ],
                           ),

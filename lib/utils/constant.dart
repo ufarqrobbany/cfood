@@ -1,5 +1,3 @@
-
-
 // ignore_for_file: non_constant_identifier_names
 
 class Constant {
@@ -17,7 +15,6 @@ class Constant {
 
   static String currencyCode = "Rp";
 
-
   static String androidAppId = "";
   static String iosAppId = "";
 }
@@ -27,7 +24,7 @@ class AppConfig {
 
   static int USER_ID = 0;
 
-  static int  STUDENT_ID = 0;
+  static int STUDENT_ID = 0;
 
   static String NAME = '';
 
@@ -55,4 +52,5 @@ class AppConfig {
 
   static bool MERCHANT_OPEN = false;
 
+  static bool ON_DASHBOARD = false;
 }

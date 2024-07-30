@@ -1,21 +1,26 @@
 import 'dart:convert';
 
-class GetAllMerchantsResponse {
+GetFollowedResponse getFollowedResponseFromJson(String str) =>
+    GetFollowedResponse.fromJson(json.decode(str));
+
+class GetFollowedResponse {
   int? statusCode;
   String? status;
   String? message;
-  DataGetMerchant? data;
+  List<DataFollowed>? data;
 
-  GetAllMerchantsResponse(
-      {this.statusCode, this.status, this.message, this.data});
+  GetFollowedResponse({this.statusCode, this.status, this.message, this.data});
 
-  GetAllMerchantsResponse.fromJson(Map<String, dynamic> json) {
+  GetFollowedResponse.fromJson(Map<String, dynamic> json) {
     statusCode = json['statusCode'];
     status = json['status'];
     message = json['message'];
-    data = json['data'] != null
-        ? new DataGetMerchant.fromJson(json['data'])
-        : null;
+    if (json['data'] != null) {
+      data = <DataFollowed>[];
+      json['data'].forEach((v) {
+        data!.add(new DataFollowed.fromJson(v));
+      });
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -24,42 +29,13 @@ class GetAllMerchantsResponse {
     data['status'] = this.status;
     data['message'] = this.message;
     if (this.data != null) {
-      data['data'] = this.data!.toJson();
+      data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
     return data;
   }
 }
 
-class DataGetMerchant {
-  List<MerchantItems>? merchants;
-  int? totalPages;
-  int? totalElements;
-
-  DataGetMerchant({this.merchants, this.totalPages, this.totalElements});
-
-  DataGetMerchant.fromJson(Map<String, dynamic> json) {
-    if (json['merchants'] != null) {
-      merchants = <MerchantItems>[];
-      json['merchants'].forEach((v) {
-        merchants!.add(new MerchantItems.fromJson(v));
-      });
-    }
-    totalPages = json['totalPages'];
-    totalElements = json['totalElements'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.merchants != null) {
-      data['merchants'] = this.merchants!.map((v) => v.toJson()).toList();
-    }
-    data['totalPages'] = this.totalPages;
-    data['totalElements'] = this.totalElements;
-    return data;
-  }
-}
-
-class MerchantItems {
+class DataFollowed {
   int? merchantId;
   String? merchantName;
   String? merchantPhoto;
@@ -71,7 +47,7 @@ class MerchantItems {
   bool? open;
   bool? danus;
 
-  MerchantItems(
+  DataFollowed(
       {this.merchantId,
       this.merchantName,
       this.merchantPhoto,
@@ -83,7 +59,7 @@ class MerchantItems {
       this.open,
       this.danus});
 
-  MerchantItems.fromJson(Map<String, dynamic> json) {
+  DataFollowed.fromJson(Map<String, dynamic> json) {
     merchantId = json['merchantId'];
     merchantName = json['merchantName'];
     merchantPhoto = json['merchantPhoto'];

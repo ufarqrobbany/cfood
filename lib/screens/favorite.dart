@@ -1,6 +1,13 @@
 import 'package:cfood/custom/CButtons.dart';
+import 'package:cfood/custom/CPageMover.dart';
 import 'package:cfood/custom/card.dart';
+import 'package:cfood/custom/page_item_void.dart';
+import 'package:cfood/model/followed_response.dart';
+import 'package:cfood/model/getl_all_merchant_response.dart';
+import 'package:cfood/repository/fetch_controller.dart';
+import 'package:cfood/screens/canteen.dart';
 import 'package:cfood/style.dart';
+import 'package:cfood/utils/constant.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
@@ -13,13 +20,39 @@ class FavoriteScreen extends StatefulWidget {
 
 class _FavoriteScreenState extends State<FavoriteScreen> {
   String selectedTab = 'store';
+  // GetAllMerchantsResponse? dataMerchantsResponse;
+  // DataGetMerchant? dataMerchants;
+  // MerchantItems? merchantListItems;
+  GetFollowedResponse? dataFollowedMerchants;
+  List<DataFollowed>? dataFollowed;
+
+  @override
+  void initState() {
+    super.initState();
+    getAllMerchants();
+  }
+
+  Future<void> getAllMerchants() async {
+    dataFollowedMerchants = await FetchController(
+      endpoint: 'merchants/followed?userId=${AppConfig.USER_ID}',
+      fromJson: (json) => GetFollowedResponse.fromJson(json),
+    ).getData();
+
+    setState(() {
+      dataFollowed = dataFollowedMerchants?.data!;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         leadingWidth: 90,
         leading: backButtonCustom(context: context),
-        title: const Text('Favorit', style: AppTextStyles.title,),
+        title: const Text(
+          'Favorit',
+          style: AppTextStyles.title,
+        ),
         foregroundColor: Colors.white,
         backgroundColor: Colors.white,
         scrolledUnderElevation: 0,
@@ -41,20 +74,22 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
                         setState(() {
                           selectedTab = 'store';
                         });
-                      }, 
+                      },
                       selectedTab: selectedTab,
                       typeTab: 'store',
-                      text: 'kantin & Wirausaha',
+                      text: 'Kantin & Wirausaha',
                     ),
                   ),
-                  const SizedBox(width: 20,),
+                  const SizedBox(
+                    width: 20,
+                  ),
                   Expanded(
                     child: CTabButtons(
                       onPressed: () {
                         setState(() {
                           selectedTab = 'menu';
                         });
-                      }, 
+                      },
                       selectedTab: selectedTab,
                       typeTab: 'menu',
                       text: 'Menu',
@@ -63,9 +98,7 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
                 ],
               ),
             ),
-        
-            selectedTab == 'store' ?
-            storeBody() : menuBody(),
+            selectedTab == 'store' ? storeBody() : menuBody(),
           ],
         ),
       ),
@@ -73,24 +106,40 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
   }
 
   Widget storeBody() {
-    return ListView.builder(
-      itemCount: 5,
-      physics: const NeverScrollableScrollPhysics(),
-      shrinkWrap: true,
-      padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 0),
-      itemBuilder: (context, index) {
-        return const Padding(
-          padding: EdgeInsets.symmetric(vertical: 10),
-          child: CanteenCardBox(
-            canteenId: '98098',
-            canteenName: 'Nama Canteen',
-            likes: '98',
-            rate: '4.2',
-            menuList: 'Geprek Bebek, Nasgor, Rotbar',
-          ),
-        );
-    },
-    );
+    return dataFollowedMerchants == null
+        ? Container()
+        : dataFollowed?.length == 0
+            ? itemsEmptyBody(context, bgcolors: Warna.pageBackgroundColor)
+            : ListView.builder(
+                itemCount: dataFollowed?.length,
+                physics: const NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
+                padding: const EdgeInsets.fromLTRB(25, 15, 25, 40),
+                itemBuilder: (context, index) {
+                  DataFollowed? items = dataFollowed?[index];
+                  return Container(
+                    // margin: const EdgeInsets.only(top: 25, bottom: 10, left: 25, right: 25),
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    child: CanteenCardBox(
+                      imgUrl:
+                          '${AppConfig.URL_IMAGES_PATH}${items?.merchantPhoto}',
+                      canteenName: items?.merchantName,
+                      // menuList: 'kosong',
+                      likes: ' ${items?.followers}',
+                      rate: '${items?.rating}',
+                      type: items?.merchantType,
+                      onPressed: () => navigateTo(
+                          context,
+                          CanteenScreen(
+                            merchantId: items?.merchantId,
+                            isOwner: false,
+                            merchantType: items!.merchantType!,
+                            itsDanusan: items.danus,
+                          )),
+                    ),
+                  );
+                },
+              );
   }
 
   Widget menuBody() {
@@ -101,14 +150,14 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 0),
       crossAxisCount: 2,
       crossAxisSpacing: 20,
-      mainAxisSpacing: 20, 
+      mainAxisSpacing: 20,
       itemBuilder: (context, index) {
         return const ProductCardBox(
-                productName: '[Nama Menu]',
-                storeName: '[Nama Toko]',
-                price: '10.000',
-                likes: '100',
-                rate: '4.5',
+          productName: '[Nama Menu]',
+          storeName: '[Nama Toko]',
+          price: '10.000',
+          likes: '100',
+          rate: '4.5',
         );
       },
     );
