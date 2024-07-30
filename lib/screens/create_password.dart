@@ -196,14 +196,14 @@ class _CreatePasswordScreenState extends State<CreatePasswordScreen> {
           );
         }
 
-        log('request otp');
-        await RegisterRepository().sendPostOtp(
-          context,
-          userId: dataUser.id!,
-          name: dataUser.name,
-          to: dataUser.email,
-          type: widget.forgotPass ? "RESET_PASSWORD" : "REGISTER",
-        );
+        // log('request otp');
+        // await RegisterRepository().sendPostOtp(
+        //   context,
+        //   userId: dataUser.id!,
+        //   name: dataUser.name,
+        //   to: dataUser.email,
+        //   type: widget.forgotPass ? "RESET_PASSWORD" : "REGISTER",
+        // );
 
         setState(() {
           loadButton = false;
