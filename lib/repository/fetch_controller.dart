@@ -40,7 +40,7 @@ class FetchController {
     log('response: ${response.body}');
 
     if (response.statusCode <= 300) {
-      dynamic data = fromJson(json.decode(response.body));
+      // dynamic data = fromJson(json.decode(response.body));
       log(response.body);
       // showToast(data.message);
       return fromJson(json.decode(response.body));
@@ -139,6 +139,8 @@ class FetchController {
     try {
       Dio dio = Dio();
       Uri url = getUrl();
+
+      log(json.encode(data));
 
       // FormData creation
       FormData formData = FormData.fromMap({

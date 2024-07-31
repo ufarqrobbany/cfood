@@ -97,6 +97,7 @@ class DynamicColorButton extends StatefulWidget {
   final Widget? icon;
   final bool isLoading;
   final TextStyle? textStyle;
+  final BorderSide? border;
 
   const DynamicColorButton({
     super.key,
@@ -112,6 +113,7 @@ class DynamicColorButton extends StatefulWidget {
     this.icon,
     this.isLoading = false,
     this.textStyle,
+    this.border,
   });
 
   @override
@@ -131,6 +133,7 @@ class _DynamicColorButtonState extends State<DynamicColorButton> {
         padding: widget.padding,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(widget.borderRadius),
+          side: widget.border == null? BorderSide.none : widget.border!,
         ),
         elevation: widget.elevation,
       ),

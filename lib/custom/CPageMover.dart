@@ -1,18 +1,22 @@
 import 'package:flutter/material.dart';
 
-void navigateTo(BuildContext? context, Widget page) {
-  Navigator.push(
+
+Future<T?> navigateTo<T>(BuildContext? context, Widget page) {
+  return Navigator.push(
     context!,
-    MaterialPageRoute(builder: (context) => page,)
-    );
+    MaterialPageRoute(builder: (context) => page),
+  );
 }
 
-void navigateBack(BuildContext? context) {
-  Navigator.of(context!).pop();
+void navigateBack(BuildContext? context, {dynamic result}){
+  Navigator.of(context!).pop(result);
 }
 
-void navigateToRep(BuildContext? context, Widget page) {
-  Navigator.pushReplacement(context!, MaterialPageRoute(builder: (context) => page,));
+Future<T?> navigateToRep<T>(BuildContext? context, Widget page) {
+  return Navigator.pushReplacement(
+    context!,
+    MaterialPageRoute(builder: (context) => page),
+  );
 }
 
 void printCurrentRoutes(BuildContext context) {

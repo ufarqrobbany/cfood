@@ -1,5 +1,7 @@
 // ignore_for_file: non_constant_identifier_names
 
+import 'package:cfood/model/data_variants_local.dart';
+
 class Constant {
   static const String baseUrl = "";
 
@@ -53,4 +55,8 @@ class AppConfig {
   static bool MERCHANT_OPEN = false;
 
   static bool ON_DASHBOARD = false;
+}
+
+class MenuConfig {
+  static List<VariantDatas> variants = [];
 }

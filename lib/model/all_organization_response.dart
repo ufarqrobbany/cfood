@@ -6,20 +6,27 @@ class GetAllOrganizationResponse {
   int? statusCode;
   String? status;
   String? message;
-  List<DataGetOrganization>? data;
+  List<DataGetOrganization>? organizations;
+  int? totalPages;
+  int? totalElements;
 
   GetAllOrganizationResponse(
-      {this.statusCode, this.status, this.message, this.data});
+      {this.statusCode, this.status, this.message, this.organizations, this.totalPages, this.totalElements});
 
   GetAllOrganizationResponse.fromJson(Map<String, dynamic> json) {
     statusCode = json['statusCode'];
     status = json['status'];
     message = json['message'];
     if (json['data'] != null) {
-      data = <DataGetOrganization>[];
-      json['data'].forEach((v) {
-        data!.add(new DataGetOrganization.fromJson(v));
-      });
+      var dataJson = json['data'];
+      if (dataJson['organizations'] != null) {
+        organizations = <DataGetOrganization>[];
+        dataJson['organizations'].forEach((v) {
+          organizations!.add(new DataGetOrganization.fromJson(v));
+        });
+      }
+      totalPages = dataJson['totalPages'];
+      totalElements = dataJson['totalElements'];
     }
   }
 
@@ -28,8 +35,12 @@ class GetAllOrganizationResponse {
     data['statusCode'] = this.statusCode;
     data['status'] = this.status;
     data['message'] = this.message;
-    if (this.data != null) {
-      data['data'] = this.data!.map((v) => v.toJson()).toList();
+    if (this.organizations != null) {
+      data['data'] = {
+        'organizations': this.organizations!.map((v) => v.toJson()).toList(),
+        'totalPages': this.totalPages,
+        'totalElements': this.totalElements
+      };
     }
     return data;
   }

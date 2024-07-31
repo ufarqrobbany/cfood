@@ -12,6 +12,8 @@ import 'package:cfood/model/follow_merchant_response.dart';
 import 'package:cfood/model/get_detail_merchant_response.dart';
 import 'package:cfood/repository/fetch_controller.dart';
 import 'package:cfood/screens/reviews.dart';
+import 'package:cfood/screens/wirausaha_pages/menu_add_edit.dart';
+import 'package:cfood/screens/wirausaha_pages/signup_danus.dart';
 import 'package:cfood/style.dart';
 import 'package:cfood/utils/constant.dart';
 import 'package:community_material_icon/community_material_icon.dart';
@@ -425,7 +427,9 @@ class _CanteenScreenState extends State<CanteenScreen>
                                                 fontWeight: FontWeight.w400),
                                           ),
                                           trailing: IconButton(
-                                            onPressed: () {},
+                                            onPressed: () {
+                                              navigateTo(context, SignUpDanusScreen(campusId: dataMerchant!.studentInformation!.campusId!,),);
+                                            },
                                             icon: const Icon(Icons
                                                 .arrow_forward_ios_rounded),
                                             iconSize: 18,
@@ -523,7 +527,9 @@ class _CanteenScreenState extends State<CanteenScreen>
           ? Padding(
               padding: const EdgeInsets.only(bottom: 100),
               child: IconButton(
-                onPressed: () {},
+                onPressed: () {
+                  navigateTo(context, const AddEditMenuScreen(isEdit: false,));
+                },
                 icon: Icon(
                   UIcons.solidRounded.plus_small,
                 ),

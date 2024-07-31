@@ -104,6 +104,7 @@ class StudentInformation {
   int? userId;
   String? userName;
   String? userPhoto;
+  int? campusId;
   String? campusName;
   String? majorName;
   String? studyProgramName;
@@ -113,6 +114,7 @@ class StudentInformation {
       this.userId,
       this.userName,
       this.userPhoto,
+      this.campusId,
       this.campusName,
       this.majorName,
       this.studyProgramName});
@@ -122,6 +124,7 @@ class StudentInformation {
     userId = json['userId'];
     userName = json['userName'];
     userPhoto = json['userPhoto'];
+    campusId = json['campusId'];
     campusName = json['campusName'];
     majorName = json['majorName'];
     studyProgramName = json['studyProgramName'];
@@ -133,6 +136,7 @@ class StudentInformation {
     data['userId'] = this.userId;
     data['userName'] = this.userName;
     data['userPhoto'] = this.userPhoto;
+    data['campusId'] = this.campusId;
     data['campusName'] = this.campusName;
     data['majorName'] = this.majorName;
     data['studyProgramName'] = this.studyProgramName;
