@@ -5,6 +5,7 @@ import 'package:cfood/custom/CPageMover.dart';
 import 'package:cfood/custom/card.dart';
 import 'package:cfood/custom/reload_indicator.dart';
 import 'package:cfood/model/getl_all_merchant_response.dart';
+import 'package:cfood/model/get_all_organization_response.dart';
 import 'package:cfood/repository/fetch_controller.dart';
 import 'package:cfood/screens/canteen.dart';
 import 'package:cfood/screens/favorite.dart';
@@ -34,9 +35,18 @@ class _HomeScreenState extends State<HomeScreen> {
   DataGetMerchant? dataMerchants;
   MerchantItems? merchantListItems;
 
+  GetAllOrganizationsResponse? dataOrganizationsResponse;
+  DataGetOrganization? dataOrganizations;
+  OrganizationItems? organizationListItems;
+
   @override
   void initState() {
     super.initState();
+
+    if (dataOrganizationsResponse == null) {
+      log('load all organizations');
+      getAllOrganizations(context);
+    }
 
     if (dataMerchantsResponse == null) {
       log('load all merchants');
@@ -68,6 +78,18 @@ class _HomeScreenState extends State<HomeScreen> {
     super.dispose();
   }
 
+  Future<void> getAllOrganizations(BuildContext context) async {
+    dataOrganizationsResponse = await FetchController(
+      endpoint: 'organizations/?campusId=1&page=1&size=5&name',
+      fromJson: (json) => GetAllOrganizationsResponse.fromJson(json),
+    ).getData();
+
+    setState(() {
+      dataOrganizations = dataOrganizationsResponse?.data;
+      log(dataOrganizations.toString());
+    });
+  }
+
   Future<void> getAllMerchants(BuildContext context) async {
     dataMerchantsResponse = await FetchController(
       endpoint: 'merchants/all?page=1&size=10&type=all&isOpen=all&searchName=',
@@ -76,6 +98,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     setState(() {
       dataMerchants = dataMerchantsResponse?.data;
+      log(dataMerchants.toString());
     });
   }
 
@@ -309,7 +332,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 width: 8,
               ),
               const Text(
-                'POLBAN, Gedung JTK',
+                'POLBAN',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 13,
@@ -503,28 +526,35 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         SizedBox(
           height: 224,
-          child: ListView.builder(
-            itemCount: 4,
-            physics: const BouncingScrollPhysics(),
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 15),
-            itemExtent: 180,
-            shrinkWrap: true,
-            itemBuilder: (context, index) {
-              return Container(
-                alignment: Alignment.center,
-                margin: const EdgeInsets.only(top: 24, bottom: 40),
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                child: OrganizationCard(
-                  onPressed: () => navigateTo(
-                    context,
-                    const OrganizationScreen(id: '0'),
-                  ),
-                  text: '[Nama Organisasi]',
+          child: dataOrganizations?.organizations == null
+              ? Container()
+              : ListView.builder(
+                  itemCount: dataOrganizations?.organizations!.length,
+                  physics: const BouncingScrollPhysics(),
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 15),
+                  itemExtent: 180,
+                  shrinkWrap: true,
+                  // lagi di bikin
+                  itemBuilder: (context, index) {
+                    OrganizationItems? items =
+                        dataOrganizations?.organizations![index];
+                    return Container(
+                      alignment: Alignment.center,
+                      margin: const EdgeInsets.only(top: 24, bottom: 40),
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: OrganizationCard(
+                        text: items?.organizationName!,
+                        imgUrl:
+                            '${AppConfig.URL_IMAGES_PATH}${items?.organizationLogo}',
+                        onPressed: () => navigateTo(
+                          context,
+                          OrganizationScreen(id: items?.id),
+                        ),
+                      ),
+                    );
+                  },
                 ),
-              );
-            },
-          ),
         ),
 
         // Kantin dan Wirausaga

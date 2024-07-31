@@ -20,9 +20,6 @@ class FavoriteScreen extends StatefulWidget {
 
 class _FavoriteScreenState extends State<FavoriteScreen> {
   String selectedTab = 'store';
-  // GetAllMerchantsResponse? dataMerchantsResponse;
-  // DataGetMerchant? dataMerchants;
-  // MerchantItems? merchantListItems;
   GetFollowedResponse? dataFollowedMerchants;
   List<DataFollowed>? dataFollowed;
 
@@ -108,7 +105,7 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
   Widget storeBody() {
     return dataFollowedMerchants == null
         ? Container()
-        : dataFollowed?.length == 0
+        : dataFollowed!.isEmpty
             ? itemsEmptyBody(context, bgcolors: Warna.pageBackgroundColor)
             : ListView.builder(
                 itemCount: dataFollowed?.length,
@@ -125,9 +122,10 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
                           '${AppConfig.URL_IMAGES_PATH}${items?.merchantPhoto}',
                       canteenName: items?.merchantName,
                       // menuList: 'kosong',
-                      likes: ' ${items?.followers}',
-                      rate: '${items?.rating}',
-                      type: items?.merchantType,
+                      open: items!.open!,
+                      likes: ' ${items.followers}',
+                      rate: '${items.rating}',
+                      type: items.merchantType,
                       onPressed: () => navigateTo(
                           context,
                           CanteenScreen(

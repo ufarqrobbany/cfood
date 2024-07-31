@@ -7,8 +7,10 @@ import 'package:cfood/custom/card.dart';
 import 'package:cfood/custom/page_item_void.dart';
 import 'package:cfood/custom/reload_indicator.dart';
 import 'package:cfood/model/getl_all_merchant_response.dart';
+import 'package:cfood/model/get_all_organization_response.dart';
 import 'package:cfood/repository/fetch_controller.dart';
 import 'package:cfood/screens/canteen.dart';
+import 'package:cfood/screens/organization.dart';
 import 'package:cfood/style.dart';
 import 'package:cfood/utils/constant.dart';
 import 'package:flutter/material.dart';
@@ -21,7 +23,7 @@ class SeeAllItemsScreen extends StatefulWidget {
   const SeeAllItemsScreen({
     super.key,
     this.listGrid = false,
-    this.typeName = 'Kantin', // Kantin | Organiasi | Pre-Order | Wirausaha
+    this.typeName = 'Kantin', // Kantin | Organisasi | Pre-Order | Wirausaha
     this.typeCode = 'kantin',
   });
 
@@ -35,6 +37,10 @@ class _SeeAllItemsScreenState extends State<SeeAllItemsScreen> {
   DataGetMerchant? dataMerchants;
   MerchantItems? merchantListItems;
 
+  GetAllOrganizationsResponse? dataOrganizationsResponse;
+  DataGetOrganization? dataOrganizations;
+  OrganizationItems? organizationListItems;
+
   @override
   void initState() {
     super.initState();
@@ -45,6 +51,10 @@ class _SeeAllItemsScreenState extends State<SeeAllItemsScreen> {
     log('get data type : ${widget.typeCode}');
     if (widget.typeCode == 'wirausaha' || widget.typeCode == 'kantin') {
       getAllMerchants(context);
+    }
+
+    if (widget.typeCode == 'organisasi') {
+      getAllOrganizations(context);
     }
   }
 
@@ -61,9 +71,25 @@ class _SeeAllItemsScreenState extends State<SeeAllItemsScreen> {
     });
   }
 
+  Future<void> getAllOrganizations(BuildContext context,
+      {String searchItem = ''}) async {
+    dataOrganizationsResponse = await FetchController(
+      endpoint: 'organizations/?campusId=1&page=1&size=50&name=$searchItem',
+      fromJson: (json) => GetAllOrganizationsResponse.fromJson(json),
+    ).getData();
+
+    setState(() {
+      dataOrganizations = dataOrganizationsResponse?.data;
+    });
+  }
+
   void onSearch({String searchItem = ''}) {
     if (widget.typeCode == 'wirausaha' || widget.typeCode == 'kantin') {
       getAllMerchants(context, searchItem: searchItem);
+    }
+
+    if (widget.typeCode == 'organisasi') {
+      getAllOrganizations(context, searchItem: searchItem);
     }
   }
 
@@ -227,24 +253,37 @@ class _SeeAllItemsScreenState extends State<SeeAllItemsScreen> {
       onRefresh: fetchData,
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
-        child: ListView.builder(
-          itemCount: 10,
-          physics: const NeverScrollableScrollPhysics(),
-          shrinkWrap: true,
-          padding: const EdgeInsets.fromLTRB(25, 25, 25, 20),
-          itemBuilder: (context, index) {
-            return Container(
-              // margin: const EdgeInsets.only(top: 25, bottom: 10, left: 25, right: 25),
-              padding: const EdgeInsets.symmetric(vertical: 10),
-              child: const OrganizationCardBox(
-                organizationName: '[Canteen Name]',
-                menuList: 'Rendang, Ayam Geprek, Nasgor ...',
-                likes: '200',
-                rate: '4.4',
-              ),
-            );
-          },
-        ),
+        child: dataOrganizations?.organizations == null
+            ? Container()
+            : dataOrganizations?.totalElements == 0
+                ? itemsEmptyBody(context)
+                : ListView.builder(
+                    itemCount: dataOrganizations?.organizations?.length,
+                    physics: const NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    padding: const EdgeInsets.fromLTRB(25, 25, 25, 20),
+                    itemBuilder: (context, index) {
+                      OrganizationItems? items =
+                          dataOrganizations?.organizations![index];
+                      return Container(
+                        // margin: const EdgeInsets.only(top: 25, bottom: 10, left: 25, right: 25),
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        child: OrganizationCardBox(
+                          organizationId: items?.id,
+                          imgUrl:
+                              '${AppConfig.URL_IMAGES_PATH}${items?.organizationLogo}',
+                          organizationName: items?.organizationName,
+                          totalActivity: '${items?.totalActivity}',
+                          totalWirausaha: '${items?.totalWirausaha}',
+                          totalMenu: '${items?.totalMenu}',
+                          onPressed: () => navigateTo(
+                            context,
+                            OrganizationScreen(id: items?.id),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
       ),
     );
   }

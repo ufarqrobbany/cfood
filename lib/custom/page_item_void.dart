@@ -7,7 +7,7 @@ Widget itemsEmptyBody(BuildContext context, {String? text, Color? bgcolors}) {
     // width: MediaQuery.of(context).size.width,
     // height: MediaQuery.of(context).size.height,
     width: double.infinity,
-    height: double.infinity,
+    // height: double.infinity,
     color: bgcolors ?? Colors.white,
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -22,12 +22,12 @@ Widget itemsEmptyBody(BuildContext context, {String? text, Color? bgcolors}) {
           color: Warna.biru,
         ),
         const SizedBox(
-          height: 15,
+          height: 20,
         ),
         Text(
           text ?? 'Item yang kamu cari kosong',
           style: TextStyle(
-              fontSize: 26, fontWeight: FontWeight.w700, color: Warna.abu6),
+              fontSize: 20, fontWeight: FontWeight.normal, color: Warna.abu6),
         ),
       ],
     ),

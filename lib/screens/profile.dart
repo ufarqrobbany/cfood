@@ -835,58 +835,34 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ),
               const Spacer(),
-              // switchOpenCLoseStore(),
-              IconButton(
-                onPressed: () {
-                  setState(() {
-                    AppConfig.ON_DASHBOARD = false;
-                  });
-                  navigateToRep(context, const MainScreen());
-                },
-                icon: const Icon(Icons.arrow_circle_right_rounded),
-                iconSize: 10,
-                padding: EdgeInsets.zero,
-                style: IconButton.styleFrom(
+              SizedBox(
+                width: 30, // Sesuaikan ukuran yang diinginkan
+                height: 30, // Sesuaikan ukuran yang diinginkan
+                child: IconButton(
+                  onPressed: () {
+                    setState(() {
+                      AppConfig.ON_DASHBOARD = false;
+                    });
+                    navigateToRep(context, const MainScreen());
+                  },
+                  icon: const Icon(Icons.arrow_forward_ios_rounded),
+                  iconSize: 10,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(
+                    minWidth: 10, // Sesuaikan ukuran minimal yang diinginkan
+                    minHeight: 10, // Sesuaikan ukuran minimal yang diinginkan
+                  ),
+                  style: IconButton.styleFrom(
                     backgroundColor: Warna.kuning,
                     shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50))),
+                      borderRadius: BorderRadius.circular(50),
+                    ),
+                  ),
+                ),
               ),
             ],
           ),
         ),
-        Container(
-            padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 9),
-            color: Warna.kuning.withOpacity(0.05),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                driverItemsMenu(
-                  onTap: () {
-                    // navigateTo(context, const OrderAvailableScreen());
-                  },
-                  icons: Icons.move_to_inbox,
-                  text: 'Pesanan Masuk',
-                  notifCount: 7,
-                ),
-                driverItemsMenu(
-                  onTap: () {
-                    // navigateTo(context, const DeliveryInfoScreen());
-                  },
-                  icons: UIcons.regularRounded.receipt,
-                  text: 'Transaksi',
-                  notifCount: 7,
-                ),
-                driverItemsMenu(
-                  onTap: () {
-                    navigateTo(context, ChatSellerScreen());
-                  },
-                  icons: UIcons.solidRounded.comment,
-                  text: 'Chat Pembeli',
-                  notifCount: 7,
-                ),
-              ],
-            )),
       ],
     );
   }

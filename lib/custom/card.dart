@@ -675,7 +675,7 @@ class OrganizationCard extends StatelessWidget {
             ),
             Text(
               text!,
-              style: AppTextStyles.textRegular,
+              style: AppTextStyles.canteenName,
               textAlign: TextAlign.center,
             )
           ],
@@ -717,7 +717,7 @@ class CanteenCardBox extends StatelessWidget {
     return InkWell(
       onTap: onPressed,
       child: Container(
-        height: 120,
+        height: 130,
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(8),
@@ -737,8 +737,8 @@ class CanteenCardBox extends StatelessWidget {
               borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(8), bottomLeft: Radius.circular(8)),
               child: Container(
-                width: 120,
-                height: 120,
+                width: 130,
+                height: 130,
                 decoration: BoxDecoration(
                   color: Warna.abu,
                   borderRadius: const BorderRadius.only(
@@ -763,6 +763,7 @@ class CanteenCardBox extends StatelessWidget {
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Icon(
                           type! == 'kantin'
@@ -791,123 +792,113 @@ class CanteenCardBox extends StatelessWidget {
                             maxLines: 1,
                           ),
                     const SizedBox(
-                      height: 8,
+                      height: 0,
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
+                    Wrap(
+                      alignment: WrapAlignment.start,
+                      spacing: 8, // Spacing between items
+                      runSpacing: 8, // Spacing between lines
                       children: [
-                        danus
-                            ? Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 6, vertical: 1),
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(4),
-                                    border:
-                                        Border.all(color: Warna.like, width: 1),
-                                    color: Warna.like.withOpacity(0.10)),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      UIcons.regularRounded.money,
-                                      size: 15,
-                                      color: Warna.like,
-                                    ),
-                                    Text(
-                                      ' Danusan',
-                                      style: TextStyle(
-                                          color: Warna.like, fontSize: 12),
-                                    ),
-                                  ],
-                                ),
-                              )
-                            : Container(),
-                        danus
-                            ? const SizedBox(
-                                width: 8,
-                              )
-                            : Container(),
-                        open
-                            ? Container()
-                            : Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 6, vertical: 1),
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(4),
-                                    border:
-                                        Border.all(color: Warna.like, width: 1),
-                                    color: Warna.like.withOpacity(0.10)),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      UIcons.solidRounded.time_oclock,
-                                      size: 13,
-                                      color: Warna.like,
-                                    ),
-                                    Text(
-                                      ' Tutup',
-                                      style: TextStyle(
-                                          color: Warna.like, fontSize: 12),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                        open
-                            ? Container()
-                            : const SizedBox(
-                                width: 8,
-                              ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 6, vertical: 1),
-                          decoration: BoxDecoration(
+                        if (danus)
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 6, vertical: 1),
+                            decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(4),
                               border: Border.all(color: Warna.like, width: 1),
-                              color: Warna.like.withOpacity(0.10)),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.favorite,
-                                size: 10,
-                                color: Warna.like,
-                              ),
-                              Text(
-                                likes!,
-                                style:
-                                    TextStyle(color: Warna.like, fontSize: 12),
-                              ),
-                            ],
+                              color: Warna.like.withOpacity(0.10),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  UIcons.regularRounded.money,
+                                  size: 15,
+                                  color: Warna.like,
+                                ),
+                                Text(
+                                  ' Danusan',
+                                  style: TextStyle(
+                                      color: Warna.like, fontSize: 12),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                        const SizedBox(
-                          width: 8,
-                        ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 6, vertical: 1),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(4),
-                            border: Border.all(color: Warna.kuning, width: 1),
-                            color: Warna.kuning.withOpacity(0.10),
+                        if (!open)
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 6, vertical: 1),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(4),
+                              border: Border.all(color: Warna.like, width: 1),
+                              color: Warna.like.withOpacity(0.10),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  UIcons.solidRounded.time_oclock,
+                                  size: 13,
+                                  color: Warna.like,
+                                ),
+                                Text(
+                                  ' Tutup',
+                                  style: TextStyle(
+                                      color: Warna.like, fontSize: 12),
+                                ),
+                              ],
+                            ),
                           ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.star,
-                                size: 10,
-                                color: Warna.kuning,
-                              ),
-                              Text(
-                                rate!,
-                                style: TextStyle(
-                                    color: Warna.kuning, fontSize: 12),
-                              ),
-                            ],
+                        if (likes != null)
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 6, vertical: 1),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(4),
+                              border: Border.all(color: Warna.like, width: 1),
+                              color: Warna.like.withOpacity(0.10),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.favorite,
+                                  size: 10,
+                                  color: Warna.like,
+                                ),
+                                Text(
+                                  likes!,
+                                  style: TextStyle(
+                                      color: Warna.like, fontSize: 12),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
+                        if (rate != null)
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 6, vertical: 1),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(4),
+                              border: Border.all(color: Warna.kuning, width: 1),
+                              color: Warna.kuning.withOpacity(0.10),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.star,
+                                  size: 10,
+                                  color: Warna.kuning,
+                                ),
+                                Text(
+                                  rate!,
+                                  style: TextStyle(
+                                      color: Warna.kuning, fontSize: 12),
+                                ),
+                              ],
+                            ),
+                          ),
                       ],
                     ),
                     const Spacer(),
@@ -955,202 +946,184 @@ class CanteenCardBox extends StatelessWidget {
 }
 
 class OrganizationCardBox extends StatelessWidget {
-  final String? canteenId;
+  final int? organizationId;
   final String? imgUrl;
   final String? organizationName;
-  final String? price;
-  final String? rate;
-  final String? likes;
-  final String? menuList;
+  final String? totalActivity;
+  final String? totalWirausaha;
+  final String? totalMenu;
   final VoidCallback? onPressed;
   const OrganizationCardBox({
     super.key,
-    this.canteenId,
+    this.organizationId,
     this.imgUrl,
     this.organizationName,
-    this.price,
-    this.rate,
-    this.likes,
-    this.menuList,
+    this.totalActivity,
+    this.totalWirausaha,
+    this.totalMenu,
     this.onPressed,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      // height: 140,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        boxShadow: [
-          BoxShadow(
-              blurRadius: 20,
-              spreadRadius: 0,
-              color: Warna.shadow.withOpacity(0.12),
-              offset: const Offset(0, 0))
-        ],
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          // Container(
-          //   width: 140,
-          //   height: 140,
-          //   decoration: BoxDecoration(
-          //     color: Warna.abu,
-          //     borderRadius: const BorderRadius.only(topLeft: Radius.circular(8), bottomLeft: Radius.circular(8)),
-          //   ),
-          //   child: imgUrl == null ? const Center(child: Icon(Icons.image),) : Image.network(imgUrl!),
-          // ),
-
-          Padding(
-            padding: const EdgeInsets.only(left: 10),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(100),
-              child: imgUrl != null
-                  ? Image.network(
-                      imgUrl!,
-                      width: 80,
-                      height: 80,
-                    )
-                  : Container(
-                      height: 80,
-                      width: 80,
-                      decoration: BoxDecoration(
-                          color: Warna.abu,
-                          borderRadius: BorderRadius.circular(100)),
-                      child: const Center(child: Icon(Icons.image))),
-            ),
+    return InkWell(
+        onTap: onPressed,
+        child: Container(
+          // height: 140,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(8),
+            boxShadow: [
+              BoxShadow(
+                  blurRadius: 20,
+                  spreadRadius: 0,
+                  color: Warna.shadow.withOpacity(0.12),
+                  offset: const Offset(0, 0))
+            ],
           ),
-
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      // Icon(
-                      //   type! == 'kantin' ?
-                      //   Icons.store :
-                      //   CommunityMaterialIcons.handshake,
-                      //   size: 15,
-                      //   color: type! == 'kantin' ?
-                      //   Warna.biru :
-                      //   Warna.kuning,
-                      // ),
-                      // const SizedBox(width: 10,),
-                      Text(
-                        organizationName!,
-                        style: AppTextStyles.canteenName,
-                      ),
-                    ],
-                  ),
-                  const SizedBox(
-                    height: 8,
-                  ),
-                  Text(
-                    menuList!,
-                    style: AppTextStyles.productStoreName,
-                    maxLines: 1,
-                  ),
-                  const SizedBox(
-                    height: 8,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 6, vertical: 1),
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(4),
-                            border: Border.all(color: Warna.like, width: 1),
-                            color: Warna.like.withOpacity(0.10)),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.favorite,
-                              size: 10,
-                              color: Warna.like,
-                            ),
-                            Text(
-                              likes!,
-                              style: TextStyle(color: Warna.like, fontSize: 12),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(
-                        width: 8,
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 6, vertical: 1),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(4),
-                          border: Border.all(color: Warna.kuning, width: 1),
-                          color: Warna.kuning.withOpacity(0.10),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.star,
-                              size: 10,
-                              color: Warna.kuning,
-                            ),
-                            Text(
-                              rate!,
-                              style:
-                                  TextStyle(color: Warna.kuning, fontSize: 12),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  // const Spacer(),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      // Spacer(),
-                      const Text(
-                        'Lihat Selengkapnya',
-                        style: AppTextStyles.productStoreName,
-                      ),
-                      const SizedBox(
-                        width: 5,
-                      ),
-                      Container(
-                        height: 25,
-                        width: 25,
-                        padding: const EdgeInsets.all(5),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
-                          color: Warna.abu,
-                        ),
-                        child: Center(
-                          child: Icon(
-                            Icons.arrow_forward_ios_rounded,
-                            color: Warna.biru,
-                            size: 13,
-                          ),
-                        ),
-                      ),
-                    ],
-                  )
-                ],
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(left: 10),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(100),
+                  child: imgUrl != null
+                      ? Image.network(
+                          imgUrl!,
+                          width: 80,
+                          height: 80,
+                        )
+                      : Container(
+                          height: 80,
+                          width: 80,
+                          decoration: BoxDecoration(
+                              color: Warna.abu,
+                              borderRadius: BorderRadius.circular(100)),
+                          child: const Center(child: Icon(Icons.image))),
+                ),
               ),
-            ),
-          )
-        ],
-      ),
-    );
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Text(
+                            organizationName!,
+                            style: AppTextStyles.canteenName,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 4,
+                      ),
+                      Text(
+                        '${totalActivity ?? 0} Kegiatan',
+                        style: AppTextStyles.productStoreName,
+                        maxLines: 1,
+                      ),
+                      const SizedBox(
+                        height: 8,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 6, vertical: 1),
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(4),
+                                border:
+                                    Border.all(color: Warna.kuning, width: 1),
+                                color: Warna.kuning.withOpacity(0.10)),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  CommunityMaterialIcons.handshake,
+                                  size: 10,
+                                  color: Warna.kuning,
+                                ),
+                                Text(
+                                  ' ${totalWirausaha ?? 0}',
+                                  style: TextStyle(
+                                      color: Warna.kuning, fontSize: 12),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(
+                            width: 8,
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 6, vertical: 1),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(4),
+                              border:
+                                  Border.all(color: Warna.oranye1, width: 1),
+                              color: Warna.oranye1.withOpacity(0.10),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.fastfood_rounded,
+                                  size: 10,
+                                  color: Warna.oranye1,
+                                ),
+                                Text(
+                                  ' ${totalMenu ?? 0}',
+                                  style: TextStyle(
+                                      color: Warna.oranye1, fontSize: 12),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      // const Spacer(),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          // Spacer(),
+                          const Text(
+                            'Lihat Selengkapnya',
+                            style: AppTextStyles.productStoreName,
+                          ),
+                          const SizedBox(
+                            width: 5,
+                          ),
+                          Container(
+                            height: 25,
+                            width: 25,
+                            padding: const EdgeInsets.all(5),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              color: Warna.abu,
+                            ),
+                            child: Center(
+                              child: Icon(
+                                Icons.arrow_forward_ios_rounded,
+                                color: Warna.biru,
+                                size: 13,
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
+                ),
+              )
+            ],
+          ),
+        ));
   }
 }
 
