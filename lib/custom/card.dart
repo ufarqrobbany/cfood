@@ -1,5 +1,6 @@
 import 'package:cfood/custom/shimmer.dart';
 import 'package:cfood/style.dart';
+import 'package:cfood/utils/common.dart';
 import 'package:cfood/utils/constant.dart';
 import 'package:community_material_icon/community_material_icon.dart';
 import 'package:flutter/material.dart';
@@ -63,9 +64,11 @@ class ProductCardBox extends StatelessWidget {
   final String? imgUrl;
   final String? productName;
   final String? storeName;
-  final String? price;
+  final int? price;
   final String? rate;
   final String? likes;
+  final String? merchantType;
+  final bool? isDanus;
   final bool? itsLoading;
   final VoidCallback? onPressed;
   const ProductCardBox({
@@ -77,6 +80,8 @@ class ProductCardBox extends StatelessWidget {
     this.price,
     this.rate,
     this.likes,
+    this.merchantType,
+    this.isDanus,
     this.itsLoading = false,
     this.onPressed,
   });
@@ -100,26 +105,58 @@ class ProductCardBox extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            customShimmer(
-              enabled: itsLoading,
-              child: Container(
-                // width: double.infinity,
-                height: 120,
-                constraints: const BoxConstraints(
-                  minWidth: 160,
-                  maxWidth: double.infinity,
-                ),
-                decoration: BoxDecoration(
-                  color: Warna.abu,
-                  borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(8),
-                      topRight: Radius.circular(8)),
-                ),
-                child: imgUrl == null
-                    ? const Center(
-                        child: Icon(Icons.image),
-                      )
-                    : Image.network(imgUrl!),
+            Container(
+              height: 120,
+              constraints: const BoxConstraints(
+                minWidth: 160,
+                maxWidth: 170,
+              ),
+              decoration: BoxDecoration(
+                color: Warna.abu,
+                borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(8), topRight: Radius.circular(8)),
+              ),
+              child: Stack(
+                children: [
+                  ClipRRect(
+                    borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(8),
+                        topRight: Radius.circular(8)),
+                    child: imgUrl == null
+                        ? const Center(
+                            child: Icon(Icons.image),
+                          )
+                        : Image.network(
+                            imgUrl!,
+                            fit: BoxFit.cover,
+                            width: double.infinity,
+                            height: double.infinity,
+                          ),
+                  ),
+                  if (isDanus ??
+                      false) // Conditionally show the "Produk Danus" text
+                    Positioned(
+                      top: 0,
+                      left: 0,
+                      child: Container(
+                        padding: const EdgeInsets.all(4.0),
+                        decoration: BoxDecoration(
+                          color: Warna.like.withAlpha(200),
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(8),
+                            bottomRight: Radius.circular(8),
+                          ),
+                        ),
+                        child: const Text(
+                          'Produk Danus',
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 10),
+                        ),
+                      ),
+                    ),
+                ],
               ),
             ),
             itsLoading == true
@@ -166,13 +203,20 @@ class ProductCardBox extends StatelessWidget {
                           productName!,
                           style: AppTextStyles.productName,
                         ),
+                        const SizedBox(
+                          height: 6,
+                        ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                             Icon(
-                              Icons.store,
+                              merchantType == "KANTIN"
+                                  ? Icons.store
+                                  : CommunityMaterialIcons.handshake,
                               size: 15,
-                              color: Warna.biru,
+                              color: merchantType == "KANTIN"
+                                  ? Warna.biru
+                                  : Warna.kuning,
                             ),
                             const SizedBox(
                               width: 5,
@@ -184,10 +228,11 @@ class ProductCardBox extends StatelessWidget {
                           ],
                         ),
                         const SizedBox(
-                          height: 8,
+                          height: 6,
                         ),
                         Text(
-                          Constant.currencyCode + price!,
+                          Constant.currencyCode +
+                              formatNumberWithThousandsSeparator(price!),
                           style: AppTextStyles.productPrice,
                         ),
                         const SizedBox(
@@ -214,9 +259,8 @@ class ProductCardBox extends StatelessWidget {
                                     color: Warna.kuning,
                                   ),
                                   Text(
-                                    rate!,
-                                    style: TextStyle(
-                                        color: Warna.kuning, fontSize: 12),
+                                    ' ${rate!}',
+                                    style: TextStyle(fontSize: 12),
                                   ),
                                 ],
                               ),
@@ -241,9 +285,8 @@ class ProductCardBox extends StatelessWidget {
                                     color: Warna.like,
                                   ),
                                   Text(
-                                    likes!,
-                                    style: TextStyle(
-                                        color: Warna.like, fontSize: 12),
+                                    ' ${likes!}',
+                                    style: TextStyle(fontSize: 12),
                                   ),
                                 ],
                               ),
@@ -659,6 +702,7 @@ class OrganizationCard extends StatelessWidget {
               child: imgUrl != null
                   ? Image.network(
                       imgUrl!,
+                      fit: BoxFit.cover,
                       width: 80,
                       height: 80,
                     )
@@ -985,6 +1029,7 @@ class OrganizationCardBox extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
+              const SizedBox(width: 6),
               Padding(
                 padding: const EdgeInsets.only(left: 10),
                 child: ClipRRect(
@@ -1004,6 +1049,7 @@ class OrganizationCardBox extends StatelessWidget {
                           child: const Center(child: Icon(Icons.image))),
                 ),
               ),
+              const SizedBox(width: 6),
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.all(10),
@@ -1050,9 +1096,8 @@ class OrganizationCardBox extends StatelessWidget {
                                   color: Warna.kuning,
                                 ),
                                 Text(
-                                  ' ${totalWirausaha ?? 0}',
-                                  style: TextStyle(
-                                      color: Warna.kuning, fontSize: 12),
+                                  ' ${totalWirausaha ?? 0} Wirausaha',
+                                  style: TextStyle(fontSize: 11),
                                 ),
                               ],
                             ),
@@ -1078,15 +1123,15 @@ class OrganizationCardBox extends StatelessWidget {
                                   color: Warna.oranye1,
                                 ),
                                 Text(
-                                  ' ${totalMenu ?? 0}',
-                                  style: TextStyle(
-                                      color: Warna.oranye1, fontSize: 12),
+                                  ' ${totalMenu ?? 0} Menu',
+                                  style: TextStyle(fontSize: 11),
                                 ),
                               ],
                             ),
                           ),
                         ],
                       ),
+                      const SizedBox(height: 6),
                       // const Spacer(),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,

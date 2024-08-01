@@ -5,6 +5,7 @@ import 'package:cfood/custom/CPageMover.dart';
 import 'package:cfood/custom/card.dart';
 import 'package:cfood/custom/reload_indicator.dart';
 import 'package:cfood/model/getl_all_merchant_response.dart';
+import 'package:cfood/model/get_all_menu_response.dart';
 import 'package:cfood/model/get_all_organization_response.dart';
 import 'package:cfood/repository/fetch_controller.dart';
 import 'package:cfood/screens/canteen.dart';
@@ -39,9 +40,17 @@ class _HomeScreenState extends State<HomeScreen> {
   DataGetOrganization? dataOrganizations;
   OrganizationItems? organizationListItems;
 
+  MenusResponse? dataMenusResponse;
+  DataGetMenu? dataMenus;
+
   @override
   void initState() {
     super.initState();
+
+    if (dataMenusResponse == null) {
+      log('load all menus');
+      getAllMenus(context);
+    }
 
     if (dataOrganizationsResponse == null) {
       log('load all organizations');
@@ -76,6 +85,18 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void dispose() {
     super.dispose();
+  }
+
+  Future<void> getAllMenus(BuildContext context) async {
+    dataMenusResponse = await FetchController(
+      endpoint: 'menus/?page=1&size=5',
+      fromJson: (json) => MenusResponse.fromJson(json),
+    ).getData();
+
+    setState(() {
+      dataMenus = dataMenusResponse?.data;
+      log(dataMenus.toString());
+    });
   }
 
   Future<void> getAllOrganizations(BuildContext context) async {
@@ -415,91 +436,99 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         SizedBox(
+          // lagi di bikin
           height: 315,
-          child: ListView.builder(
-            itemCount: 10,
-            physics: const BouncingScrollPhysics(),
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 15),
-            itemBuilder: (context, index) {
-              return Container(
-                margin: const EdgeInsets.only(top: 24, bottom: 40),
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                child: ProductCardBox(
-                  onPressed: () {
-                    navigateTo(
-                      context,
-                      const CanteenScreen(
-                        menuId: '0',
-                        merchantId: 1,
-                      ),
+          child: dataMenus?.content == null
+              ? Container()
+              : ListView.builder(
+                  itemCount: dataMenus?.content!.length,
+                  physics: const BouncingScrollPhysics(),
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 15),
+                  itemBuilder: (context, index) {
+                    MenuItems? items = dataMenus?.content![index];
+                    return Container(
+                      margin: const EdgeInsets.only(top: 24, bottom: 40),
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: ProductCardBox(
+                          onPressed: () {
+                            navigateTo(
+                              context,
+                              CanteenScreen(
+                                  menuId: '${items?.menuId}',
+                                  merchantId: items?.merchants!.merchantId!,
+                                  merchantType:
+                                      items!.merchants!.merchantType!),
+                            );
+                          },
+                          imgUrl:
+                              '${AppConfig.URL_IMAGES_PATH}${items?.menuPhoto}',
+                          productName: '${items?.menuName}',
+                          storeName: '${items?.merchants?.merchantName}',
+                          price: items?.menuPrice,
+                          likes: '${items?.menuLikes}',
+                          rate: '${items?.menuRating}',
+                          merchantType: '${items?.merchants?.merchantType}',
+                          isDanus: items?.menuIsDanus!),
                     );
                   },
-                  productName: '[Nama Menu]',
-                  storeName: '[Nama Toko]',
-                  price: '10.000',
-                  likes: '100',
-                  rate: '4.5',
                 ),
-              );
-            },
-          ),
         ),
 
         // Pre-Order
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 25),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                'Pre-order Sekarang ',
-                style: AppTextStyles.subTitle,
-                textAlign: TextAlign.left,
-              ),
-              CYellowMoreButton(
-                  onPressed: () => navigateTo(
-                        context,
-                        const SeeAllItemsScreen(
-                          typeName: 'Pre-Order',
-                          typeCode: 'pre-order',
-                        ),
-                      ),
-                  text: 'Lihat Semua'),
-            ],
-          ),
-        ),
-        SizedBox(
-          height: 315,
-          child: ListView.builder(
-            itemCount: 10,
-            physics: const BouncingScrollPhysics(),
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 15),
-            itemBuilder: (context, index) {
-              return Container(
-                margin: const EdgeInsets.only(top: 24, bottom: 40),
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                child: ProductCardBox(
-                  onPressed: () {
-                    navigateTo(
-                      context,
-                      const CanteenScreen(
-                        menuId: '0',
-                        merchantId: 1,
-                      ),
-                    );
-                  },
-                  productName: '[Nama Menu]',
-                  storeName: '[Nama Toko]',
-                  price: '10.000',
-                  likes: '100',
-                  rate: '4.5',
-                ),
-              );
-            },
-          ),
-        ),
+        // Padding(
+        //   padding: const EdgeInsets.symmetric(horizontal: 25),
+        //   child: Row(
+        //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        //     children: [
+        //       const Text(
+        //         'Pre-order Sekarang ',
+        //         style: AppTextStyles.subTitle,
+        //         textAlign: TextAlign.left,
+        //       ),
+        //       CYellowMoreButton(
+        //           onPressed: () => navigateTo(
+        //                 context,
+        //                 const SeeAllItemsScreen(
+        //                   typeName: 'Pre-Order',
+        //                   typeCode: 'pre-order',
+        //                 ),
+        //               ),
+        //           text: 'Lihat Semua'),
+        //     ],
+        //   ),
+        // ),
+        // SizedBox(
+        //   height: 315,
+        //   child: ListView.builder(
+        //     itemCount: 10,
+        //     physics: const BouncingScrollPhysics(),
+        //     scrollDirection: Axis.horizontal,
+        //     padding: const EdgeInsets.symmetric(horizontal: 15),
+        //     itemBuilder: (context, index) {
+        //       return Container(
+        //         margin: const EdgeInsets.only(top: 24, bottom: 40),
+        //         padding: const EdgeInsets.symmetric(horizontal: 10),
+        //         child: ProductCardBox(
+        //           onPressed: () {
+        //             navigateTo(
+        //               context,
+        //               const CanteenScreen(
+        //                 menuId: '0',
+        //                 merchantId: 1,
+        //               ),
+        //             );
+        //           },
+        //           productName: '[Nama Menu]',
+        //           storeName: '[Nama Toko]',
+        //           price: 100000,
+        //           likes: '100',
+        //           rate: '4.5',
+        //         ),
+        //       );
+        //     },
+        //   ),
+        // ),
 
         // SUMBANGAN DANA BANtu Usaha
         Padding(

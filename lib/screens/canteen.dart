@@ -6,11 +6,15 @@ import 'package:cfood/custom/CPageMover.dart';
 import 'package:cfood/custom/CTextField.dart';
 import 'package:cfood/custom/CToast.dart';
 import 'package:cfood/custom/card.dart';
+import 'package:cfood/custom/popup_dialog.dart';
 import 'package:cfood/custom/reload_indicator.dart';
 import 'package:cfood/model/add_merchants_response.dart';
+import 'package:cfood/model/error_response.dart';
 import 'package:cfood/model/follow_merchant_response.dart';
 import 'package:cfood/model/get_detail_merchant_response.dart';
+import 'package:cfood/model/reponse_handler.dart';
 import 'package:cfood/repository/fetch_controller.dart';
+import 'package:cfood/screens/organization.dart';
 import 'package:cfood/screens/reviews.dart';
 import 'package:cfood/screens/wirausaha_pages/menu_add_edit.dart';
 import 'package:cfood/screens/wirausaha_pages/signup_danus.dart';
@@ -51,6 +55,7 @@ class _CanteenScreenState extends State<CanteenScreen>
   late TabController categoryTabController;
   TextEditingController searchTextController = TextEditingController();
   List<Map<String, dynamic>> orderMenuCount = [];
+  Map<String, dynamic> organizationMaps = {};
 
   GetDetailMerchantResponse? merchantDataResponse;
   DataDetailMerchant? dataMerchant;
@@ -161,6 +166,22 @@ class _CanteenScreenState extends State<CanteenScreen>
           'merchants/${widget.merchantId}/is-follow?userId=${AppConfig.USER_ID}',
       fromJson: (json) => IsFollowMerchantResponse.fromJson(json),
     ).postData({});
+  }
+
+  Future<void> finishDanus(BuildContext context) async {
+    try {
+      ResponseHendler response = await FetchController(
+          endpoint:
+              'organizations/merchants_danus?merchantId=${AppConfig.MERCHANT_ID}',
+          fromJson: (json) => ResponseHendler.fromJson(json)).deleteData();
+      if (response.status == 'success') {
+        refreshPage();
+      }
+    } on Exception catch (e) {
+      // TODO
+      log(e.toString());
+      showToast(e.toString().replaceAll('Exception: ', ''));
+    }
   }
 
   Future<void> addOrderMenu({
@@ -428,7 +449,14 @@ class _CanteenScreenState extends State<CanteenScreen>
                                           ),
                                           trailing: IconButton(
                                             onPressed: () {
-                                              navigateTo(context, SignUpDanusScreen(campusId: dataMerchant!.studentInformation!.campusId!,),);
+                                              navigateTo(
+                                                context,
+                                                SignUpDanusScreen(
+                                                  campusId: dataMerchant!
+                                                      .studentInformation!
+                                                      .campusId!,
+                                                ),
+                                              );
                                             },
                                             icon: const Icon(Icons
                                                 .arrow_forward_ios_rounded),
@@ -492,18 +520,80 @@ class _CanteenScreenState extends State<CanteenScreen>
                                             style: const TextStyle(
                                                 fontWeight: FontWeight.w400),
                                           ),
-                                          trailing: IconButton(
-                                            onPressed: () {},
-                                            icon: const Icon(Icons
-                                                .arrow_forward_ios_rounded),
-                                            iconSize: 18,
-                                            style: IconButton.styleFrom(
-                                                backgroundColor: Warna.kuning,
-                                                shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            50))),
-                                          ),
+                                          trailing: widget.isOwner!
+                                              ? InkWell(
+                                                  onTap: () {
+                                                    log('finish danush?');
+                                                    showMyCustomDialog(
+                                                      context,
+                                                      text:
+                                                          'Apakah and yakin ingin menyelesaikan kegiatan danus?\nProduk danus tidak akan dihapus.',
+                                                      colorYes: Warna.like,
+                                                      onTapYes: () {
+                                                        finishDanus(context);
+                                                        navigateBack(context);
+                                                      },
+                                                    );
+                                                  },
+                                                  child: Container(
+                                                    // height: 30,
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
+                                                        horizontal: 15,
+                                                        vertical: 8),
+                                                    decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              40),
+                                                      color: Warna.like,
+                                                    ),
+                                                    child: const Row(
+                                                      mainAxisSize:
+                                                          MainAxisSize.min,
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .center,
+                                                      children: [
+                                                        Text(
+                                                          'Selesai  ',
+                                                          style: TextStyle(
+                                                            color: Colors.white,
+                                                            fontSize: 14,
+                                                            fontWeight:
+                                                                FontWeight.w600,
+                                                          ),
+                                                        ),
+                                                        Icon(
+                                                          Icons
+                                                              .arrow_forward_ios_rounded,
+                                                          size: 15,
+                                                          color: Colors.white,
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                )
+                                              : IconButton(
+                                                  onPressed: () => navigateTo(
+                                                    context,
+                                                    OrganizationScreen(
+                                                        id: dataMerchant!
+                                                            .danusInformation!
+                                                            .organizationId!),
+                                                  ),
+                                                  icon: const Icon(Icons
+                                                      .arrow_forward_ios_rounded),
+                                                  iconSize: 18,
+                                                  style: IconButton.styleFrom(
+                                                      backgroundColor:
+                                                          Warna.kuning,
+                                                      shape:
+                                                          RoundedRectangleBorder(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          50))),
+                                                ),
                                         ),
                                       ),
                                 const SizedBox(
@@ -528,7 +618,11 @@ class _CanteenScreenState extends State<CanteenScreen>
               padding: const EdgeInsets.only(bottom: 100),
               child: IconButton(
                 onPressed: () {
-                  navigateTo(context, const AddEditMenuScreen(isEdit: false,));
+                  navigateTo(
+                      context,
+                      const AddEditMenuScreen(
+                        isEdit: false,
+                      ));
                 },
                 icon: Icon(
                   UIcons.solidRounded.plus_small,

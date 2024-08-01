@@ -231,14 +231,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
               const SizedBox(
                 height: 10,
               ),
-              studentInfo?.id != null
-                  ? AppConfig.IS_DRIVER == true
-                      ? Container()
-                      : joinDriverNotifBox()
-                  : Container(),
+
+              // Fitur Kurir (Simpan buat nanti)
+
+              // studentInfo?.id != null
+              //     ? AppConfig.IS_DRIVER == true
+              //         ? Container()
+              //         : joinDriverNotifBox()
+              //     : Container(),
 
               // boxMerchantTaks(),
-              AppConfig.IS_DRIVER == true ? boxDriverTasks() : Container(),
+              // AppConfig.IS_DRIVER == true ? boxDriverTasks() : Container(),
+
               widget.userType == 'kantin'
                   ? sectionMenuBox(
                       title: 'Akun',
@@ -363,32 +367,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ],
               ),
-              sectionMenuBox(
-                title: 'dev shortcut',
-                items: [
-                  menuItemContainer(
-                    icons: UIcons.solidRounded.store_alt,
-                    showBorder: true,
-                    text: 'Halaman Canteens',
-                    onTap: () {
-                      navigateToRep(context, const MainScreenCanteen());
-                      // context.pushReplacementNamed('main-canteen');
-                    },
-                  ),
-                  menuItemContainer(
-                    icons: UIcons.solidRounded.bike,
-                    showBorder: true,
-                    text: 'Halaman Kurir',
-                    onTap: () {},
-                  ),
-                  menuItemContainer(
-                    icons: UIcons.solidRounded.business_time,
-                    showBorder: false,
-                    text: 'Halaman Wirausaha',
-                    onTap: () {},
-                  ),
-                ],
-              ),
+              // sectionMenuBox(
+              //   title: 'dev shortcut',
+              //   items: [
+              //     menuItemContainer(
+              //       icons: UIcons.solidRounded.store_alt,
+              //       showBorder: true,
+              //       text: 'Halaman Canteens',
+              //       onTap: () {
+              //         navigateToRep(context, const MainScreenCanteen());
+              //         // context.pushReplacementNamed('main-canteen');
+              //       },
+              //     ),
+              //     menuItemContainer(
+              //       icons: UIcons.solidRounded.bike,
+              //       showBorder: true,
+              //       text: 'Halaman Kurir',
+              //       onTap: () {},
+              //     ),
+              //     menuItemContainer(
+              //       icons: UIcons.solidRounded.business_time,
+              //       showBorder: false,
+              //       text: 'Halaman Wirausaha',
+              //       onTap: () {},
+              //     ),
+              //   ],
+              // ),
               const SizedBox(
                 height: 100,
               ),

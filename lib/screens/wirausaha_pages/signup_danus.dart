@@ -190,17 +190,21 @@ class _SignUpDanusScreenState extends State<SignUpDanusScreen> {
               ),
               RichText(
                 text: TextSpan(
-                  text: 'Organisasi tidak ditemukan?  ',
+                  text: '',
                   style: TextStyle(color: Colors.grey.shade900, fontSize: 15),
                   children: [
                     TextSpan(
-                      text: 'Tambah Organiasasi!',
+                      text: 'Tambah Organisasi',
                       style: TextStyle(color: Warna.biru, fontSize: 15),
                       recognizer: TapGestureRecognizer()
                         ..onTap = () {
                           log('go to add Organization');
-                          navigateTo(context, OrganizationAddScreen(campusId: widget.campusId!,)).then((result) {
-                            if(result == 'load org'){
+                          navigateTo(
+                              context,
+                              OrganizationAddScreen(
+                                campusId: widget.campusId!,
+                              )).then((result) {
+                            if (result == 'load org') {
                               getOrganizations(context);
                             }
                           });
@@ -216,7 +220,7 @@ class _SignUpDanusScreenState extends State<SignUpDanusScreen> {
               ),
               CTextField(
                 hintText: 'Tisigram',
-                labelText: 'Program kerja/Kegiatan',
+                labelText: 'Program Kerja/Kegiatan',
                 controller: programController,
                 onChanged: (p0) {
                   _activityItenmsFilter();
@@ -244,19 +248,22 @@ class _SignUpDanusScreenState extends State<SignUpDanusScreen> {
               ),
               RichText(
                 text: TextSpan(
-                  text: 'Kegiatan tidak ditemukan?  ',
+                  text: '',
                   style: TextStyle(color: Colors.grey.shade900, fontSize: 15),
                   children: [
                     TextSpan(
-                      text: 'Tambah Kegiatan!',
+                      text: 'Tambah Kegiatan',
                       style: TextStyle(color: Warna.biru, fontSize: 15),
                       recognizer: TapGestureRecognizer()
                         ..onTap = () {
                           log('go to add Kegiatan');
                           // context.pushReplacementNamed('register');
-                          
-                          navigateTo(context, ActivityAddScreen(campusId: widget.campusId!,));
 
+                          navigateTo(
+                              context,
+                              ActivityAddScreen(
+                                campusId: widget.campusId!,
+                              ));
                         },
                     ),
                   ],
@@ -265,15 +272,16 @@ class _SignUpDanusScreenState extends State<SignUpDanusScreen> {
               const SizedBox(
                 height: 40,
               ),
-
               SizedBox(
                 height: 50,
                 width: double.infinity,
                 child: CBlueButton(
                   isLoading: buttonLoad,
                   onPressed: () {
-                  dataCheck(context);
-                }, text: 'Daftar',),
+                    dataCheck(context);
+                  },
+                  text: 'Daftar',
+                ),
               )
             ],
           ),

@@ -2,7 +2,8 @@ import 'package:cfood/style.dart';
 import 'package:flutter/material.dart';
 import 'package:uicons/uicons.dart';
 
-Widget itemsEmptyBody(BuildContext context, {String? text, Color? bgcolors}) {
+Widget itemsEmptyBody(BuildContext context,
+    {IconData? icons, Color? iconsColor, String? text, Color? bgcolors}) {
   return Container(
     // width: MediaQuery.of(context).size.width,
     // height: MediaQuery.of(context).size.height,
@@ -17,9 +18,9 @@ Widget itemsEmptyBody(BuildContext context, {String? text, Color? bgcolors}) {
           height: 60,
         ),
         Icon(
-          UIcons.solidRounded.bug,
+          icons ?? UIcons.solidRounded.bug,
           size: 40,
-          color: Warna.biru,
+          color: iconsColor ?? Warna.biru,
         ),
         const SizedBox(
           height: 20,

@@ -1,11 +1,18 @@
 import 'dart:developer';
 
 import 'package:cfood/custom/CButtons.dart';
+import 'package:cfood/custom/CPageMover.dart';
 import 'package:cfood/custom/card.dart';
 import 'package:cfood/custom/reload_indicator.dart';
+import 'package:cfood/model/get_detail_organization_response.dart';
+import 'package:cfood/screens/canteen.dart';
 import 'package:cfood/style.dart';
+import 'package:community_material_icon/community_material_icon.dart';
 import 'package:flutter/material.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:uicons/uicons.dart';
+import 'package:cfood/repository/fetch_controller.dart';
+import 'package:cfood/utils/constant.dart';
 
 class OrganizationScreen extends StatefulWidget {
   final int? id;
@@ -23,188 +30,50 @@ class _OrganizationScreenState extends State<OrganizationScreen>
   String selectedTab = 'Semua';
   late TabController categoryTabController;
   TextEditingController searchTextController = TextEditingController();
-  Map<String, Map<String, Map<String, dynamic>>> organizationMaps = {
-    'Semua': {
-      'wirausaha 1': {
-        'id': '1',
-        'nama': 'nama wirausaha',
-        'rate': '4.0',
-        'likes': '100',
-        'menuList': 'Rendang, Ayam Geprek, Nasgor ...',
-      },
-      'wirausaha 2': {
-        'id': '2',
-        'nama': 'nama wirausaha',
-        'rate': '4.0',
-        'likes': '100',
-        'menuList': 'Rendang, Ayam Geprek, Nasgor ...',
-      },
-      'wirausaha 3': {
-        'id': '3',
-        'nama': 'nama wirausaha',
-        'rate': '4.0',
-        'likes': '100',
-        'menuList': 'Rendang, Ayam Geprek, Nasgor ...',
-      },
-      'wirausaha 4': {
-        'id': '4',
-        'nama': 'nama wirausaha',
-        'rate': '4.0',
-        'likes': '100',
-        'menuList': 'Rendang, Ayam Geprek, Nasgor ...',
-      },
-      'wirausaha 5': {
-        'id': '5',
-        'nama': 'nama wirausaha',
-        'rate': '4.0',
-        'likes': '100',
-        'menuList': 'Rendang, Ayam Geprek, Nasgor ...',
-      },
-      'wirausaha 6': {
-        'id': '6',
-        'nama': 'nama wirausaha',
-        'rate': '4.0',
-        'likes': '100',
-        'menuList': 'Rendang, Ayam Geprek, Nasgor ...',
-      },
-    },
-    'kategori 1': {
-      'wirausaha 1': {
-        'id': '7',
-        'nama': 'nama wirausaha kategori 1',
-        'rate': '4.0',
-        'likes': '100',
-        'menuList': 'Rendang, Ayam Geprek, Nasgor ...',
-      },
-      'wirausaha 2': {
-        'id': '8',
-        'nama': 'nama wirausaha',
-        'rate': '4.0',
-        'likes': '100',
-        'menuList': 'Rendang, Ayam Geprek, Nasgor ...',
-      },
-      'wirausaha 3': {
-        'id': '9',
-        'nama': 'nama wirausaha',
-        'rate': '4.0',
-        'likes': '100',
-        'menuList': 'Rendang, Ayam Geprek, Nasgor ...',
-      },
-      'wirausaha 4': {
-        'id': '10',
-        'nama': 'nama wirausaha',
-        'rate': '4.0',
-        'likes': '100',
-        'menuList': 'Rendang, Ayam Geprek, Nasgor ...',
-      },
-    },
-    'kategori 2': {
-      'wirausaha 1': {
-        'id': '11',
-        'nama': 'nama wirausaha kategori 2',
-        'rate': '4.0',
-        'likes': '100',
-        'menuList': 'Rendang, Ayam Geprek, Nasgor ...',
-      },
-      'wirausaha 2': {
-        'id': '12',
-        'nama': 'nama wirausaha',
-        'rate': '4.0',
-        'likes': '100',
-        'menuList': 'Rendang, Ayam Geprek, Nasgor ...',
-      },
-      'wirausaha 3': {
-        'id': '13',
-        'nama': 'nama wirausaha',
-        'rate': '4.0',
-        'likes': '100',
-        'menuList': 'Rendang, Ayam Geprek, Nasgor ...',
-      },
-      'wirausaha 4': {
-        'id': '14',
-        'nama': 'nama wirausaha',
-        'rate': '4.0',
-        'likes': '100',
-        'menuList': 'Rendang, Ayam Geprek, Nasgor ...',
-      },
-    },
-    'kategori 3': {
-      'wirausaha 1': {
-        'id': '15',
-        'nama': 'nama wirausaha kategori 3',
-        'rate': '4.0',
-        'likes': '100',
-        'menuList': 'Rendang, Ayam Geprek, Nasgor ...',
-      },
-      'wirausaha 2': {
-        'id': '16',
-        'nama': 'nama wirausaha',
-        'rate': '4.0',
-        'likes': '100',
-        'menuList': 'Rendang, Ayam Geprek, Nasgor ...',
-      },
-      'wirausaha 3': {
-        'id': '17',
-        'nama': 'nama wirausaha',
-        'rate': '4.0',
-        'likes': '100',
-        'menuList': 'Rendang, Ayam Geprek, Nasgor ...',
-      },
-      'wirausaha 4': {
-        'id': '18',
-        'nama': 'nama wirausaha',
-        'rate': '4.0',
-        'likes': '100',
-        'menuList': 'Rendang, Ayam Geprek, Nasgor ...',
-      },
-    },
-    'kategori 4': {
-      'wirausaha 1': {
-        'id': '19',
-        'nama': 'nama wirausaha kategori 4',
-        'rate': '4.0',
-        'likes': '100',
-        'menuList': 'Rendang, Ayam Geprek, Nasgor ...',
-      },
-      'wirausaha 2': {
-        'id': '20',
-        'nama': 'nama wirausaha',
-        'rate': '4.0',
-        'likes': '100',
-        'menuList': 'Rendang, Ayam Geprek, Nasgor ...',
-      },
-      'wirausaha 3': {
-        'id': '21',
-        'nama': 'nama wirausaha',
-        'rate': '4.0',
-        'likes': '100',
-        'menuList': 'Rendang, Ayam Geprek, Nasgor ...',
-      },
-      'wirausaha 4': {
-        'id': '22',
-        'nama': 'nama wirausaha',
-        'rate': '4.0',
-        'likes': '100',
-        'menuList': 'Rendang, Ayam Geprek, Nasgor ...',
-      },
-    }
-  };
+  Map<String, dynamic> organizationMaps = {};
+
+  GetDetailOrganizationResponse? organizationDataResponse;
+  DataDetailOrganization? dataOrganization;
+  String? logoOrganization;
 
   @override
   void initState() {
     super.initState();
-    categoryTabController =
-        TabController(length: organizationMaps.length, vsync: this);
     onEnterPage();
   }
 
-
-  Future<void> onEnterPage() async {}
+  Future<void> onEnterPage() async {
+    fetchDetailDataOrganization();
+    categoryTabController =
+        TabController(length: organizationMaps.keys.length, vsync: this);
+  }
 
   Future<void> refreshPage() async {
-    await Future.delayed(const Duration(seconds: 10));
-
+    await Future.delayed(const Duration(seconds: 1));
+    fetchDetailDataOrganization();
     print('reload...');
+  }
+
+  Future<void> fetchDetailDataOrganization() async {
+    organizationDataResponse = await FetchController(
+      endpoint: 'organizations/${widget.id}',
+      fromJson: (json) => GetDetailOrganizationResponse.fromJson(json),
+    ).getData();
+
+    setState(() {
+      dataOrganization = organizationDataResponse!.data;
+      logoOrganization = AppConfig.URL_IMAGES_PATH +
+          organizationDataResponse!.data!.organizationLogo!;
+    });
+
+    organizationMaps = {
+      for (var activity in organizationDataResponse!.data!.activities!)
+        activity.activityName!: activity.merchants!,
+    };
+    if (organizationMaps.isNotEmpty) {
+      selectedTab = organizationMaps.keys.first;
+    }
+    log("$dataOrganization");
   }
 
   @override
@@ -248,19 +117,39 @@ class _OrganizationScreenState extends State<OrganizationScreen>
               SliverList(
                   delegate: SliverChildListDelegate([
                 Container(
-                    height: 120,
-                    width: double.infinity,
-                    color: Colors.white,
-                    margin: const EdgeInsets.symmetric(vertical: 15),
-                    child: Center(
-                      child: Container(
-                          height: 120,
-                          width: 120,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(100),
-                            color: Warna.abu5,
-                          )),
-                    )),
+                  width: double.infinity,
+                  height: 150,
+                  padding: const EdgeInsets.only(bottom: 25),
+                  child: Image.network(
+                    logoOrganization ?? './jpg',
+                    fit: BoxFit.contain,
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) {
+                        // Jika loadingProgress null, itu berarti gambar sudah selesai dimuat
+                        return child;
+                      } else {
+                        // Tampilkan loading indicator selama gambar belum selesai dimuat
+                        return Container(
+                          height: 200,
+                          width: double.infinity,
+                          color: Warna.abu2,
+                          child: Center(
+                            child: SizedBox(
+                              width: 50,
+                              child: LoadingAnimationWidget.staggeredDotsWave(
+                                  color: Warna.biru, size: 30),
+                            ),
+                          ),
+                        );
+                      }
+                    },
+                    errorBuilder: (context, error, stackTrace) => Container(
+                      height: 200,
+                      width: double.infinity,
+                      color: Warna.abu2,
+                    ),
+                  ),
+                ),
               ])),
               SliverList(
                 delegate: SliverChildListDelegate(
@@ -298,54 +187,81 @@ class _OrganizationScreenState extends State<OrganizationScreen>
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(
-                Icons.store,
-                color: Warna.biru.withOpacity(0.70),
+                Icons.groups,
+                color: Warna.biru,
                 size: 35,
               ),
               const SizedBox(
                 width: 15,
               ),
-              const Text(
-                '[Nama Kantin]',
+              Text(
+                '${dataOrganization?.organizationName}',
                 style: AppTextStyles.title,
                 maxLines: 2,
               ),
             ],
           ),
-          const Text(
-            '[List Kategori Kantin]',
+          const SizedBox(
+            height: 12,
+          ),
+          Text(
+            '${dataOrganization?.totalActivity} Kegiatan',
             style: AppTextStyles.textRegular,
           ),
           const SizedBox(
-            height: 8,
+            height: 16,
           ),
-          // storeReviewContainer(),
-          // const SizedBox(
-          //   height: 8,
-          // ),
           Row(
             children: [
-              Icon(
-                UIcons.solidRounded.user,
-                color: Warna.biru,
-                size: 16,
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(4),
+                  border: Border.all(color: Warna.kuning, width: 1),
+                  color: Warna.kuning.withOpacity(0.10),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      CommunityMaterialIcons.handshake,
+                      size: 15,
+                      color: Warna.kuning,
+                    ),
+                    Text(
+                      ' ${dataOrganization?.totalWirausaha.toString()} Wirausaha',
+                      style: const TextStyle(fontSize: 12),
+                    ),
+                  ],
+                ),
               ),
               const SizedBox(
                 width: 8,
               ),
-              const Text(
-                'Nama Mahasiswa - Prodi dan Jurusan',
-                style: AppTextStyles.textRegular,
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(4),
+                  border: Border.all(color: Warna.oranye1, width: 1),
+                  color: Warna.oranye1.withOpacity(0.10),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.fastfood_rounded,
+                      size: 15,
+                      color: Warna.oranye1,
+                    ),
+                    Text(
+                      ' ${dataOrganization?.totalMenu.toString()} Menu',
+                      style: const TextStyle(fontSize: 12),
+                    ),
+                  ],
+                ),
               ),
             ],
-          ),
-          const SizedBox(
-            height: 8,
-          ),
-          const Text(
-            '[Deskripsi kantin/wirausaha]',
-            style: AppTextStyles.textRegular,
-          ),
+          )
         ],
       ),
     );
@@ -365,65 +281,99 @@ class _OrganizationScreenState extends State<OrganizationScreen>
             physics: const BouncingScrollPhysics(),
             padding: const EdgeInsets.symmetric(horizontal: 25),
             children: organizationMaps.keys.map((String key) {
-              return AnimatedContainer(
-                duration: const Duration(milliseconds: 300),
-                decoration: BoxDecoration(
-                  border: key == selectedTab
-                      ? Border(
-                          bottom: BorderSide(
-                              color: Warna.kuning,
-                              width: 2,
-                              style: BorderStyle.solid),
-                        )
-                      : null,
-                ),
-                child: TextButton(
-                  onPressed: () {
-                    setState(() {
-                      selectedTab = key;
-                    });
-                    log(selectedTab);
-                  },
-                  child: Text(
-                    key,
-                    style: TextStyle(
-                      fontSize: key == selectedTab ? 16 : 14,
-                      color: key == selectedTab ? Warna.kuning : Warna.biru,
-                    ),
-                  ),
-                ),
+              return tabMenuItem(
+                onPressed: () {
+                  setState(() {
+                    selectedTab = key;
+                  });
+                },
+                text: key,
+                menuName: key,
+                activeColor: Warna.kuning,
               );
             }).toList(),
           ),
         ),
+        const SizedBox(
+          height: 20,
+        ),
         ListView.builder(
-          itemCount: organizationMaps[selectedTab]?.length,
+          itemCount: organizationMaps[selectedTab]?.length ?? 0,
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           itemBuilder: (context, index) {
-            Map<String, dynamic> wirausahaItems =
-                organizationMaps[selectedTab]!;
-            String wirausahaKey = wirausahaItems.keys.elementAt(index);
-            var item = wirausahaItems[wirausahaKey];
+            var merchants = organizationMaps[selectedTab]!;
+            var merchant = merchants[index];
+            log('Merchant data: ${merchant.toString()}');
+            debugPrint('Merchant data: ${merchant.toString()}');
             return Container(
-              color: Colors.white,
-              padding: const EdgeInsets.symmetric(
-                horizontal: 25,
-              ),
-              child: Container(
-                // margin: const EdgeInsets.only(top: 25, bottom: 10, left: 25, right: 25),
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                child: OrganizationCardBox(
-                  organizationName: item['nama'],
-                  // menuList: item['menuList'],
-                  // likes: item['likes'],
-                  // rate: item['rate'],
+                color: Colors.white,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 25,
                 ),
-              ),
-            );
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  child: CanteenCardBox(
+                    canteenId: '${merchant.merchantId}',
+                    imgUrl:
+                        '${AppConfig.URL_IMAGES_PATH}${merchant?.merchantPhoto}',
+                    canteenName: merchant.merchantName,
+                    likes: ' ${merchant?.followers}',
+                    rate: '${merchant?.rating}',
+                    type: merchant?.merchantType,
+                    open: merchant!.open!,
+                    danus: merchant.danus!,
+                    onPressed: () => navigateTo(
+                        context,
+                        CanteenScreen(
+                          merchantId: merchant.merchantId,
+                          isOwner: false,
+                          merchantType: merchant.merchantType!,
+                          itsDanusan: merchant.danus,
+                        )),
+                  ),
+                ));
           },
         ),
       ],
+    );
+  }
+
+  Widget tabMenuItem(
+      {VoidCallback? onPressed,
+      String? text,
+      IconData? icons,
+      String? menuName,
+      Color? activeColor}) {
+    return Container(
+      decoration: BoxDecoration(
+        border: menuName == selectedTab
+            ? Border(bottom: BorderSide(color: activeColor!, width: 2))
+            : null,
+      ),
+      child: TextButton(
+        onPressed: onPressed,
+        style: TextButton.styleFrom(
+          elevation: 0,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              text!,
+              style: TextStyle(
+                color: menuName == selectedTab
+                    ? Warna.regulerFontColor
+                    : Warna.abu6,
+                fontSize: 15,
+                fontWeight: menuName == selectedTab
+                    ? FontWeight.w700
+                    : FontWeight.normal,
+              ),
+            )
+          ],
+        ),
+      ),
     );
   }
 

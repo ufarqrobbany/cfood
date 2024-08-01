@@ -1,7 +1,19 @@
+import 'dart:developer';
+
 import 'package:cfood/custom/CButtons.dart';
+import 'package:cfood/custom/CPageMover.dart';
 import 'package:cfood/custom/CTextField.dart';
 import 'package:cfood/custom/card.dart';
+import 'package:cfood/custom/page_item_void.dart';
+import 'package:cfood/model/get_all_menu_response.dart';
+import 'package:cfood/model/get_all_organization_response.dart';
+import 'package:cfood/model/getl_all_merchant_response.dart';
+import 'package:cfood/model/reponse_handler.dart';
+import 'package:cfood/repository/fetch_controller.dart';
+import 'package:cfood/screens/canteen.dart';
+import 'package:cfood/screens/organization.dart';
 import 'package:cfood/style.dart';
+import 'package:cfood/utils/constant.dart';
 import 'package:community_material_icon/community_material_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
@@ -19,6 +31,17 @@ class _SearchScreenState extends State<SearchScreen> {
   ScrollController searchResultScrollController = ScrollController();
   bool searchDone = false;
   String selectedTab = 'menu';
+
+  GetAllMerchantsResponse? dataMerchantsResponse;
+  DataGetMerchant? dataMerchants;
+  MerchantItems? merchantListItems;
+
+  GetAllOrganizationsResponse? dataOrganizationsResponse;
+  DataGetOrganization? dataOrganizations;
+  OrganizationItems? organizationListItems;
+
+  MenusResponse? dataMenusResponse;
+  DataGetMenu? dataMenus;
 
   final List<String> riwayat = [
     'ayam geprek',
@@ -69,6 +92,7 @@ class _SearchScreenState extends State<SearchScreen> {
     setState(() {
       selectedTab = tab;
     });
+    log(selectedTab);
   }
 
   void _filterSearch() {
@@ -98,6 +122,63 @@ class _SearchScreenState extends State<SearchScreen> {
       });
       print('Filtered List cleared');
     }
+  }
+
+  void searchItemsBy(BuildContext context, {String query = ''}) {
+    log('$query -- $selectedTab');
+    if (selectedTab == 'menu') {
+      getAllMenus(context, query: query);
+      return;
+    }
+
+    if (selectedTab == 'wirausaha') {
+      getAllMerchants(context, query: query);
+      return;
+    }
+
+    if (selectedTab == 'organization') {
+      getAllOrganizations(context);
+      return;
+    }
+  }
+
+  Future<void> getAllMenus(BuildContext context, {String query = ''}) async {
+    dataMenusResponse = await FetchController(
+      endpoint: 'menus/?page=1&size=5&searchName=$query',
+      fromJson: (json) => MenusResponse.fromJson(json),
+    ).getData();
+
+    setState(() {
+      dataMenus = dataMenusResponse?.data;
+      log(dataMenus.toString());
+    });
+  }
+
+  Future<void> getAllOrganizations(BuildContext context,
+      {String query = ''}) async {
+    dataOrganizationsResponse = await FetchController(
+      endpoint: 'organizations/?campusId=1&page=1&size=5&name=$query',
+      fromJson: (json) => GetAllOrganizationsResponse.fromJson(json),
+    ).getData();
+
+    setState(() {
+      dataOrganizations = dataOrganizationsResponse?.data;
+      log(dataOrganizations.toString());
+    });
+  }
+
+  Future<void> getAllMerchants(BuildContext context,
+      {String query = ''}) async {
+    dataMerchantsResponse = await FetchController(
+      endpoint:
+          'merchants/all?page=1&size=10&type=all&isOpen=all&searchName=$query',
+      fromJson: (json) => GetAllMerchantsResponse.fromJson(json),
+    ).getData();
+
+    setState(() {
+      dataMerchants = dataMerchantsResponse?.data;
+      log(dataMerchants.toString());
+    });
   }
 
   @override
@@ -140,7 +221,8 @@ class _SearchScreenState extends State<SearchScreen> {
                         });
                       },
                       onChanged: (p0) {
-                        _filterSearch();
+                        // _filterSearch();
+                        searchItemsBy(context, query: p0);
                         setState(() {
                           searchDone = true;
                         });
@@ -225,28 +307,28 @@ class _SearchScreenState extends State<SearchScreen> {
           // if (_showSuggestions && searchTextController.text.isNotEmpty)
           //     onSearchResultItemsSelection(),
 
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 25, vertical: 20),
-            child: Text(
-              'Riwayat',
-              style: AppTextStyles.subTitle,
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Wrap(
-              children: [
-                for (var item in riwayat)
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(5, 5, 5, 5),
-                    child: searchItemBox(
-                      onPressed: () {},
-                      text: item,
-                    ),
-                  )
-              ],
-            ),
-          ),
+          // const Padding(
+          //   padding: EdgeInsets.symmetric(horizontal: 25, vertical: 20),
+          //   child: Text(
+          //     'Riwayat',
+          //     style: AppTextStyles.subTitle,
+          //   ),
+          // ),
+          // Padding(
+          //   padding: const EdgeInsets.symmetric(horizontal: 20),
+          //   child: Wrap(
+          //     children: [
+          //       for (var item in riwayat)
+          //         Padding(
+          //           padding: const EdgeInsets.fromLTRB(5, 5, 5, 5),
+          //           child: searchItemBox(
+          //             onPressed: () {},
+          //             text: item,
+          //           ),
+          //         )
+          //     ],
+          //   ),
+          // ),
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 25, vertical: 20),
             child: Text(
@@ -262,7 +344,16 @@ class _SearchScreenState extends State<SearchScreen> {
                   Padding(
                     padding: const EdgeInsets.fromLTRB(5, 5, 5, 5),
                     child: searchItemBox(
-                      onPressed: () {},
+                      onPressed: () {
+                        setState(() {
+                          searchTextController.text = item;
+                          searchDone = true;
+                        });
+                        searchItemsBy(
+                          context,
+                          query: searchTextController.text,
+                        );
+                      },
                       text: item,
                     ),
                   )
@@ -289,83 +380,143 @@ class _SearchScreenState extends State<SearchScreen> {
     } else {
       // If selectedTab is not null, check its value and return the corresponding widget
       if (selectedTab == 'menu') {
-        return MasonryGridView.count(
-          itemCount: 8,
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 25),
-          crossAxisCount: 2,
-          crossAxisSpacing: 20,
-          mainAxisSpacing: 20,
-          itemBuilder: (context, index) {
-            return const ProductCardBox(
-              productName: '[Nama Menu]',
-              storeName: '[Nama Toko]',
-              price: '10.000',
-              likes: '100',
-              rate: '4.5',
-            );
-          },
-        ); // Replace with the widget you want to show for 'menu'
-      } else if (selectedTab == 'kantin') {
-        return ListView.builder(
-          itemCount: 10,
-          physics: const NeverScrollableScrollPhysics(),
-          shrinkWrap: true,
-          padding: const EdgeInsets.fromLTRB(25, 25, 25, 20),
-          itemBuilder: (context, index) {
-            return Container(
-              // margin: const EdgeInsets.only(top: 25, bottom: 10, left: 25, right: 25),
-              padding: const EdgeInsets.symmetric(vertical: 10),
-              child: const CanteenCardBox(
-                canteenName: '[Canteen Name]',
-                menuList: 'Rendang, Ayam Geprek, Nasgor ...',
-                likes: '200',
-                rate: '4.4',
-                type: 'kantin',
-              ),
-            );
-          },
-        ); // Replace with the widget you want to show for 'kantin'
-      } else if (selectedTab == 'wirausaha') {
-        return ListView.builder(
-          itemCount: 10,
-          physics: const NeverScrollableScrollPhysics(),
-          shrinkWrap: true,
-          padding: const EdgeInsets.fromLTRB(25, 25, 25, 20),
-          itemBuilder: (context, index) {
-            return Container(
-              // margin: const EdgeInsets.only(top: 25, bottom: 10, left: 25, right: 25),
-              padding: const EdgeInsets.symmetric(vertical: 10),
-              child: const CanteenCardBox(
-                canteenName: '[Canteen Name]',
-                menuList: 'Rendang, Ayam Geprek, Nasgor ...',
-                likes: '200',
-                rate: '4.4',
-                type: 'wirausaha',
-              ),
-            );
-          },
-        ); // Default case if selectedTab doesn't match 'menu' or 'kantin'
+        return dataMenus?.content == null
+            ? itemsEmptyBody(context,
+                bgcolors: Warna.pageBackgroundColor,
+                icons: Icons.fastfood_rounded,
+                iconsColor: Warna.oranye1,
+                text: 'Cari Menu')
+            : dataMenus!.content!.isEmpty
+                ? itemsEmptyBody(context,
+                    icons: Icons.fastfood_rounded,
+                    iconsColor: Warna.oranye1,
+                    bgcolors: Warna.pageBackgroundColor)
+                : MasonryGridView.count(
+                    itemCount: dataMenus?.content?.length,
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 25, vertical: 25),
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 20,
+                    mainAxisSpacing: 20,
+                    itemBuilder: (context, index) {
+                      MenuItems? items = dataMenus?.content![index];
+                      return ProductCardBox(
+                          onPressed: () {
+                            navigateTo(
+                              context,
+                              const CanteenScreen(
+                                menuId: '0',
+                                merchantId: 1,
+                              ),
+                            );
+                          },
+                          imgUrl:
+                              '${AppConfig.URL_IMAGES_PATH}${items?.menuPhoto}',
+                          productName: '${items?.menuName}',
+                          storeName: '${items?.merchants?.merchantName}',
+                          price: items?.menuPrice,
+                          likes: '${items?.menuLikes}',
+                          rate: '${items?.menuRating}',
+                          merchantType: '${items?.merchants?.merchantType}',
+                          isDanus: items?.menuIsDanus!);
+                    },
+                  ); // Replace with the widget you want to show for 'menu'
+      }
+      // else if (selectedTab == 'kantin') {
+      //   return ListView.builder(
+      //     itemCount: 10,
+      //     physics: const NeverScrollableScrollPhysics(),
+      //     shrinkWrap: true,
+      //     padding: const EdgeInsets.fromLTRB(25, 25, 25, 20),
+      //     itemBuilder: (context, index) {
+      //       return Container(
+      //         // margin: const EdgeInsets.only(top: 25, bottom: 10, left: 25, right: 25),
+      //         padding: const EdgeInsets.symmetric(vertical: 10),
+      //         child: const CanteenCardBox(
+      //           canteenName: '[Canteen Name]',
+      //           menuList: 'Rendang, Ayam Geprek, Nasgor ...',
+      //           likes: '200',
+      //           rate: '4.4',
+      //           type: 'kantin',
+      //         ),
+      //       );
+      //     },
+      //   ); // Replace with the widget you want to show for 'kantin'
+      // }
+      else if (selectedTab == 'wirausaha') {
+        return dataMerchants?.merchants! == null
+            ? itemsEmptyBody(context,
+                bgcolors: Warna.pageBackgroundColor,
+                icons: CommunityMaterialIcons.handshake,
+                iconsColor: Warna.kuning,
+                text: 'Cari Wirausaha')
+            : dataMerchants!.merchants!.isEmpty
+                ? itemsEmptyBody(context,
+                    icons: CommunityMaterialIcons.handshake,
+                    iconsColor: Warna.kuning,
+                    bgcolors: Warna.pageBackgroundColor)
+                : ListView.builder(
+                    itemCount: dataMerchants?.merchants?.length,
+                    physics: const NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    padding: const EdgeInsets.fromLTRB(25, 25, 25, 20),
+                    itemBuilder: (context, index) {
+                      MerchantItems? items = dataMerchants?.merchants![index];
+                      return CanteenCardBox(
+                        imgUrl:
+                            '${AppConfig.URL_IMAGES_PATH}${items?.merchantPhoto}',
+                        canteenName: items?.merchantName,
+                        // menuList: 'kosong',
+                        // likes: ' 0',
+                        likes: ' ${items?.followers}',
+                        rate: '${items?.rating}',
+                        type: items?.merchantType,
+                        open: items!.open!,
+                        danus: items.danus!,
+                        onPressed: () => navigateTo(
+                            context,
+                            CanteenScreen(
+                              merchantId: items.merchantId,
+                              isOwner: false,
+                              merchantType: items.merchantType!,
+                              itsDanusan: items.danus,
+                            )),
+                      );
+                    },
+                  ); // Default case if selectedTab doesn't match 'menu' or 'kantin'
       } else {
-        return ListView.builder(
-          itemCount: 10,
-          physics: const NeverScrollableScrollPhysics(),
-          shrinkWrap: true,
-          padding: const EdgeInsets.fromLTRB(25, 25, 25, 20),
-          itemBuilder: (context, index) {
-            return Container(
-              // margin: const EdgeInsets.only(top: 25, bottom: 10, left: 25, right: 25),
-              padding: const EdgeInsets.symmetric(vertical: 10),
-              child: const OrganizationCardBox(
-                organizationName: '[Canteen Name]',
-                // menuList: 'Rendang, Ayam Geprek, Nasgor ...',
-                // likes: '200',
-                // rate: '4.4',
-              ),
-            );
-          },
-        );
+        return dataOrganizations?.organizations == null
+            ? itemsEmptyBody(context,
+                icons: Icons.groups,
+                iconsColor: Warna.biru,
+                text: 'Cari Organisasi',
+                bgcolors: Warna.pageBackgroundColor)
+            : dataOrganizations!.organizations!.isEmpty
+                ? itemsEmptyBody(context,
+                    icons: Icons.groups,
+                    iconsColor: Warna.biru,
+                    bgcolors: Warna.pageBackgroundColor)
+                : ListView.builder(
+                    itemCount: dataOrganizations?.organizations?.length,
+                    physics: const NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    padding: const EdgeInsets.fromLTRB(25, 25, 25, 20),
+                    itemBuilder: (context, index) {
+                      OrganizationItems? items =
+                          dataOrganizations?.organizations![index];
+                      return OrganizationCard(
+                        text: items?.organizationName!,
+                        imgUrl:
+                            '${AppConfig.URL_IMAGES_PATH}${items?.organizationLogo}',
+                        onPressed: () => navigateTo(
+                          context,
+                          OrganizationScreen(id: items?.id),
+                        ),
+                      );
+                    },
+                  );
       }
     }
   }
@@ -387,15 +538,15 @@ class _SearchScreenState extends State<SearchScreen> {
             activeColor: Warna.oranye1,
             menuName: 'menu',
           ),
-          tabMenuItem(
-            onPressed: () {
-              selectTabs('kantin');
-            },
-            text: 'Kantin',
-            icons: Icons.store_rounded,
-            activeColor: Warna.biru1,
-            menuName: 'kantin',
-          ),
+          // tabMenuItem(
+          //   onPressed: () {
+          //     selectTabs('kantin');
+          //   },
+          //   text: 'Kantin',
+          //   icons: Icons.store_rounded,
+          //   activeColor: Warna.biru1,
+          //   menuName: 'kantin',
+          // ),
           tabMenuItem(
             onPressed: () {
               selectTabs('wirausaha');

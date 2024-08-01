@@ -301,7 +301,7 @@ class _AddEditMenuScreenState extends State<AddEditMenuScreen> {
                       padding: EdgeInsets.zero,
                     ),
                     child: Text(
-                      'Tambah Category',
+                      'Tambah Kategori',
                       style: TextStyle(
                         color: Warna.biru,
                         fontSize: 15,
@@ -342,8 +342,8 @@ class _AddEditMenuScreenState extends State<AddEditMenuScreen> {
               ),
 
               const Text(
-                'varian Produk',
-                style: AppTextStyles.textInput,
+                'Varian Produk',
+                style: AppTextStyles.labelInput,
               ),
 
               MenuConfig.variants.isEmpty
@@ -404,7 +404,7 @@ class _AddEditMenuScreenState extends State<AddEditMenuScreen> {
                   ),
                   const SizedBox(
                       width: 8), // Add some spacing between checkbox and text
-                  Text('danusan'),
+                  Text('Produk Danus'),
                 ],
               ),
 

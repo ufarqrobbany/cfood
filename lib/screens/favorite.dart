@@ -3,7 +3,9 @@ import 'package:cfood/custom/CPageMover.dart';
 import 'package:cfood/custom/card.dart';
 import 'package:cfood/custom/page_item_void.dart';
 import 'package:cfood/model/followed_response.dart';
+import 'package:cfood/model/liked_response.dart';
 import 'package:cfood/model/getl_all_merchant_response.dart';
+// import 'package:cfood/model/get_all_menu_response.dart';
 import 'package:cfood/repository/fetch_controller.dart';
 import 'package:cfood/screens/canteen.dart';
 import 'package:cfood/style.dart';
@@ -23,10 +25,14 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
   GetFollowedResponse? dataFollowedMerchants;
   List<DataFollowed>? dataFollowed;
 
+  GetLikedResponse? dataLikedMenus;
+  List<DataLiked>? dataLiked;
+
   @override
   void initState() {
     super.initState();
     getAllMerchants();
+    getAllMenus();
   }
 
   Future<void> getAllMerchants() async {
@@ -37,6 +43,17 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
 
     setState(() {
       dataFollowed = dataFollowedMerchants?.data!;
+    });
+  }
+
+  Future<void> getAllMenus() async {
+    dataLikedMenus = await FetchController(
+      endpoint: 'menus/liked?userId=${AppConfig.USER_ID}',
+      fromJson: (json) => GetLikedResponse.fromJson(json),
+    ).getData();
+
+    setState(() {
+      dataLiked = dataLikedMenus?.data!;
     });
   }
 
@@ -141,23 +158,40 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
   }
 
   Widget menuBody() {
-    return MasonryGridView.count(
-      itemCount: 3,
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 0),
-      crossAxisCount: 2,
-      crossAxisSpacing: 20,
-      mainAxisSpacing: 20,
-      itemBuilder: (context, index) {
-        return const ProductCardBox(
-          productName: '[Nama Menu]',
-          storeName: '[Nama Toko]',
-          price: '10.000',
-          likes: '100',
-          rate: '4.5',
-        );
-      },
-    );
+    return dataLikedMenus == null
+        ? Container()
+        : dataLiked!.isEmpty
+            ? itemsEmptyBody(context, bgcolors: Warna.pageBackgroundColor)
+            : MasonryGridView.count(
+                itemCount: dataLiked?.length,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 25, vertical: 0),
+                crossAxisCount: 2,
+                crossAxisSpacing: 20,
+                mainAxisSpacing: 20,
+                itemBuilder: (context, index) {
+                  DataLiked? items = dataLiked?[index];
+                  return ProductCardBox(
+                      onPressed: () {
+                        navigateTo(
+                          context,
+                          CanteenScreen(
+                              menuId: '${items?.menuId}',
+                              merchantId: items?.merchants!.merchantId!,
+                              merchantType: items!.merchants!.merchantType!),
+                        );
+                      },
+                      imgUrl: '${AppConfig.URL_IMAGES_PATH}${items?.menuPhoto}',
+                      productName: '${items?.menuName}',
+                      storeName: '${items?.merchants?.merchantName}',
+                      price: items?.menuPrice,
+                      likes: '${items?.menuLikes}',
+                      rate: '${items?.menuRating}',
+                      merchantType: '${items?.merchants?.merchantType}',
+                      isDanus: items?.menuIsDanus!);
+                },
+              );
   }
 }

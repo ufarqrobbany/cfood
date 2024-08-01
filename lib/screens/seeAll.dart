@@ -305,7 +305,7 @@ class _SeeAllItemsScreenState extends State<SeeAllItemsScreen> {
             return const ProductCardBox(
               productName: '[Nama Menu]',
               storeName: '[Nama Toko]',
-              price: '10.000',
+              price: 11111,
               likes: '100',
               rate: '4.5',
             );

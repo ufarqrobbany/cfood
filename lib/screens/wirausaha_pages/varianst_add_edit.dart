@@ -131,7 +131,7 @@ class _AddEditVariantsScreenState extends State<AddEditVariantsScreen> {
               ),
               CTextField(
                 controller: variantNameController,
-                labelText: 'Nama Vraian',
+                labelText: 'Nama Varian',
               ),
               const SizedBox(
                 height: 10,
