@@ -10,20 +10,25 @@ import 'package:uicons/uicons.dart';
 
 Future menuFrameSheet(
   BuildContext? context, {
+  final int? menuId,
+  final int? merchantId,
   final String? imgUrl,
   final String? productName,
   final String? description,
+  final String? location,
   final String? price,
   final String? rate,
   final String? likes,
+  bool isLike = false,
   final String? count,
   final int? sold,
+  final Function? onTapLike,
   final VoidCallback? onPressed,
   final VoidCallback? onTapAdd,
   final VoidCallback? onTapRemove,
   final double? innerContentSize,
 }) {
-  bool itsFavorite = false;
+  // bool itsFavorite = false;
   return showModalBottomSheet(
     context: context!,
     // barrierColor: Colors.transparent,
@@ -48,7 +53,7 @@ Future menuFrameSheet(
                   ClipRRect(
                     borderRadius: BorderRadius.circular(8),
                     child: Image.network(
-                      '/.jpg',
+                      imgUrl!,
                       width: double.infinity,
                       height: 300,
                       fit: BoxFit.cover,
@@ -68,8 +73,8 @@ Future menuFrameSheet(
                     height: 20,
                   ),
                   // MENU NAME
-                  const Text(
-                    '[Nama Menu]',
+                  Text(
+                    productName!,
                     style: AppTextStyles.title,
                   ),
                   const SizedBox(
@@ -79,34 +84,39 @@ Future menuFrameSheet(
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 6, vertical: 1),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(4),
-                          border: Border.all(
-                              color: Warna.hijau.withOpacity(0.60), width: 1),
-                          color: Warna.hijau.withOpacity(0.10),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.location_pin,
-                              size: 15,
-                              color: Warna.hijau,
-                            ),
-                            const Text(
-                              'Lokasi',
-                              style: TextStyle(fontSize: 12),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(
-                        width: 8,
-                      ),
+                      location != null
+                          ? Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 6, vertical: 1),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(4),
+                                border: Border.all(
+                                    color: Warna.hijau.withOpacity(0.60),
+                                    width: 1),
+                                color: Warna.hijau.withOpacity(0.10),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    Icons.location_pin,
+                                    size: 15,
+                                    color: Warna.hijau,
+                                  ),
+                                  const Text(
+                                    'Lokasi',
+                                    style: TextStyle(fontSize: 12),
+                                  ),
+                                ],
+                              ),
+                            )
+                          : Container(),
+                      location != null
+                          ? const SizedBox(
+                              width: 8,
+                            )
+                          : Container(),
                       Container(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 6, vertical: 1),
@@ -123,8 +133,8 @@ Future menuFrameSheet(
                               size: 15,
                               color: Warna.like,
                             ),
-                            const Text(
-                              '100',
+                            Text(
+                              likes!,
                               style: TextStyle(fontSize: 12),
                             ),
                           ],
@@ -149,8 +159,8 @@ Future menuFrameSheet(
                               size: 15,
                               color: Warna.kuning,
                             ),
-                            const Text(
-                              '4.1',
+                            Text(
+                              rate!,
                               style: TextStyle(fontSize: 12),
                             ),
                           ],
@@ -161,7 +171,9 @@ Future menuFrameSheet(
                         onPressed: () {
                           navigateTo(
                             context,
-                            const ReviewScreen(
+                            ReviewScreen(
+                              menuId: menuId,
+                              merchantId: merchantId,
                               storeName: 'Nama Toko',
                               likes: '100',
                               rate: '4.4',
@@ -193,13 +205,13 @@ Future menuFrameSheet(
                     height: 8,
                   ),
                   // MENU DESCRIPTION
-                  const SizedBox(
+                  SizedBox(
                     height: 40,
                     child: SingleChildScrollView(
                       scrollDirection: Axis.vertical,
-                      physics: AlwaysScrollableScrollPhysics(),
+                      physics: const AlwaysScrollableScrollPhysics(),
                       child: Text(
-                        '''Nasi Goreng Spesial kami adalah perpaduan sempurna antara rasa dan aroma yang menggugah selera. Dibuat dari nasi putih berkualitas, kami menggorengnya dengan bumbu pilihan seperti bawang putih, bawang merah, dan cabai merah yang dihaluskan. Ditambah dengan potongan ayam, udang segar, dan sayuran seperti wortel, kacang polong, serta irisan daun bawang, menciptakan tekstur yang beragam dalam setiap suapan. Tak lupa, tambahan kecap manis dan saus tiram memberikan sentuhan manis dan gurih yang seimbang. Disajikan dengan telur mata sapi setengah matang di atasnya, serta kerupuk udang yang renyah, membuat hidangan ini semakin istimewa. Sebagai pelengkap, acar mentimun dan tomat segar memberikan kesegaran yang kontras dengan rasa gurih nasi goreng. Cocok dinikmati kapan saja, baik untuk sarapan, makan siang, maupun makan malam. Nikmati kelezatan Nasi Goreng Spesial yang akan memanjakan lidah Anda dan memberikan pengalaman kuliner yang tak terlupakan.''',
+                        '''$description!''',
                         style: AppTextStyles.textRegular,
                         // maxLines: 5,
                         // maxLines: 5,
@@ -213,7 +225,7 @@ Future menuFrameSheet(
                   ),
                   // PRICE
                   Text(
-                    'Rp10.000',
+                    '${Constant.currencyCode}$price',
                     style: TextStyle(
                         color: Warna.biru,
                         fontSize: 20,
@@ -226,14 +238,20 @@ Future menuFrameSheet(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       TextButton.icon(
-                        onPressed: () {
-                          setState(() {
-                            itsFavorite = !itsFavorite;
-                          });
-                        },
+                        onPressed: () => onTapLike!(setState(
+                          () {
+                            isLike = !isLike;
+                          },
+                        )),
+                        // onPressed: () {
+                        //   setState(() {
+                        //     // itsFavorite = !itsFavorite;
+                        //     isLike = !isLike;
+                        //   });
+                        // },
                         icon: Icon(
                           Icons.favorite,
-                          color: itsFavorite ? Colors.white : Warna.abu4,
+                          color: isLike ? Colors.white : Warna.abu4,
                           size: 20,
                         ),
                         label: Text(
@@ -241,42 +259,41 @@ Future menuFrameSheet(
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
-                            color: itsFavorite
-                                ? Colors.white
-                                : Warna.regulerFontColor,
+                            color:
+                                isLike ? Colors.white : Warna.regulerFontColor,
                           ),
                         ),
                         style: TextButton.styleFrom(
-                          backgroundColor:
-                              itsFavorite ? Warna.like : Colors.white,
+                          backgroundColor: isLike ? Warna.like : Colors.white,
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(53)),
                           side: BorderSide(
-                              color: itsFavorite ? Warna.like : Warna.abu4,
+                              color: isLike ? Warna.like : Warna.abu4,
                               width: 1),
                         ),
                       ),
-                      TextButton.icon(
-                        onPressed: () {},
-                        icon: Icon(
-                          Icons.share,
-                          color: Warna.abu4,
-                          size: 20,
-                        ),
-                        label: Text(
-                          'Bagikan',
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                            color: Warna.regulerFontColor,
-                          ),
-                        ),
-                        style: TextButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(53)),
-                          side: BorderSide(color: Warna.abu4, width: 1),
-                        ),
-                      ),
+                      const Spacer(),
+                      // TextButton.icon(
+                      //   onPressed: () {},
+                      //   icon: Icon(
+                      //     Icons.share,
+                      //     color: Warna.abu4,
+                      //     size: 20,
+                      //   ),
+                      //   label: Text(
+                      //     'Bagikan',
+                      //     style: TextStyle(
+                      //       fontSize: 13,
+                      //       fontWeight: FontWeight.w600,
+                      //       color: Warna.regulerFontColor,
+                      //     ),
+                      //   ),
+                      //   style: TextButton.styleFrom(
+                      //     shape: RoundedRectangleBorder(
+                      //         borderRadius: BorderRadius.circular(53)),
+                      //     side: BorderSide(color: Warna.abu4, width: 1),
+                      //   ),
+                      // ),
                     ],
                   ),
                   const SizedBox(
@@ -286,7 +303,7 @@ Future menuFrameSheet(
                     width: double.infinity,
                     height: 55,
                     child: CBlueButton(
-                      onPressed: () {},
+                      onPressed: onPressed!,
                       borderRadius: 55,
                       text: 'Tambah Pesanan',
                     ),
@@ -312,7 +329,7 @@ Future menuCustomeFrameSheet(
   final String? imgUrl,
   final String? productName,
   final String? description,
-  final String? price,
+  final int? price,
   final String? rate,
   final String? likes,
   final String? count,

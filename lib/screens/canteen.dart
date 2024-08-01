@@ -13,12 +13,15 @@ import 'package:cfood/model/add_merchants_response.dart';
 import 'package:cfood/model/error_response.dart';
 import 'package:cfood/model/follow_merchant_response.dart';
 import 'package:cfood/model/get_detail_merchant_response.dart';
+import 'package:cfood/model/post_menu_like_response.dart';
+import 'package:cfood/model/post_menu_unlike_response.dart';
 import 'package:cfood/model/reponse_handler.dart';
 import 'package:cfood/repository/fetch_controller.dart';
 import 'package:cfood/screens/organization.dart';
 import 'package:cfood/screens/reviews.dart';
 import 'package:cfood/screens/wirausaha_pages/menu_add_edit.dart';
 import 'package:cfood/screens/wirausaha_pages/signup_danus.dart';
+import 'package:cfood/screens/wirausaha_pages/update_merchant.dart';
 import 'package:cfood/style.dart';
 import 'package:cfood/utils/constant.dart';
 import 'package:community_material_icon/community_material_icon.dart';
@@ -177,6 +180,118 @@ class _CanteenScreenState extends State<CanteenScreen>
       fromJson: (json) => IsFollowMerchantResponse.fromJson(json),
     ).postData({});
   }
+
+  
+  void tapLikeMenu(
+    BuildContext context, {
+    bool isLike = false,
+    int menuId = 0,
+    Function? updateState,
+    Menu? menuItem,
+  }) {
+    if (isLike) {
+      unLikeMenu(context,
+          isLike: isLike, menuId: menuId, updateState: updateState, menuItem: menuItem);
+    } else {
+      likeMenu(context,
+          isLike: isLike, menuId: menuId, updateState: updateState, menuItem: menuItem);
+    }
+  }
+
+  Future<void> likeMenu(BuildContext context,
+      {bool isLike = false, int menuId = 0, Function? updateState, Menu? menuItem}) async {
+    PostMenuLikeResponse response = await FetchController(
+      endpoint: 'menus/$menuId/like?userId=${AppConfig.USER_ID}',
+      fromJson: (json) => PostMenuLikeResponse.fromJson(json),
+    ).postData({});
+
+    if (response.statusCode == 201 || response.status == 'success') {
+      setState(() {
+        isLike = true;
+        menuItem!.isLike = isLike;
+      });
+      updateState!(() {
+        isLike = true;
+        menuItem!.isLike = isLike;
+      });
+      log('tap like menu');
+    } else {
+      // Handle error here
+      log('Failed to like menu');
+      showToast('Gagal Menyukai Menu');
+    }
+  }
+
+  Future<void> unLikeMenu(BuildContext context,
+      {bool isLike = false, int menuId = 0, Function? updateState, Menu? menuItem}) async {
+    PostMenuUnlikeResponse response = await FetchController(
+      endpoint: 'menus/$menuId/unlike?userId=${AppConfig.USER_ID}',
+      fromJson: (json) => PostMenuUnlikeResponse.fromJson(json),
+    ).deleteData();
+
+    if (response.statusCode == 201 || response.status == 'success') {
+      setState(() {
+        isLike = false;
+        menuItem!.isLike = isLike;
+      });
+      updateState!(() {
+        isLike = false;
+        menuItem!.isLike = isLike;
+      });
+      log('tap unlike menu');
+    } else {
+      // Handle error here
+      log('Failed to unlike menu');
+      showToast('Gagal Tidak Menyukai Menu');
+    }
+  }
+
+  // void tapLikeMenu(BuildContext context, {bool isLike = false, int menuId = 0}) {
+  //   if(isLike){
+  //     unLikeMenu(context, isLike: isLike, menuId: menuId);
+  //   } else {
+  //     likeMenu(context, isLike: isLike, menuId: menuId);
+  //   }
+  // }
+
+  // Future<void> likeMenu(BuildContext context, {bool isLike = false, int menuId = 0}) async {
+  //   PostMenuLikeResponse response = await FetchController(
+  //     endpoint:
+  //         'menus/$menuId/like?userId=${AppConfig.USER_ID}',
+  //     fromJson: (json) => PostMenuLikeResponse.fromJson(json),
+  //   ).postData({});
+
+  //   if (response.statusCode == 201 || response.status == 'success') {
+  //     setState(() {
+  //       isLike = true;
+  //     });
+  //     log('tap like menu');
+  //   } else {
+  //     // Handle error here
+  //     log('Failed to like menu');
+  //     showToast('Gagal Menyukai Menu');
+  //   }
+  // }
+
+  // Future<void> unLikeMenu(BuildContext context, {bool isLike = false, int menuId = 0}) async {
+  //   PostMenuUnlikeResponse response = await FetchController(
+  //     endpoint:
+  //         'menus/$menuId/unlike?userId=${AppConfig.USER_ID}',
+  //     fromJson: (json) => PostMenuUnlikeResponse.fromJson(json),
+  //   ).deleteData();
+
+  //   if (response.statusCode == 201 || response.status == 'success') {
+  //     setState(() {
+  //       isLike = true;
+  //     });
+  //     log('tap like menu');
+  //   } else {
+  //     // Handle error here
+  //     log('Failed to like menu');
+  //     showToast('Gagal Follow tidak Menyukai Menu');
+  //   }
+  // }
+
 
   Future<void> finishDanus(BuildContext context) async {
     try {
@@ -433,7 +548,7 @@ class _CanteenScreenState extends State<CanteenScreen>
                             delegate: SliverChildListDelegate(
                               [
                                 bodyCanteenInfo(),
-                                dataMerchant?.danusInformation == null
+                                (widget.isOwner!
                                     ? Padding(
                                         padding: const EdgeInsets.only(top: 15),
                                         child: ListTile(
@@ -442,37 +557,31 @@ class _CanteenScreenState extends State<CanteenScreen>
                                               const EdgeInsets.symmetric(
                                                   horizontal: 25, vertical: 10),
                                           tileColor:
-                                              Warna.kuning.withOpacity(0.10),
+                                              Warna.hijau.withOpacity(0.10),
 
                                           title: const Text(
                                             // dataMerchant!
                                             //     .danusInformation!.organizationName!
                                             //     .toString(),
-                                            "Lagi Danusan?",
+                                            "Edit Informasi Wirausaha",
                                             style: TextStyle(
                                                 fontWeight: FontWeight.w700),
                                           ),
-                                          subtitle: const Text(
-                                            'Prioritaskan menu kamu agar mudah ditemukan pembeli',
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.w400),
-                                          ),
+
                                           trailing: IconButton(
                                             onPressed: () {
                                               navigateTo(
-                                                context,
-                                                SignUpDanusScreen(
-                                                  campusId: dataMerchant!
-                                                      .studentInformation!
-                                                      .campusId!,
-                                                ),
-                                              );
+                                                  context,
+                                                  UpdateMerchantScreen(
+                                                    merchantId: dataMerchant
+                                                        ?.merchantId,
+                                                  ));
                                             },
-                                            icon: const Icon(Icons
-                                                .arrow_forward_ios_rounded),
+                                            icon: const Icon(Icons.edit,
+                                                color: Colors.white),
                                             iconSize: 18,
                                             style: IconButton.styleFrom(
-                                              backgroundColor: Warna.kuning,
+                                              backgroundColor: Warna.hijau,
                                               shape: RoundedRectangleBorder(
                                                 borderRadius:
                                                     BorderRadius.circular(50),
@@ -481,6 +590,62 @@ class _CanteenScreenState extends State<CanteenScreen>
                                           ),
                                         ),
                                       )
+                                    : Container()),
+                                dataMerchant?.danusInformation == null
+                                    ? (widget.isOwner!
+                                        ? Padding(
+                                            padding:
+                                                const EdgeInsets.only(top: 15),
+                                            child: ListTile(
+                                              // contentPadding: EdgeInsets.zero,
+                                              contentPadding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 25,
+                                                      vertical: 10),
+                                              tileColor: Warna.kuning
+                                                  .withOpacity(0.10),
+
+                                              title: const Text(
+                                                // dataMerchant!
+                                                //     .danusInformation!.organizationName!
+                                                //     .toString(),
+                                                "Lagi Danusan?",
+                                                style: TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.w700),
+                                              ),
+                                              subtitle: const Text(
+                                                'Prioritaskan menu kamu agar mudah ditemukan pembeli',
+                                                style: TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.w400),
+                                              ),
+                                              trailing: IconButton(
+                                                onPressed: () {
+                                                  navigateTo(
+                                                    context,
+                                                    SignUpDanusScreen(
+                                                      campusId: dataMerchant!
+                                                          .studentInformation!
+                                                          .campusId!,
+                                                    ),
+                                                  );
+                                                },
+                                                icon: const Icon(Icons
+                                                    .arrow_forward_ios_rounded),
+                                                iconSize: 18,
+                                                style: IconButton.styleFrom(
+                                                  backgroundColor: Warna.kuning,
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            50),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          )
+                                        : Container())
                                     : Padding(
                                         padding: const EdgeInsets.only(top: 15),
                                         child: ListTile(
@@ -537,7 +702,7 @@ class _CanteenScreenState extends State<CanteenScreen>
                                                     showMyCustomDialog(
                                                       context,
                                                       text:
-                                                          'Apakah and yakin ingin menyelesaikan kegiatan danus?\nProduk danus tidak akan dihapus.',
+                                                          'Apakah anda yakin ingin menyelesaikan kegiatan danus?\nProduk danus tidak akan dihapus.',
                                                       colorYes: Warna.like,
                                                       onTapYes: () {
                                                         finishDanus(context);
@@ -640,7 +805,7 @@ class _CanteenScreenState extends State<CanteenScreen>
                 iconSize: 40,
                 color: Colors.white,
                 style: IconButton.styleFrom(
-                  backgroundColor: Warna.hijau,
+                  backgroundColor: Warna.biru,
                 ),
               ),
             )
@@ -677,10 +842,13 @@ class _CanteenScreenState extends State<CanteenScreen>
               const SizedBox(
                 width: 15,
               ),
-              Text(
-                dataMerchant!.merchantName!,
-                style: AppTextStyles.title,
-                maxLines: 2,
+              Flexible(
+                child: Text(
+                  dataMerchant!.merchantName!,
+                  style: AppTextStyles.title,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
             ],
           ),
@@ -831,12 +999,37 @@ class _CanteenScreenState extends State<CanteenScreen>
                       onPressed: () {
                         log('product: ${item.menuName}');
                         // storeMenuCountSheet();
-                        menuFrameSheet(context);
+                        menuFrameSheet(
+                          context,
+                          menuId: item.id!,
+                          merchantId: dataMerchant?.merchantId!,
+                          imgUrl:
+                              "${AppConfig.URL_IMAGES_PATH}${item.menuPhoto}",
+                          productName: item.menuName!,
+                          description: item.menuDesc!,
+                          price: item.menuPrice!.toString(),
+                          likes: item.menuLikes!.toString(),
+                          count: item.menuStock!.toString(),
+                          sold: item.menuSolds ?? 0,
+                          rate: item.menuRate.toString(),
+                          innerContentSize: 110,
+                          isLike: item.isLike!,
+                          onTapLike: (updateState) {
+                            tapLikeMenu(context,
+                                isLike: item.isLike!,
+                                menuId: item.id!,
+                                updateState: updateState,
+                                menuItem: item);
+                          },
+                          onPressed: () {},
+                          onTapAdd: () {},
+                          onTapRemove: () {},
+                        );
                       },
                       imgUrl: "${AppConfig.URL_IMAGES_PATH}${item.menuPhoto}",
                       productName: item.menuName!,
                       description: item.menuDesc ?? 'deskripsi menu',
-                      price: item.menuPrice.toString(),
+                      price: item.menuPrice,
                       likes: item.menuLikes.toString(),
                       rate: item.menuRate.toString(),
                       count: item.menuStock.toString(),
@@ -854,7 +1047,7 @@ class _CanteenScreenState extends State<CanteenScreen>
                       imgUrl: "${AppConfig.URL_IMAGES_PATH}${item.menuPhoto}",
                       productName: item.menuName!,
                       description: item.menuDesc ?? 'deskripsi menu',
-                      price: item.menuPrice.toString(),
+                      price: item.menuPrice,
                       likes: item.menuLikes.toString(),
                       rate: item.menuRate.toString(),
                       count: item.menuStock.toString(),
@@ -866,7 +1059,7 @@ class _CanteenScreenState extends State<CanteenScreen>
                             context,
                             productName: item.menuName!,
                             description: item.menuDesc ?? '',
-                            price: item.menuPrice.toString(),
+                            price: item.menuPrice,
                             likes: item.menuLikes.toString(),
                             rate: item.menuRate.toString(),
                             count: item.menuStock.toString(),
@@ -905,132 +1098,13 @@ class _CanteenScreenState extends State<CanteenScreen>
             );
           },
         ),
+        const SizedBox(
+          height: 150,
+        )
       ],
     );
   }
 
-  // Widget bodyProductList() {
-  //   return Column(
-  //     mainAxisSize: MainAxisSize.min,
-  //     children: [
-  //       Container(
-  //         height: 60,
-  //         width: double.infinity,
-  //         color: Colors.white,
-  //         child: ListView(
-  //           shrinkWrap: true,
-  //           scrollDirection: Axis.horizontal,
-  //           physics: const BouncingScrollPhysics(),
-  //           padding: const EdgeInsets.symmetric(horizontal: 25),
-  //           children: menuMaps.keys.map((String key) {
-  //             return tabMenuItem(
-  //               onPressed: () {
-  //                 setState(() {
-  //                   selectedTab = key;
-  //                 });
-  //               },
-  //               text: key,
-  //               menuName: key,
-  //               activeColor: Warna.kuning,
-  //             );
-
-  //           }).toList(),
-  //         ),
-  //       ),
-  //       ListView.builder(
-  //         itemCount: menuMaps[selectedTab]?.length,
-  //         shrinkWrap: true,
-  //         physics: const NeverScrollableScrollPhysics(),
-  //         itemBuilder: (context, index) {
-  //           Map<String, dynamic> menuItems = menuMaps[selectedTab]!;
-  //           String menuKey = menuItems.keys.elementAt(index);
-  //           var item = menuItems[menuKey];
-  //           return Container(
-  //             color: Colors.white,
-  //             padding: const EdgeInsets.symmetric(
-  //               horizontal: 25,
-  //             ),
-  //             child: widget.isOwner!
-  //                 ? ProductCardBoxHorizontal(
-  //                     onPressed: () {
-  //                       log('product: ${item['nama']}');
-  //                       // storeMenuCountSheet();
-  //                       menuFrameSheet(context);
-  //                     },
-  //                     productName: item['nama'],
-  //                     // description: menuItem[index]['desc'],
-  //                     description: 'deskripsi menu',
-  //                     price: item['price'].toString(),
-  //                     likes: item['likes'],
-  //                     rate: item['rate'],
-  //                     count: item['count'].toString(),
-  //                     isCustom: item['custom'],
-  //                     isOwner: widget.isOwner!,
-  //                     onTapEditProduct: () {},
-  //                   )
-  //                 : ProductCardBoxHorizontal(
-  //                     onPressed: () {
-  //                       log('product: ${item['nama']}');
-  //                       // storeMenuCountSheet();
-  //                       menuFrameSheet(context);
-  //                     },
-  //                     productName: item['nama'],
-  //                     // description: menuItem[index]['desc'],
-  //                     description: 'deskripsi menu',
-  //                     price: item['price'].toString(),
-  //                     likes: item['likes'],
-  //                     rate: item['rate'],
-  //                     count: item['count'].toString(),
-  //                     isCustom: item['custom'],
-  //                     onTapAdd: () {
-  //                       if (item['custom']) {
-  //                         menuCustomeFrameSheet(
-  //                           context,
-  //                           productName: item['nama'],
-  //                           // description: menuItem[index]['desc'],
-  //                           description: '',
-  //                           price: item['price'].toString(),
-  //                           likes: item['likes'],
-  //                           rate: item['rate'],
-  //                           count: item['count'].toString(),
-  //                           sold: 100,
-  //                           innerContentSize: 110,
-  //                           variantTypeList: variantMenuTypeList,
-  //                           onTapAdd: () {},
-  //                           onTapRemove: () {},
-  //                           onPressedAddOrder: () {},
-  //                         );
-  //                       } else {
-  //                         // menuFrameSheet(context);
-  //                         setState(() {
-  //                           item['count'] += 1;
-  //                         });
-  //                         addOrderMenu(
-  //                             menuId: item['id'],
-  //                             menuName: item['nama'],
-  //                             price: item['price'],
-  //                             menuCount: item['count']);
-  //                         // print(menuItem[index]['count']);
-  //                       }
-  //                     },
-  //                     onTapRemove: () {
-  //                       setState(() {
-  //                         item['count'] -= 1;
-  //                       });
-  //                       deleteOrderMenu(
-  //                           menuId: item['id'],
-  //                           menuName: item['nama'],
-  //                           price: item['price'],
-  //                           menuCount: item['count']);
-  //                       // print(orderCount);
-  //                     },
-  //                   ),
-  //           );
-  //         },
-  //       ),
-  //     ],
-  //   );
-  // }
 
   Widget searchBarStore() {
     return Container(
@@ -1615,7 +1689,7 @@ class _CanteenScreenState extends State<CanteenScreen>
                 },
                 productName: item.menuName!,
                 description: item.menuDesc ?? 'deskripsi menu',
-                price: item.menuPrice.toString(),
+                price: item.menuPrice,
                 likes: item.menuLikes.toString(),
                 rate: item.menuRate.toString(),
                 count: item.menuStock.toString(),

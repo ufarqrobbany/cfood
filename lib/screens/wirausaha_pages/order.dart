@@ -15,7 +15,7 @@ class OrderWirausahaScreen extends StatefulWidget {
 }
 
 class _OrderWirausahaScreenState extends State<OrderWirausahaScreen> {
-  bool acceptAll = false;
+  bool isOpen = false;
   @override
   void initState() {
     super.initState();
@@ -44,7 +44,7 @@ class _OrderWirausahaScreenState extends State<OrderWirausahaScreen> {
                 curve: Curves.bounceOut,
                 child: SliverAppBar(
                   leadingWidth: moveToogleBox ? 90 : 10,
-                  leading: moveToogleBox ? switchAcceptBox() : Container(),
+                  leading: moveToogleBox ? switchOpenBox() : Container(),
                   pinned: true,
                   stretch: true,
                   title: const Text(
@@ -145,7 +145,7 @@ class _OrderWirausahaScreenState extends State<OrderWirausahaScreen> {
                                   const SizedBox(
                                     width: 10,
                                   ),
-                                  switchAcceptBox(),
+                                  switchOpenBox(),
                                 ],
                               ),
 
@@ -171,13 +171,13 @@ class _OrderWirausahaScreenState extends State<OrderWirausahaScreen> {
     );
   }
 
-  Widget switchAcceptBox() => Transform.scale(
+  Widget switchOpenBox() => Transform.scale(
         scale: 1,
         child: Switch(
-          value: acceptAll,
+          value: isOpen,
           onChanged: (value) {
             setState(() {
-              acceptAll = value;
+              isOpen = value;
             });
           },
           activeColor: Warna.kuning,
@@ -476,10 +476,9 @@ class _OrderWirausahaScreenState extends State<OrderWirausahaScreen> {
             ),
             SizedBox(
               height: 45,
-              width: 100,
               child: DynamicColorButton(
                 onPressed: () {},
-                text: 'Terima',
+                text: 'Konfirmasi',
                 backgroundColor: Warna.hijau,
                 borderRadius: 50,
               ),

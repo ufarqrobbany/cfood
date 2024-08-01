@@ -69,8 +69,7 @@ class _SignupWirausahaScreenState extends State<SignupWirausahaScreen> {
     }
 
     try {
-      AddMerchantResponse response = 
-      await FetchController(
+      AddMerchantResponse response = await FetchController(
         endpoint: 'merchants/',
         headers: {
           "Content-Type": 'multipart/form-data',
@@ -93,7 +92,7 @@ class _SignupWirausahaScreenState extends State<SignupWirausahaScreen> {
       DataMerchant dataMerchant = response.data!;
       log(dataMerchant.toString());
 
-       AuthHelper().setMerchantId(id: dataMerchant.merchantId.toString());
+      AuthHelper().setMerchantId(id: dataMerchant.merchantId.toString());
       setState(() {
         AppConfig.MERCHANT_ID = dataMerchant.merchantId!;
         AppConfig.MERCHANT_NAME = dataMerchant.merchantName!;
@@ -112,7 +111,9 @@ class _SignupWirausahaScreenState extends State<SignupWirausahaScreen> {
       setState(() {
         buttonLoad = false;
       });
-      showToast(e.toString().replaceAll('Exception: ', ''),);
+      showToast(
+        e.toString().replaceAll('Exception: ', ''),
+      );
     }
   }
 
@@ -156,35 +157,42 @@ class _SignupWirausahaScreenState extends State<SignupWirausahaScreen> {
                     decoration: BoxDecoration(
                       color: Warna.abu,
                       borderRadius: BorderRadius.circular(8),
-                      border: _image == null ? DashedBorder.fromBorderSide(
-                        dashLength: 12,
-                        side: BorderSide(
-                          color: Warna.biru,
-                          width: 3,
-                        ),
-                      ) : null,
+                      border: _image == null
+                          ? DashedBorder.fromBorderSide(
+                              dashLength: 12,
+                              side: BorderSide(
+                                color: Warna.biru,
+                                width: 3,
+                              ),
+                            )
+                          : null,
                     ),
-                    child: _image != null ? Image.file(_image!, fit: BoxFit.cover,) : Center(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            UIcons.solidRounded.camera,
-                            color: Warna.biru,
-                            size: 30,
-                          ),
-                          Text(
-                            'Tambah foto',
-                            style: TextStyle(
-                              color: Warna.biru,
-                              fontSize: 13,
-                              fontWeight: FontWeight.w400,
-                            ),
+                    child: _image != null
+                        ? Image.file(
+                            _image!,
+                            fit: BoxFit.cover,
                           )
-                        ],
-                      ),
-                    ),
+                        : Center(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  UIcons.solidRounded.camera,
+                                  color: Warna.biru,
+                                  size: 30,
+                                ),
+                                Text(
+                                  'Tambah foto',
+                                  style: TextStyle(
+                                    color: Warna.biru,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
                   ),
                 ),
               ),
@@ -203,7 +211,8 @@ class _SignupWirausahaScreenState extends State<SignupWirausahaScreen> {
                 controller: descriptionController,
                 hintText: '',
                 labelText: 'Deskripsi',
-                subLabelText: '  ${descriptionController.text.length}/100 karakter',
+                subLabelText:
+                    '  ${descriptionController.text.length}/100 karakter',
                 minLines: 5,
               ),
               const SizedBox(
@@ -220,6 +229,9 @@ class _SignupWirausahaScreenState extends State<SignupWirausahaScreen> {
                   },
                   text: 'Daftar',
                 ),
+              ),
+              const SizedBox(
+                height: 60,
               ),
             ],
           ),

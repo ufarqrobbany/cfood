@@ -238,7 +238,7 @@ class _CartScreenState extends State<CartScreen> {
                             },
                             productName: menuItem['name'],
                             description: 'deskripsi menu',
-                            price: menuItem['price'].toString(),
+                            price: menuItem['price'],
                             count: menuItem['count'].toString(),
                             onTapAdd: () {
                               setState(() {

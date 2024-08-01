@@ -310,7 +310,7 @@ class ProductCardBoxHorizontal extends StatelessWidget {
   final String? imgUrl;
   final String? productName;
   final String? description;
-  final String? price;
+  final int? price;
   final String? rate;
   final String? likes;
   final String? count;
@@ -357,15 +357,6 @@ class ProductCardBoxHorizontal extends StatelessWidget {
         border: hideBorder
             ? null
             : Border(bottom: BorderSide(color: Warna.shadow.withOpacity(0.10))),
-        // borderRadius: BorderRadius.circular(8),
-        // boxShadow: [
-        //   BoxShadow(
-        //     blurRadius: 20,
-        //     spreadRadius: 0,
-        //     color: Warna.shadow.withOpacity(0.12),
-        //     offset: const Offset(0, 0)
-        //   )
-        // ],
       ),
       child: InkWell(
         onTap: onPressed,
@@ -403,8 +394,11 @@ class ProductCardBoxHorizontal extends StatelessWidget {
                                   child: Icon(Icons.image),
                                 )
                               : ClipRRect(
-                                borderRadius: BorderRadius.circular(8),
-                                child: Image.network(imgUrl!, fit: BoxFit.cover,)),
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: Image.network(
+                                    imgUrl!,
+                                    fit: BoxFit.cover,
+                                  )),
                         ),
                         Align(
                           alignment: Alignment.bottomCenter,
@@ -444,8 +438,11 @@ class ProductCardBoxHorizontal extends StatelessWidget {
                             child: Icon(Icons.image),
                           )
                         : ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: Image.network(imgUrl!, fit: BoxFit.cover,)),
+                            borderRadius: BorderRadius.circular(8),
+                            child: Image.network(
+                              imgUrl!,
+                              fit: BoxFit.cover,
+                            )),
                   ),
             Expanded(
               child: Container(
@@ -460,6 +457,7 @@ class ProductCardBoxHorizontal extends StatelessWidget {
                     Text(
                       productName!,
                       style: AppTextStyles.productName,
+                      overflow: TextOverflow.ellipsis,
                     ),
                     rate == null && likes == null
                         ? Container(
@@ -488,7 +486,7 @@ class ProductCardBoxHorizontal extends StatelessWidget {
                                         color: Warna.kuning,
                                       ),
                                       Text(
-                                        rate!,
+                                        ' ${rate!}',
                                         style: TextStyle(
                                             color: Warna.kuning, fontSize: 12),
                                       ),
@@ -515,7 +513,7 @@ class ProductCardBoxHorizontal extends StatelessWidget {
                                         color: Warna.like,
                                       ),
                                       Text(
-                                        likes!,
+                                        ' ${likes!}',
                                         style: TextStyle(
                                             color: Warna.like, fontSize: 12),
                                       ),
@@ -540,17 +538,14 @@ class ProductCardBoxHorizontal extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        // Icon(
-                        //   Icons.store,
-                        //   size: 15,
-                        //   color: Warna.biru,
-                        // ),
-                        // const SizedBox(
-                        //   width: 5,
-                        // ),
-                        Text(
-                          description!.toString(),
-                          style: AppTextStyles.productStoreName,
+                        Flexible(
+                          child: Text(
+                            description!.toString(),
+                            style: AppTextStyles.productStoreName,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines:
+                                1, // Ensure it only displays one line with ellipsis if too long
+                          ),
                         ),
                       ],
                     ),
@@ -562,7 +557,8 @@ class ProductCardBoxHorizontal extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          Constant.currencyCode + price!.toString(),
+                          Constant.currencyCode +
+                              formatNumberWithThousandsSeparator(price!),
                           style: AppTextStyles.productPrice,
                         ),
                         isOwner
@@ -827,9 +823,12 @@ class CanteenCardBox extends StatelessWidget {
                         const SizedBox(
                           width: 10,
                         ),
-                        Text(
-                          canteenName!,
-                          style: AppTextStyles.canteenName,
+                        Expanded(
+                          child: Text(
+                            canteenName!,
+                            style: AppTextStyles.canteenName,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
                       ],
                     ),

@@ -292,6 +292,9 @@ class _UpdateMerchantScreenState extends State<UpdateMerchantScreen> {
                         text: 'Update',
                       ),
                     ),
+                    const SizedBox(
+                      height: 60,
+                    ),
                   ],
                 ),
               ),
