@@ -7,6 +7,8 @@ import 'package:cfood/utils/constant.dart';
 import 'package:flutter/material.dart';
 
 class ReviewScreen extends StatefulWidget {
+  final int? menuId;
+  final int? merchantId;
   final String? storeId;
   final String? imgUrl;
   final String? storeName;
@@ -15,6 +17,8 @@ class ReviewScreen extends StatefulWidget {
   final String type;
   const ReviewScreen({
     super.key,
+    this.menuId,
+    this.merchantId,
     this.storeId,
     this.imgUrl,
     this.storeName,

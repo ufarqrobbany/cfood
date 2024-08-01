@@ -13,6 +13,8 @@ import 'package:cfood/model/add_merchants_response.dart';
 import 'package:cfood/model/error_response.dart';
 import 'package:cfood/model/follow_merchant_response.dart';
 import 'package:cfood/model/get_detail_merchant_response.dart';
+import 'package:cfood/model/post_menu_like_response.dart';
+import 'package:cfood/model/post_menu_unlike_response.dart';
 import 'package:cfood/model/reponse_handler.dart';
 import 'package:cfood/repository/fetch_controller.dart';
 import 'package:cfood/screens/organization.dart';
@@ -177,6 +179,116 @@ class _CanteenScreenState extends State<CanteenScreen>
       fromJson: (json) => IsFollowMerchantResponse.fromJson(json),
     ).postData({});
   }
+
+  void tapLikeMenu(
+    BuildContext context, {
+    bool isLike = false,
+    int menuId = 0,
+    Function? updateState,
+    Menu? menuItem,
+  }) {
+    if (isLike) {
+      unLikeMenu(context,
+          isLike: isLike, menuId: menuId, updateState: updateState, menuItem: menuItem);
+    } else {
+      likeMenu(context,
+          isLike: isLike, menuId: menuId, updateState: updateState, menuItem: menuItem);
+    }
+  }
+
+  Future<void> likeMenu(BuildContext context,
+      {bool isLike = false, int menuId = 0, Function? updateState, Menu? menuItem}) async {
+    PostMenuLikeResponse response = await FetchController(
+      endpoint: 'menus/$menuId/like?userId=${AppConfig.USER_ID}',
+      fromJson: (json) => PostMenuLikeResponse.fromJson(json),
+    ).postData({});
+
+    if (response.statusCode == 201 || response.status == 'success') {
+      setState(() {
+        isLike = true;
+        menuItem!.isLike = isLike;
+      });
+      updateState!(() {
+        isLike = true;
+        menuItem!.isLike = isLike;
+      });
+      log('tap like menu');
+    } else {
+      // Handle error here
+      log('Failed to like menu');
+      showToast('Gagal Menyukai Menu');
+    }
+  }
+
+  Future<void> unLikeMenu(BuildContext context,
+      {bool isLike = false, int menuId = 0, Function? updateState, Menu? menuItem}) async {
+    PostMenuUnlikeResponse response = await FetchController(
+      endpoint: 'menus/$menuId/unlike?userId=${AppConfig.USER_ID}',
+      fromJson: (json) => PostMenuUnlikeResponse.fromJson(json),
+    ).deleteData();
+
+    if (response.statusCode == 201 || response.status == 'success') {
+      setState(() {
+        isLike = false;
+        menuItem!.isLike = isLike;
+      });
+      updateState!(() {
+        isLike = false;
+        menuItem!.isLike = isLike;
+      });
+      log('tap unlike menu');
+    } else {
+      // Handle error here
+      log('Failed to unlike menu');
+      showToast('Gagal Tidak Menyukai Menu');
+    }
+  }
+
+  // void tapLikeMenu(BuildContext context, {bool isLike = false, int menuId = 0}) {
+  //   if(isLike){
+  //     unLikeMenu(context, isLike: isLike, menuId: menuId);
+  //   } else {
+  //     likeMenu(context, isLike: isLike, menuId: menuId);
+  //   }
+  // }
+
+  // Future<void> likeMenu(BuildContext context, {bool isLike = false, int menuId = 0}) async {
+  //   PostMenuLikeResponse response = await FetchController(
+  //     endpoint:
+  //         'menus/$menuId/like?userId=${AppConfig.USER_ID}',
+  //     fromJson: (json) => PostMenuLikeResponse.fromJson(json),
+  //   ).postData({});
+
+  //   if (response.statusCode == 201 || response.status == 'success') {
+  //     setState(() {
+  //       isLike = true;
+  //     });
+  //     log('tap like menu');
+  //   } else {
+  //     // Handle error here
+  //     log('Failed to like menu');
+  //     showToast('Gagal Menyukai Menu');
+  //   }
+  // }
+
+  // Future<void> unLikeMenu(BuildContext context, {bool isLike = false, int menuId = 0}) async {
+  //   PostMenuUnlikeResponse response = await FetchController(
+  //     endpoint:
+  //         'menus/$menuId/unlike?userId=${AppConfig.USER_ID}',
+  //     fromJson: (json) => PostMenuUnlikeResponse.fromJson(json),
+  //   ).deleteData();
+
+  //   if (response.statusCode == 201 || response.status == 'success') {
+  //     setState(() {
+  //       isLike = true;
+  //     });
+  //     log('tap like menu');
+  //   } else {
+  //     // Handle error here
+  //     log('Failed to like menu');
+  //     showToast('Gagal Follow tidak Menyukai Menu');
+  //   }
+  // }
 
   Future<void> finishDanus(BuildContext context) async {
     try {
@@ -849,7 +961,32 @@ class _CanteenScreenState extends State<CanteenScreen>
                       onPressed: () {
                         log('product: ${item.menuName}');
                         // storeMenuCountSheet();
-                        menuFrameSheet(context);
+                        menuFrameSheet(
+                          context,
+                          menuId: item.id!,
+                          merchantId: dataMerchant?.merchantId!,
+                          imgUrl:
+                              "${AppConfig.URL_IMAGES_PATH}${item.menuPhoto}",
+                          productName: item.menuName!,
+                          description: item.menuDesc!,
+                          price: item.menuPrice!.toString(),
+                          likes: item.menuLikes!.toString(),
+                          count: item.menuStock!.toString(),
+                          sold: item.menuSolds ?? 0,
+                          rate: item.menuRate.toString(),
+                          innerContentSize: 110,
+                          isLike: item.isLike!,
+                          onTapLike: (updateState) {
+                            tapLikeMenu(context,
+                                isLike: item.isLike!,
+                                menuId: item.id!,
+                                updateState: updateState,
+                                menuItem: item);
+                          },
+                          onPressed: () {},
+                          onTapAdd: () {},
+                          onTapRemove: () {},
+                        );
                       },
                       imgUrl: "${AppConfig.URL_IMAGES_PATH}${item.menuPhoto}",
                       productName: item.menuName!,
@@ -908,129 +1045,6 @@ class _CanteenScreenState extends State<CanteenScreen>
       ],
     );
   }
-
-  // Widget bodyProductList() {
-  //   return Column(
-  //     mainAxisSize: MainAxisSize.min,
-  //     children: [
-  //       Container(
-  //         height: 60,
-  //         width: double.infinity,
-  //         color: Colors.white,
-  //         child: ListView(
-  //           shrinkWrap: true,
-  //           scrollDirection: Axis.horizontal,
-  //           physics: const BouncingScrollPhysics(),
-  //           padding: const EdgeInsets.symmetric(horizontal: 25),
-  //           children: menuMaps.keys.map((String key) {
-  //             return tabMenuItem(
-  //               onPressed: () {
-  //                 setState(() {
-  //                   selectedTab = key;
-  //                 });
-  //               },
-  //               text: key,
-  //               menuName: key,
-  //               activeColor: Warna.kuning,
-  //             );
-
-  //           }).toList(),
-  //         ),
-  //       ),
-  //       ListView.builder(
-  //         itemCount: menuMaps[selectedTab]?.length,
-  //         shrinkWrap: true,
-  //         physics: const NeverScrollableScrollPhysics(),
-  //         itemBuilder: (context, index) {
-  //           Map<String, dynamic> menuItems = menuMaps[selectedTab]!;
-  //           String menuKey = menuItems.keys.elementAt(index);
-  //           var item = menuItems[menuKey];
-  //           return Container(
-  //             color: Colors.white,
-  //             padding: const EdgeInsets.symmetric(
-  //               horizontal: 25,
-  //             ),
-  //             child: widget.isOwner!
-  //                 ? ProductCardBoxHorizontal(
-  //                     onPressed: () {
-  //                       log('product: ${item['nama']}');
-  //                       // storeMenuCountSheet();
-  //                       menuFrameSheet(context);
-  //                     },
-  //                     productName: item['nama'],
-  //                     // description: menuItem[index]['desc'],
-  //                     description: 'deskripsi menu',
-  //                     price: item['price'].toString(),
-  //                     likes: item['likes'],
-  //                     rate: item['rate'],
-  //                     count: item['count'].toString(),
-  //                     isCustom: item['custom'],
-  //                     isOwner: widget.isOwner!,
-  //                     onTapEditProduct: () {},
-  //                   )
-  //                 : ProductCardBoxHorizontal(
-  //                     onPressed: () {
-  //                       log('product: ${item['nama']}');
-  //                       // storeMenuCountSheet();
-  //                       menuFrameSheet(context);
-  //                     },
-  //                     productName: item['nama'],
-  //                     // description: menuItem[index]['desc'],
-  //                     description: 'deskripsi menu',
-  //                     price: item['price'].toString(),
-  //                     likes: item['likes'],
-  //                     rate: item['rate'],
-  //                     count: item['count'].toString(),
-  //                     isCustom: item['custom'],
-  //                     onTapAdd: () {
-  //                       if (item['custom']) {
-  //                         menuCustomeFrameSheet(
-  //                           context,
-  //                           productName: item['nama'],
-  //                           // description: menuItem[index]['desc'],
-  //                           description: '',
-  //                           price: item['price'].toString(),
-  //                           likes: item['likes'],
-  //                           rate: item['rate'],
-  //                           count: item['count'].toString(),
-  //                           sold: 100,
-  //                           innerContentSize: 110,
-  //                           variantTypeList: variantMenuTypeList,
-  //                           onTapAdd: () {},
-  //                           onTapRemove: () {},
-  //                           onPressedAddOrder: () {},
-  //                         );
-  //                       } else {
-  //                         // menuFrameSheet(context);
-  //                         setState(() {
-  //                           item['count'] += 1;
-  //                         });
-  //                         addOrderMenu(
-  //                             menuId: item['id'],
-  //                             menuName: item['nama'],
-  //                             price: item['price'],
-  //                             menuCount: item['count']);
-  //                         // print(menuItem[index]['count']);
-  //                       }
-  //                     },
-  //                     onTapRemove: () {
-  //                       setState(() {
-  //                         item['count'] -= 1;
-  //                       });
-  //                       deleteOrderMenu(
-  //                           menuId: item['id'],
-  //                           menuName: item['nama'],
-  //                           price: item['price'],
-  //                           menuCount: item['count']);
-  //                       // print(orderCount);
-  //                     },
-  //                   ),
-  //           );
-  //         },
-  //       ),
-  //     ],
-  //   );
-  // }
 
   Widget searchBarStore() {
     return Container(
