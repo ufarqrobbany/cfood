@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:cfood/custom/CBottomSheet.dart';
@@ -60,11 +61,13 @@ class _CanteenScreenState extends State<CanteenScreen>
   GetDetailMerchantResponse? merchantDataResponse;
   DataDetailMerchant? dataMerchant;
   String? photoMerchant;
+  List<MenusMerchant>? menusMerchant;
+  Map<String, List<Menu>> menuMaps = {};
 
   @override
   void initState() {
     super.initState();
-    categoryTabController = TabController(length: menuMaps.length, vsync: this);
+    // categoryTabController = TabController(length: menuMaps.length, vsync: this);
     onEnterPage();
   }
 
@@ -106,10 +109,17 @@ class _CanteenScreenState extends State<CanteenScreen>
     setState(() {
       dataMerchant = merchantDataResponse!.data;
       favorited = merchantDataResponse!.data!.follow!;
+      menusMerchant = merchantDataResponse!.data!.menusMerchant!;
+
+      menusMerchant!.forEach((category) {
+        menuMaps[category.categoryMenuName!] = category.menus!;
+      });
+
       photoMerchant = AppConfig.URL_IMAGES_PATH +
           merchantDataResponse!.data!.merchantPhoto!;
     });
     log("$dataMerchant");
+    log("data menu -> ${json.encode(menusMerchant)}");
   }
 
   void tapFollow(BuildContext context) {
@@ -185,7 +195,7 @@ class _CanteenScreenState extends State<CanteenScreen>
   }
 
   Future<void> addOrderMenu({
-    String? menuId,
+    int? menuId,
     String? menuName,
     int? price,
     int? menuCount,
@@ -209,7 +219,7 @@ class _CanteenScreenState extends State<CanteenScreen>
   }
 
   Future<void> deleteOrderMenu({
-    String? menuId,
+    int? menuId,
     String? menuName,
     int? price,
     int? menuCount,
@@ -802,34 +812,6 @@ class _CanteenScreenState extends State<CanteenScreen>
                 menuName: key,
                 activeColor: Warna.kuning,
               );
-              // return AnimatedContainer(
-              //   duration: const Duration(milliseconds: 300),
-              //   decoration: BoxDecoration(
-              //     border: key == selectedTab
-              //         ? Border(
-              //             bottom: BorderSide(
-              //                 color: Warna.kuning,
-              //                 width: 2,
-              //                 style: BorderStyle.solid),
-              //           )
-              //         : null,
-              //   ),
-              //   child: TextButton(
-              //     onPressed: () {
-              //       setState(() {
-              //         selectedTab = key;
-              //       });
-              //       log(selectedTab);
-              //     },
-              //     child: Text(
-              //       key,
-              //       style: TextStyle(
-              //         fontSize: key == selectedTab ? 16 : 14,
-              //         color: key == selectedTab ? Warna.kuning : Warna.biru,
-              //       ),
-              //     ),
-              //   ),
-              // );
             }).toList(),
           ),
         ),
@@ -838,58 +820,57 @@ class _CanteenScreenState extends State<CanteenScreen>
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           itemBuilder: (context, index) {
-            Map<String, dynamic> menuItems = menuMaps[selectedTab]!;
-            String menuKey = menuItems.keys.elementAt(index);
-            var item = menuItems[menuKey];
+            List<Menu> menuItems = menuMaps[selectedTab]!;
+            Menu item = menuItems[index];
+            log('menu photo -> ${item.menuPhoto}');
             return Container(
               color: Colors.white,
-              padding: const EdgeInsets.symmetric(
-                horizontal: 25,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 25),
               child: widget.isOwner!
                   ? ProductCardBoxHorizontal(
                       onPressed: () {
-                        log('product: ${item['nama']}');
+                        log('product: ${item.menuName}');
                         // storeMenuCountSheet();
                         menuFrameSheet(context);
                       },
-                      productName: item['nama'],
-                      // description: menuItem[index]['desc'],
-                      description: 'deskripsi menu',
-                      price: item['price'].toString(),
-                      likes: item['likes'],
-                      rate: item['rate'],
-                      count: item['count'].toString(),
-                      isCustom: item['custom'],
+                      imgUrl: "${AppConfig.URL_IMAGES_PATH}${item.menuPhoto}",
+                      productName: item.menuName!,
+                      description: item.menuDesc ?? 'deskripsi menu',
+                      price: item.menuPrice.toString(),
+                      likes: item.menuLikes.toString(),
+                      rate: item.menuRate.toString(),
+                      count: item.menuStock.toString(),
+                      // isCustom: item.isDanus!,
+                      isCustom: item.variants != null ? true : false,
                       isOwner: widget.isOwner!,
                       onTapEditProduct: () {},
                     )
                   : ProductCardBoxHorizontal(
                       onPressed: () {
-                        log('product: ${item['nama']}');
+                        log('product: ${item.menuName}');
                         // storeMenuCountSheet();
                         menuFrameSheet(context);
                       },
-                      productName: item['nama'],
-                      // description: menuItem[index]['desc'],
-                      description: 'deskripsi menu',
-                      price: item['price'].toString(),
-                      likes: item['likes'],
-                      rate: item['rate'],
-                      count: item['count'].toString(),
-                      isCustom: item['custom'],
+                      imgUrl: "${AppConfig.URL_IMAGES_PATH}${item.menuPhoto}",
+                      productName: item.menuName!,
+                      description: item.menuDesc ?? 'deskripsi menu',
+                      price: item.menuPrice.toString(),
+                      likes: item.menuLikes.toString(),
+                      rate: item.menuRate.toString(),
+                      count: item.menuStock.toString(),
+                      // isCustom: item.isDanus!,
+                      isCustom: item.variants != null ? true : false,
                       onTapAdd: () {
-                        if (item['custom']) {
+                        if (item.isDanus!) {
                           menuCustomeFrameSheet(
                             context,
-                            productName: item['nama'],
-                            // description: menuItem[index]['desc'],
-                            description: '',
-                            price: item['price'].toString(),
-                            likes: item['likes'],
-                            rate: item['rate'],
-                            count: item['count'].toString(),
-                            sold: 100,
+                            productName: item.menuName!,
+                            description: item.menuDesc ?? '',
+                            price: item.menuPrice.toString(),
+                            likes: item.menuLikes.toString(),
+                            rate: item.menuRate.toString(),
+                            count: item.menuStock.toString(),
+                            sold: item.menuSolds ?? 0,
                             innerContentSize: 110,
                             variantTypeList: variantMenuTypeList,
                             onTapAdd: () {},
@@ -899,25 +880,25 @@ class _CanteenScreenState extends State<CanteenScreen>
                         } else {
                           // menuFrameSheet(context);
                           setState(() {
-                            item['count'] += 1;
+                            item.menuStock = item.menuStock! + 1;
                           });
                           addOrderMenu(
-                              menuId: item['id'],
-                              menuName: item['nama'],
-                              price: item['price'],
-                              menuCount: item['count']);
+                              menuId: item.id!,
+                              menuName: item.menuName!,
+                              price: item.menuPrice!,
+                              menuCount: item.menuStock!);
                           // print(menuItem[index]['count']);
                         }
                       },
                       onTapRemove: () {
                         setState(() {
-                          item['count'] -= 1;
+                          item.menuStock = item.menuStock! - 1;
                         });
                         deleteOrderMenu(
-                            menuId: item['id'],
-                            menuName: item['nama'],
-                            price: item['price'],
-                            menuCount: item['count']);
+                            menuId: item.id!,
+                            menuName: item.menuName!,
+                            price: item.menuPrice!,
+                            menuCount: item.menuStock!);
                         // print(orderCount);
                       },
                     ),
@@ -927,6 +908,129 @@ class _CanteenScreenState extends State<CanteenScreen>
       ],
     );
   }
+
+  // Widget bodyProductList() {
+  //   return Column(
+  //     mainAxisSize: MainAxisSize.min,
+  //     children: [
+  //       Container(
+  //         height: 60,
+  //         width: double.infinity,
+  //         color: Colors.white,
+  //         child: ListView(
+  //           shrinkWrap: true,
+  //           scrollDirection: Axis.horizontal,
+  //           physics: const BouncingScrollPhysics(),
+  //           padding: const EdgeInsets.symmetric(horizontal: 25),
+  //           children: menuMaps.keys.map((String key) {
+  //             return tabMenuItem(
+  //               onPressed: () {
+  //                 setState(() {
+  //                   selectedTab = key;
+  //                 });
+  //               },
+  //               text: key,
+  //               menuName: key,
+  //               activeColor: Warna.kuning,
+  //             );
+
+  //           }).toList(),
+  //         ),
+  //       ),
+  //       ListView.builder(
+  //         itemCount: menuMaps[selectedTab]?.length,
+  //         shrinkWrap: true,
+  //         physics: const NeverScrollableScrollPhysics(),
+  //         itemBuilder: (context, index) {
+  //           Map<String, dynamic> menuItems = menuMaps[selectedTab]!;
+  //           String menuKey = menuItems.keys.elementAt(index);
+  //           var item = menuItems[menuKey];
+  //           return Container(
+  //             color: Colors.white,
+  //             padding: const EdgeInsets.symmetric(
+  //               horizontal: 25,
+  //             ),
+  //             child: widget.isOwner!
+  //                 ? ProductCardBoxHorizontal(
+  //                     onPressed: () {
+  //                       log('product: ${item['nama']}');
+  //                       // storeMenuCountSheet();
+  //                       menuFrameSheet(context);
+  //                     },
+  //                     productName: item['nama'],
+  //                     // description: menuItem[index]['desc'],
+  //                     description: 'deskripsi menu',
+  //                     price: item['price'].toString(),
+  //                     likes: item['likes'],
+  //                     rate: item['rate'],
+  //                     count: item['count'].toString(),
+  //                     isCustom: item['custom'],
+  //                     isOwner: widget.isOwner!,
+  //                     onTapEditProduct: () {},
+  //                   )
+  //                 : ProductCardBoxHorizontal(
+  //                     onPressed: () {
+  //                       log('product: ${item['nama']}');
+  //                       // storeMenuCountSheet();
+  //                       menuFrameSheet(context);
+  //                     },
+  //                     productName: item['nama'],
+  //                     // description: menuItem[index]['desc'],
+  //                     description: 'deskripsi menu',
+  //                     price: item['price'].toString(),
+  //                     likes: item['likes'],
+  //                     rate: item['rate'],
+  //                     count: item['count'].toString(),
+  //                     isCustom: item['custom'],
+  //                     onTapAdd: () {
+  //                       if (item['custom']) {
+  //                         menuCustomeFrameSheet(
+  //                           context,
+  //                           productName: item['nama'],
+  //                           // description: menuItem[index]['desc'],
+  //                           description: '',
+  //                           price: item['price'].toString(),
+  //                           likes: item['likes'],
+  //                           rate: item['rate'],
+  //                           count: item['count'].toString(),
+  //                           sold: 100,
+  //                           innerContentSize: 110,
+  //                           variantTypeList: variantMenuTypeList,
+  //                           onTapAdd: () {},
+  //                           onTapRemove: () {},
+  //                           onPressedAddOrder: () {},
+  //                         );
+  //                       } else {
+  //                         // menuFrameSheet(context);
+  //                         setState(() {
+  //                           item['count'] += 1;
+  //                         });
+  //                         addOrderMenu(
+  //                             menuId: item['id'],
+  //                             menuName: item['nama'],
+  //                             price: item['price'],
+  //                             menuCount: item['count']);
+  //                         // print(menuItem[index]['count']);
+  //                       }
+  //                     },
+  //                     onTapRemove: () {
+  //                       setState(() {
+  //                         item['count'] -= 1;
+  //                       });
+  //                       deleteOrderMenu(
+  //                           menuId: item['id'],
+  //                           menuName: item['nama'],
+  //                           price: item['price'],
+  //                           menuCount: item['count']);
+  //                       // print(orderCount);
+  //                     },
+  //                   ),
+  //           );
+  //         },
+  //       ),
+  //     ],
+  //   );
+  // }
 
   Widget searchBarStore() {
     return Container(
@@ -1494,40 +1598,36 @@ class _CanteenScreenState extends State<CanteenScreen>
       child: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
         child: ListView.builder(
-          itemCount: menuMaps['Semua']?.length,
+          itemCount: menuMaps['Semua']?.length ?? 0,
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           itemBuilder: (context, index) {
-            Map<String, dynamic> menuItems = menuMaps['Semua']!;
-            String menuKey = menuItems.keys.elementAt(index);
-            var item = menuItems[menuKey];
+            List<Menu> menuItems = menuMaps['Semua']!;
+            Menu item = menuItems[index];
             return Container(
               color: Colors.white,
-              padding: const EdgeInsets.symmetric(
-                horizontal: 25,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 25),
               child: ProductCardBoxHorizontal(
                 onPressed: () {
-                  log('product: ${item['nama']}');
+                  log('product: ${item.menuName}');
                   // storeMenuCountSheet();
                   menuFrameSheet(context);
                 },
-                productName: item['nama'],
-                // description: menuItem[index]['desc'],
-                description: 'deskripsi menu',
-                price: item['price'].toString(),
-                likes: item['likes'],
-                rate: item['rate'],
-                count: item['count'].toString(),
+                productName: item.menuName!,
+                description: item.menuDesc ?? 'deskripsi menu',
+                price: item.menuPrice.toString(),
+                likes: item.menuLikes.toString(),
+                rate: item.menuRate.toString(),
+                count: item.menuStock.toString(),
                 onTapAdd: () {
                   setState(() {
-                    item['count'] += 1;
+                    item.menuStock = item.menuStock! + 1;
                   });
                   // print(menuItem[index]['count']);
                 },
                 onTapRemove: () {
                   setState(() {
-                    item['count'] -= 1;
+                    item.menuStock = item.menuStock! - 1;
                   });
                   // print(orderCount);
                 },
@@ -1539,238 +1639,144 @@ class _CanteenScreenState extends State<CanteenScreen>
     );
   }
 
-  Map<String, Map<String, Map<String, dynamic>>> menuMaps = {
-    'Semua': {
-      'menu 1': {
-        'id': '1',
-        'nama': 'nama menu',
-        'rate': '4.0',
-        'likes': '100',
-        'price': 10000,
-        'count': 0,
-        'sold': 100,
-        'custom': true,
-      },
-      'menu 2': {
-        'id': '2',
-        'nama': 'nama menu',
-        'rate': '4.0',
-        'likes': '100',
-        'price': 10000,
-        'count': 0,
-        'sold': 100,
-        'custom': false,
-      },
-      'menu 3': {
-        'id': '3',
-        'nama': 'nama menu',
-        'rate': '4.0',
-        'likes': '100',
-        'price': 10000,
-        'count': 0,
-        'sold': 100,
-        'custom': false,
-      },
-      'menu 4': {
-        'id': '4',
-        'nama': 'nama menu',
-        'rate': '4.0',
-        'likes': '100',
-        'price': 10000,
-        'count': 0,
-        'sold': 100,
-        'custom': false,
-      },
-      'menu 5': {
-        'id': '5',
-        'nama': 'nama menu',
-        'rate': '4.0',
-        'likes': '100',
-        'price': 10000,
-        'count': 0,
-        'sold': 100,
-        'custom': false,
-      },
-      'menu 6': {
-        'id': '6',
-        'nama': 'nama menu',
-        'rate': '4.0',
-        'likes': '100',
-        'price': 10000,
-        'count': 0,
-        'sold': 100,
-        'custom': false,
-      },
-    },
-    'kategori 1': {
-      'menu 1': {
-        'id': '7',
-        'nama': 'nama menu kategori 1',
-        'rate': '4.0',
-        'likes': '100',
-        'price': 10000,
-        'count': 0,
-        'sold': 100,
-        'custom': false,
-      },
-      'menu 2': {
-        'id': '8',
-        'nama': 'nama menu',
-        'rate': '4.0',
-        'likes': '100',
-        'price': 10000,
-        'count': 0,
-        'sold': 100,
-        'custom': false,
-      },
-      'menu 3': {
-        'id': '9',
-        'nama': 'nama menu',
-        'rate': '4.0',
-        'likes': '100',
-        'price': 10000,
-        'count': 0,
-        'sold': 100,
-        'custom': false,
-      },
-      'menu 4': {
-        'id': '10',
-        'nama': 'nama menu',
-        'rate': '4.0',
-        'likes': '100',
-        'price': 10000,
-        'count': 0,
-        'sold': 100,
-        'custom': false,
-      },
-    },
-    'kategori 2': {
-      'menu 1': {
-        'id': '11',
-        'nama': 'nama menu kategori 2',
-        'rate': '4.0',
-        'likes': '100',
-        'price': 10000,
-        'count': 0,
-        'sold': 100,
-        'custom': false,
-      },
-      'menu 2': {
-        'id': '12',
-        'nama': 'nama menu',
-        'rate': '4.0',
-        'likes': '100',
-        'price': 10000,
-        'count': 0,
-        'sold': 100,
-        'custom': false,
-      },
-      'menu 3': {
-        'id': '13',
-        'nama': 'nama menu',
-        'rate': '4.0',
-        'likes': '100',
-        'price': 10000,
-        'count': 0,
-        'sold': 100,
-        'custom': false,
-      },
-      'menu 4': {
-        'id': '14',
-        'nama': 'nama menu',
-        'rate': '4.0',
-        'likes': '100',
-        'price': 10000,
-        'count': 0,
-        'sold': 100,
-        'custom': false,
-      },
-    },
-    'kategori 3': {
-      'menu 1': {
-        'id': '15',
-        'nama': 'nama menu kategori 3',
-        'rate': '4.0',
-        'likes': '100',
-        'price': 10000,
-        'count': 0,
-        'sold': 100,
-        'custom': false,
-      },
-      'menu 2': {
-        'id': '16',
-        'nama': 'nama menu',
-        'rate': '4.0',
-        'likes': '100',
-        'price': 10000,
-        'count': 0,
-        'sold': 100,
-        'custom': false,
-      },
-      'menu 3': {
-        'id': '17',
-        'nama': 'nama menu',
-        'rate': '4.0',
-        'likes': '100',
-        'price': 10000,
-        'count': 0,
-        'sold': 100,
-        'custom': false,
-      },
-      'menu 4': {
-        'id': '18',
-        'nama': 'nama menu',
-        'rate': '4.0',
-        'likes': '100',
-        'price': 10000,
-        'count': 0,
-        'sold': 100,
-        'custom': false,
-      },
-    },
-    'kategori 4': {
-      'menu 1': {
-        'id': '19',
-        'nama': 'nama menu kategori 4',
-        'rate': '4.0',
-        'likes': '100',
-        'price': 10000,
-        'count': 0,
-        'sold': 100,
-        'custom': false,
-      },
-      'menu 2': {
-        'id': '20',
-        'nama': 'nama menu',
-        'rate': '4.0',
-        'likes': '100',
-        'price': 10000,
-        'count': 0,
-        'sold': 100,
-        'custom': false,
-      },
-      'menu 3': {
-        'id': '21',
-        'nama': 'nama menu',
-        'rate': '4.0',
-        'likes': '100',
-        'price': 10000,
-        'count': 0,
-        'sold': 100,
-        'custom': false,
-      },
-      'menu 4': {
-        'id': '22',
-        'nama': 'nama menu',
-        'rate': '4.0',
-        'likes': '100',
-        'price': 10000,
-        'count': 0,
-        'sold': 100,
-        'custom': false,
-      },
-    }
-  };
+  // Widget searchMenuBody() {
+  //   return ReloadIndicatorType1(
+  //     onRefresh: refreshPage,
+  //     child: SingleChildScrollView(
+  //       physics: const BouncingScrollPhysics(),
+  //       child: ListView.builder(
+  //         itemCount: menuMaps['Semua']?.length,
+  //         shrinkWrap: true,
+  //         physics: const NeverScrollableScrollPhysics(),
+  //         itemBuilder: (context, index) {
+  //           Map<String, dynamic> menuItems = menuMaps['Semua']!;
+  //           String menuKey = menuItems.keys.elementAt(index);
+  //           var item = menuItems[menuKey];
+  //           return Container(
+  //             color: Colors.white,
+  //             padding: const EdgeInsets.symmetric(
+  //               horizontal: 25,
+  //             ),
+  //             child: ProductCardBoxHorizontal(
+  //               onPressed: () {
+  //                 log('product: ${item['nama']}');
+  //                 // storeMenuCountSheet();
+  //                 menuFrameSheet(context);
+  //               },
+  //               productName: item['nama'],
+  //               // description: menuItem[index]['desc'],
+  //               description: 'deskripsi menu',
+  //               price: item['price'].toString(),
+  //               likes: item['likes'],
+  //               rate: item['rate'],
+  //               count: item['count'].toString(),
+  //               onTapAdd: () {
+  //                 setState(() {
+  //                   item['count'] += 1;
+  //                 });
+  //                 // print(menuItem[index]['count']);
+  //               },
+  //               onTapRemove: () {
+  //                 setState(() {
+  //                   item['count'] -= 1;
+  //                 });
+  //                 // print(orderCount);
+  //               },
+  //             ),
+  //           );
+  //         },
+  //       ),
+  //     ),
+  //   );
+  // }
+
+  // Map<String, Map<String, Map<String, dynamic>>> menuMaps = {
+  //   'Semua': {
+  //     'menu 1': {
+  //       'id': '1',
+  //       'nama': 'nama menu',
+  //       'rate': '4.0',
+  //       'likes': '100',
+  //       'price': 10000,
+  //       'count': 0,
+  //       'sold': 100,
+  //       'custom': true,
+  //     },
+  //     'menu 2': {
+  //       'id': '2',
+  //       'nama': 'nama menu',
+  //       'rate': '4.0',
+  //       'likes': '100',
+  //       'price': 10000,
+  //       'count': 0,
+  //       'sold': 100,
+  //       'custom': false,
+  //     },
+
+  //   },
+  //   'kategori 1': {
+  //     'menu 1': {
+  //       'id': '7',
+  //       'nama': 'nama menu kategori 1',
+  //       'rate': '4.0',
+  //       'likes': '100',
+  //       'price': 10000,
+  //       'count': 0,
+  //       'sold': 100,
+  //       'custom': false,
+  //     },
+  //     'menu 2': {
+  //       'id': '8',
+  //       'nama': 'nama menu',
+  //       'rate': '4.0',
+  //       'likes': '100',
+  //       'price': 10000,
+  //       'count': 0,
+  //       'sold': 100,
+  //       'custom': false,
+  //     },
+
+  //   },
+  //   'kategori 2': {
+  //     'menu 1': {
+  //       'id': '11',
+  //       'nama': 'nama menu kategori 2',
+  //       'rate': '4.0',
+  //       'likes': '100',
+  //       'price': 10000,
+  //       'count': 0,
+  //       'sold': 100,
+  //       'custom': false,
+  //     },
+
+  //   },
+  //   'kategori 3': {
+  //     'menu 1': {
+  //       'id': '15',
+  //       'nama': 'nama menu kategori 3',
+  //       'rate': '4.0',
+  //       'likes': '100',
+  //       'price': 10000,
+  //       'count': 0,
+  //       'sold': 100,
+  //       'custom': false,
+  //     },
+
+  //   },
+  //   'kategori 4': {
+  //     'menu 1': {
+  //       'id': '19',
+  //       'nama': 'nama menu kategori 4',
+  //       'rate': '4.0',
+  //       'likes': '100',
+  //       'price': 10000,
+  //       'count': 0,
+  //       'sold': 100,
+  //       'custom': false,
+  //     },
+
+  //   }
+  // };
 
   List<Map<String, dynamic>> variantMenuTypeList = [
     {

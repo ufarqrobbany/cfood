@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cfood/custom/shimmer.dart';
 import 'package:cfood/style.dart';
 import 'package:cfood/utils/common.dart';
@@ -345,6 +347,7 @@ class ProductCardBoxHorizontal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    log(" product image -> $imgUrl");
     return Container(
       padding: isCustom
           ? const EdgeInsets.fromLTRB(0, 25, 0, 15)
@@ -376,7 +379,8 @@ class ProductCardBoxHorizontal extends StatelessWidget {
                     height: innerContentSize ?? 133,
                     constraints: BoxConstraints(
                       minWidth: innerContentSize ?? 120,
-                      maxWidth: double.infinity,
+                      // maxWidth: double.infinity,
+                      maxWidth: 120,
                     ),
                     child: Stack(
                       alignment: Alignment.bottomCenter,
@@ -398,7 +402,9 @@ class ProductCardBoxHorizontal extends StatelessWidget {
                               ? const Center(
                                   child: Icon(Icons.image),
                                 )
-                              : Image.network(imgUrl!),
+                              : ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: Image.network(imgUrl!, fit: BoxFit.cover,)),
                         ),
                         Align(
                           alignment: Alignment.bottomCenter,
@@ -437,7 +443,9 @@ class ProductCardBoxHorizontal extends StatelessWidget {
                         ? const Center(
                             child: Icon(Icons.image),
                           )
-                        : Image.network(imgUrl!),
+                        : ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: Image.network(imgUrl!, fit: BoxFit.cover,)),
                   ),
             Expanded(
               child: Container(

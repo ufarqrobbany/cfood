@@ -39,6 +39,7 @@ class _OrganizationScreenState extends State<OrganizationScreen>
   @override
   void initState() {
     super.initState();
+    log(widget.id!.toString());
     onEnterPage();
   }
 
