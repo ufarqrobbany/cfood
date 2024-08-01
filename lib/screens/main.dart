@@ -76,6 +76,7 @@ class _MainScreenState extends State<MainScreen> {
           AppConfig.NAME = dataUser?.name ?? '';
           AppConfig.USER_ID = dataUser?.id ?? 0;
           AppConfig.STUDENT_ID = studentInfo?.id ?? 0;
+          AppConfig.USER_CAMPUS_ID = userCampus!.id!;
           AppConfig.USER_TYPE = dataUser?.isPenjual ?? 'reguler';
           AppConfig.IS_DRIVER = dataUser?.kurir ?? false;
           AppConfig.URL_PHOTO_PROFILE =

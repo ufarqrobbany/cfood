@@ -208,7 +208,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     title: InkWell(
                       onTap: () {
                         print('go to search page');
-                        navigateTo(context, const SearchScreen());
+                        navigateTo(context, SearchScreen(campusId: AppConfig.USER_CAMPUS_ID,));
                       },
                       borderRadius: BorderRadius.circular(58),
                       focusColor: Warna.abu,

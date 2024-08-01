@@ -28,6 +28,8 @@ class AppConfig {
 
   static int STUDENT_ID = 0;
 
+  static int USER_CAMPUS_ID = 0;
+
   static String NAME = '';
 
   static String EMAIL = '';
