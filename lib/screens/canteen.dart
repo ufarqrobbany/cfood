@@ -181,7 +181,10 @@ class _CanteenScreenState extends State<CanteenScreen>
     ).postData({});
   }
 
+<<<<<<< HEAD
   
+=======
+>>>>>>> 7a2ecbe89105a2ec9e37de807b5a4d779d376b7d
   void tapLikeMenu(
     BuildContext context, {
     bool isLike = false,
@@ -292,7 +295,10 @@ class _CanteenScreenState extends State<CanteenScreen>
   //   }
   // }
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 7a2ecbe89105a2ec9e37de807b5a4d779d376b7d
   Future<void> finishDanus(BuildContext context) async {
     try {
       ResponseHendler response = await FetchController(
@@ -1042,7 +1048,32 @@ class _CanteenScreenState extends State<CanteenScreen>
                       onPressed: () {
                         log('product: ${item.menuName}');
                         // storeMenuCountSheet();
-                        menuFrameSheet(context);
+                        menuFrameSheet(
+                          context,
+                          menuId: item.id!,
+                          merchantId: dataMerchant?.merchantId!,
+                          imgUrl:
+                              "${AppConfig.URL_IMAGES_PATH}${item.menuPhoto}",
+                          productName: item.menuName!,
+                          description: item.menuDesc!,
+                          price: item.menuPrice!.toString(),
+                          likes: item.menuLikes!.toString(),
+                          count: item.menuStock!.toString(),
+                          sold: item.menuSolds ?? 0,
+                          rate: item.menuRate.toString(),
+                          innerContentSize: 110,
+                          isLike: item.isLike!,
+                          onTapLike: (updateState) {
+                            tapLikeMenu(context,
+                                isLike: item.isLike!,
+                                menuId: item.id!,
+                                updateState: updateState,
+                                menuItem: item);
+                          },
+                          onPressed: () {},
+                          onTapAdd: () {},
+                          onTapRemove: () {},
+                        );
                       },
                       imgUrl: "${AppConfig.URL_IMAGES_PATH}${item.menuPhoto}",
                       productName: item.menuName!,
@@ -1105,7 +1136,10 @@ class _CanteenScreenState extends State<CanteenScreen>
     );
   }
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 7a2ecbe89105a2ec9e37de807b5a4d779d376b7d
   Widget searchBarStore() {
     return Container(
         // height: 50,
