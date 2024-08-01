@@ -1,10 +1,16 @@
+import 'dart:developer';
+
 import 'package:cfood/custom/CButtons.dart';
 import 'package:cfood/custom/CPageMover.dart';
 import 'package:cfood/custom/reload_indicator.dart';
+import 'package:cfood/model/add_merchants_response.dart';
+import 'package:cfood/model/open_close_store_response.dart';
+import 'package:cfood/repository/fetch_controller.dart';
 import 'package:cfood/screens/inbox.dart';
 import 'package:cfood/style.dart';
 import 'package:cfood/utils/constant.dart';
 import 'package:flutter/material.dart';
+import 'package:toast/toast.dart';
 import 'package:uicons/uicons.dart';
 
 class OrderWirausahaScreen extends StatefulWidget {
@@ -16,9 +22,11 @@ class OrderWirausahaScreen extends StatefulWidget {
 
 class _OrderWirausahaScreenState extends State<OrderWirausahaScreen> {
   bool isOpen = false;
+  AddMerchantResponse? merchantDataResponse;
   @override
   void initState() {
     super.initState();
+    fetchSummaryMerchant();
   }
 
   Future<void> refreshPage() async {
@@ -27,8 +35,52 @@ class _OrderWirausahaScreenState extends State<OrderWirausahaScreen> {
     print('reload...');
   }
 
+    Future<void> merchantStatusOpen(bool value) async {
+    OpenCloseStoreResponse response = await FetchController(
+      // endpoint: 'merchants/${AppConfig.MERCHANT_ID}/status?isOpen=$value',
+      endpoint: 'merchants/${AppConfig.MERCHANT_ID}/status?isOpen=$isOpen',
+      fromJson: (json) => OpenCloseStoreResponse.fromJson(json),
+    ).putData({});
+
+    if(response.data != null) {
+      setState(() {
+      isOpen = !response.data!.open!;
+      AppConfig.MERCHANT_OPEN = isOpen;
+    });
+    log('is open : $isOpen');
+    }
+
+    
+  }
+
+    Future<void> fetchSummaryMerchant() async {
+    merchantDataResponse = await FetchController(
+      endpoint: 'merchants/${AppConfig.MERCHANT_ID}',
+      fromJson: (json) => AddMerchantResponse.fromJson(json),
+    ).getData();
+
+    setState(() {
+
+      AppConfig.MERCHANT_NAME = merchantDataResponse!.data!.merchantName!;
+      AppConfig.MERCHANT_DESC = merchantDataResponse!.data!.merchantDesc!;
+      AppConfig.MERCHANT_PHOTO =
+          AppConfig.URL_IMAGES_PATH + merchantDataResponse!.data!.merchantPhoto!;
+
+      isOpen = merchantDataResponse!.data!.open!;
+    });
+    log(
+      {
+        "name": AppConfig.MERCHANT_NAME,
+        "desc": AppConfig.MERCHANT_DESC,
+        "photo": AppConfig.MERCHANT_PHOTO,
+        "isOpen": isOpen,
+      }.toString(),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    ToastContext().init(context);
     return Scaffold(
       body: ReloadIndicatorType1(
         onRefresh: refreshPage,
@@ -47,9 +99,9 @@ class _OrderWirausahaScreenState extends State<OrderWirausahaScreen> {
                   leading: moveToogleBox ? switchOpenBox() : Container(),
                   pinned: true,
                   stretch: true,
-                  title: const Text(
-                    'Nama Wirausaha',
-                    style: TextStyle(
+                  title: Text(
+                    AppConfig.MERCHANT_NAME,
+                    style: const TextStyle(
                       fontSize: 26,
                       fontWeight: FontWeight.w700,
                       color: Colors.white,
@@ -102,10 +154,11 @@ class _OrderWirausahaScreenState extends State<OrderWirausahaScreen> {
                         Container(
                           // padding: const EdgeInsets.only(bottom: 45),
                           color: Warna.pageBackgroundColor,
-                          child: Image.asset(
-                            'assets/header_image.jpg',
-                            fit: BoxFit.cover,
-                          ),
+                          child: Image.network(AppConfig.MERCHANT_PHOTO, fit: BoxFit.cover,),
+                          // child: Image.asset(
+                          //   'assets/header_image.jpg',
+                          //   fit: BoxFit.cover,
+                          // ),
                         ),
                         Container(
                           // margin: const EdgeInsets.only(bottom: 45),
@@ -136,7 +189,7 @@ class _OrderWirausahaScreenState extends State<OrderWirausahaScreen> {
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
                                   const Text(
-                                    'Terima Pesanan',
+                                    'Buka Toko',
                                     style: TextStyle(
                                         color: Colors.white,
                                         fontSize: 16,
@@ -176,9 +229,10 @@ class _OrderWirausahaScreenState extends State<OrderWirausahaScreen> {
         child: Switch(
           value: isOpen,
           onChanged: (value) {
-            setState(() {
-              isOpen = value;
-            });
+            // setState(() {
+            //   isOpen = value;
+            // });
+            merchantStatusOpen(value);
           },
           activeColor: Warna.kuning,
           activeTrackColor: Warna.kuning.withOpacity(0.14),

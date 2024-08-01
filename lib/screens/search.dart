@@ -20,7 +20,10 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 class SearchScreen extends StatefulWidget {
   final int campusId;
-  const SearchScreen({super.key, this.campusId = 0,});
+  const SearchScreen({
+    super.key,
+    this.campusId = 0,
+  });
 
   @override
   State<SearchScreen> createState() => _SearchScreenState();
@@ -138,15 +141,15 @@ class _SearchScreenState extends State<SearchScreen> {
       return;
     }
 
-    if (selectedTab == 'organization') {
-      getAllOrganizations(context);
+    if (selectedTab == 'organisasi') {
+      getAllOrganizations(context, query: query);
       return;
     }
   }
 
   Future<void> getAllMenus(BuildContext context, {String query = ''}) async {
     dataMenusResponse = await FetchController(
-      endpoint: 'menus/?page=1&size=5&searchName=$query',
+      endpoint: 'menus/?page=1&size=50&searchName=$query',
       fromJson: (json) => MenusResponse.fromJson(json),
     ).getData();
 
@@ -159,7 +162,8 @@ class _SearchScreenState extends State<SearchScreen> {
   Future<void> getAllOrganizations(BuildContext context,
       {String query = ''}) async {
     dataOrganizationsResponse = await FetchController(
-      endpoint: 'organizations/?campusId=${widget.campusId}&page=1&size=5&name=$query',
+      endpoint: 'organizations/?campusId=${widget.campusId}&page=1&size=50&name=$query',
+      // endpoint: 'organizations/?campusId=${widget.campusId}&name=$query',
       fromJson: (json) => GetAllOrganizationsResponse.fromJson(json),
     ).getData();
 
@@ -173,7 +177,7 @@ class _SearchScreenState extends State<SearchScreen> {
       {String query = ''}) async {
     dataMerchantsResponse = await FetchController(
       endpoint:
-          'merchants/all?page=1&size=10&type=all&isOpen=all&searchName=$query',
+          'merchants/all?page=1&size=50&type=all&isOpen=all&searchName=$query',
       fromJson: (json) => GetAllMerchantsResponse.fromJson(json),
     ).getData();
 
@@ -408,9 +412,11 @@ class _SearchScreenState extends State<SearchScreen> {
                           onPressed: () {
                             navigateTo(
                               context,
-                              const CanteenScreen(
-                                menuId: '0',
-                                merchantId: 1,
+                              CanteenScreen(
+                                menuId: '${items!.menuId}',
+                                merchantId: items.merchants?.merchantId,
+                                merchantType:
+                                      items.merchants!.merchantType!
                               ),
                             );
                           },
@@ -507,17 +513,25 @@ class _SearchScreenState extends State<SearchScreen> {
                     itemCount: dataOrganizations?.organizations?.length,
                     physics: const NeverScrollableScrollPhysics(),
                     shrinkWrap: true,
-                    padding: const EdgeInsets.fromLTRB(25, 25, 25, 20),
+                    padding: const EdgeInsets.fromLTRB(25, 15, 25, 20),
                     itemBuilder: (context, index) {
-                      OrganizationItems? items =
+                       OrganizationItems? items =
                           dataOrganizations?.organizations![index];
-                      return OrganizationCard(
-                        text: items?.organizationName!,
-                        imgUrl:
-                            '${AppConfig.URL_IMAGES_PATH}${items?.organizationLogo}',
-                        onPressed: () => navigateTo(
-                          context,
-                          OrganizationScreen(id: items?.id),
+                      return Container(
+                        // margin: const EdgeInsets.only(top: 25, bottom: 10, left: 25, right: 25),
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        child: OrganizationCardBox(
+                          organizationId: items?.id,
+                          imgUrl:
+                              '${AppConfig.URL_IMAGES_PATH}${items?.organizationLogo}',
+                          organizationName: items?.organizationName,
+                          totalActivity: '${items?.totalActivity}',
+                          totalWirausaha: '${items?.totalWirausaha}',
+                          totalMenu: '${items?.totalMenu}',
+                          onPressed: () => navigateTo(
+                            context,
+                            OrganizationScreen(id: items?.id),
+                          ),
                         ),
                       );
                     },

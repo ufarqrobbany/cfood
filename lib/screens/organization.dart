@@ -119,35 +119,44 @@ class _OrganizationScreenState extends State<OrganizationScreen>
                   delegate: SliverChildListDelegate([
                 Container(
                   width: double.infinity,
-                  height: 150,
+                  height: 170,
                   padding: const EdgeInsets.only(bottom: 25),
-                  child: Image.network(
-                    logoOrganization ?? './jpg',
-                    fit: BoxFit.contain,
-                    loadingBuilder: (context, child, loadingProgress) {
-                      if (loadingProgress == null) {
-                        // Jika loadingProgress null, itu berarti gambar sudah selesai dimuat
-                        return child;
-                      } else {
-                        // Tampilkan loading indicator selama gambar belum selesai dimuat
-                        return Container(
-                          height: 200,
-                          width: double.infinity,
-                          color: Warna.abu2,
-                          child: Center(
-                            child: SizedBox(
-                              width: 50,
-                              child: LoadingAnimationWidget.staggeredDotsWave(
-                                  color: Warna.biru, size: 30),
-                            ),
+                  child: Center(
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(150),
+                      child: SizedBox(
+                        height: 150,
+                        width: 150,
+                        child: Image.network(
+                          logoOrganization ?? './jpg',
+                          fit: BoxFit.cover,
+                          loadingBuilder: (context, child, loadingProgress) {
+                            if (loadingProgress == null) {
+                              // Jika loadingProgress null, itu berarti gambar sudah selesai dimuat
+                              return child;
+                            } else {
+                              // Tampilkan loading indicator selama gambar belum selesai dimuat
+                              return Container(
+                                height: 200,
+                                width: double.infinity,
+                                color: Warna.abu2,
+                                child: Center(
+                                  child: SizedBox(
+                                    width: 50,
+                                    child: LoadingAnimationWidget.staggeredDotsWave(
+                                        color: Warna.biru, size: 30),
+                                  ),
+                                ),
+                              );
+                            }
+                          },
+                          errorBuilder: (context, error, stackTrace) => Container(
+                            height: 200,
+                            width: double.infinity,
+                            color: Warna.abu2,
                           ),
-                        );
-                      }
-                    },
-                    errorBuilder: (context, error, stackTrace) => Container(
-                      height: 200,
-                      width: double.infinity,
-                      color: Warna.abu2,
+                        ),
+                      ),
                     ),
                   ),
                 ),

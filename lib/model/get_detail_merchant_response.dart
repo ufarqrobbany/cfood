@@ -229,6 +229,7 @@ class Menu {
   String? categoryMenuName;
   int? merchantId;
   List<Variant>? variants;
+  int? selectedCount;
 
   Menu({
     this.id,
@@ -245,6 +246,7 @@ class Menu {
     this.categoryMenuName,
     this.merchantId,
     this.variants,
+    this.selectedCount,
   });
 
   Menu.fromJson(Map<String, dynamic> json) {
@@ -260,6 +262,7 @@ class Menu {
     isDanus = json['isDanus'];
     isLike = json['isLike'];
     categoryMenuName = json['categoryMenuName'];
+    selectedCount = 0;
     merchantId = json['merchantId'];
     if (json['variants'] != null) {
       variants = <Variant>[];

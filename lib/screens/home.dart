@@ -452,6 +452,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       padding: const EdgeInsets.symmetric(horizontal: 10),
                       child: ProductCardBox(
                           onPressed: () {
+                            log('${items?.menuId}');
                             navigateTo(
                               context,
                               CanteenScreen(

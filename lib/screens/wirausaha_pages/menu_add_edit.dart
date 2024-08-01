@@ -155,6 +155,7 @@ class _AddEditMenuScreenState extends State<AddEditMenuScreen> {
       setState(() {
         buttonLoad = false;
       });
+      MenuConfig.variants.clear();
       log('go to canteen');
       navigateBack(context);
     } on Exception catch (e) {
@@ -166,12 +167,21 @@ class _AddEditMenuScreenState extends State<AddEditMenuScreen> {
     }
   }
 
+  void deleteVariant(int index) {
+    setState(() {
+      MenuConfig.variants.removeAt(index);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     ToastContext().init(context);
     return Scaffold(
       appBar: AppBar(
-        leading: backButtonCustom(context: context),
+        leading: backButtonCustom(context: context, customTap: () {
+          MenuConfig.variants.clear();
+          navigateBack(context);
+        }),
         leadingWidth: 90,
         title: Text(
           'Tambah Menu',
@@ -359,9 +369,13 @@ class _AddEditMenuScreenState extends State<AddEditMenuScreen> {
                       padding: const EdgeInsets.symmetric(vertical: 10),
                       itemBuilder: (context, index) {
                         VariantDatas variant = MenuConfig.variants[index];
-                        return varianProductBox(
-                          varianName: variant.variantName,
-                          listOption: variant.variantOption,
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 5),
+                          child: varianProductBox(
+                            varianName: variant.variantName,
+                            listOption: variant.variantOption,
+                            varianIdx: index,
+                          ),
                         );
                       },
                     ),
@@ -448,7 +462,7 @@ class _AddEditMenuScreenState extends State<AddEditMenuScreen> {
   }
 
   Widget varianProductBox(
-      {String? varianName, List<VariantOption>? listOption}) {
+      {String? varianName, List<VariantOption>? listOption, int? varianIdx}) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(8),
       child: Container(
@@ -497,7 +511,15 @@ class _AddEditMenuScreenState extends State<AddEditMenuScreen> {
                 children: [
                   Expanded(
                     child: DynamicColorButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        navigateTo(
+                          context,
+                          AddEditVariantsScreen(
+                            isEdit: true,
+                            indexVarian: varianIdx,
+                          ),
+                        );
+                      },
                       text: 'Edit',
                       textStyle: const TextStyle(
                         fontSize: 13,
@@ -514,7 +536,9 @@ class _AddEditMenuScreenState extends State<AddEditMenuScreen> {
                   ),
                   Expanded(
                     child: DynamicColorButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        deleteVariant(varianIdx!);
+                      },
                       text: 'Hapus',
                       textStyle: const TextStyle(
                         fontSize: 13,

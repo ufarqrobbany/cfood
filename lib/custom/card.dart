@@ -1050,6 +1050,7 @@ class OrganizationCardBox extends StatelessWidget {
                   child: imgUrl != null
                       ? Image.network(
                           imgUrl!,
+                          fit: BoxFit.cover,
                           width: 80,
                           height: 80,
                         )

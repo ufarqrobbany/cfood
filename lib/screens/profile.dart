@@ -100,6 +100,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (merchantInformation != null) {
       log('save merchant info');
       setState(() {
+        AppConfig.MERCHANT_NAME = merchantInformation!.merchantName!;
         AppConfig.MERCHANT_ID = merchantInformation!.merchantId!;
         AppConfig.MERCHANT_TYPE = merchantInformation!.merchantType!;
         AppConfig.MERCHANT_PHOTO =

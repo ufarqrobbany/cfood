@@ -15,7 +15,8 @@ import 'package:uicons/uicons.dart';
 
 class AddEditVariantsScreen extends StatefulWidget {
   final bool isEdit;
-  const AddEditVariantsScreen({super.key, this.isEdit = false});
+  final int? indexVarian;
+  const AddEditVariantsScreen({super.key, this.isEdit = false, this.indexVarian});
 
   @override
   State<AddEditVariantsScreen> createState() => _AddEditVariantsScreenState();
@@ -31,6 +32,36 @@ class _AddEditVariantsScreenState extends State<AddEditVariantsScreen> {
   bool addOption = false;
   bool buttonLoad = false;
   List<VariantOption> listOpsiVarian = [];
+
+  @override
+  void initState() {
+    super.initState();
+
+    if(widget.isEdit) {
+      isEditVariant();
+    }
+  }
+
+  void isEditVariant(){
+    variantNameController.text = MenuConfig.variants[widget.indexVarian!].variantName!;
+    minController.text = MenuConfig.variants[widget.indexVarian!].minimal!.toString();
+    maxController.text = MenuConfig.variants[widget.indexVarian!].maximal!.toString();
+    variantRequired = MenuConfig.variants[widget.indexVarian!].isRequired!;
+    listOpsiVarian = MenuConfig.variants[widget.indexVarian!].variantOption!;
+  }
+
+  void tapEditVariant(){
+    MenuConfig.variants[widget.indexVarian!] = VariantDatas(
+      variantName: variantNameController.text,
+      isRequired: variantRequired,
+      minimal: int.parse(minController.text),
+      maximal: int.parse(maxController.text),
+      variantOption: listOpsiVarian,
+    );
+
+    log(MenuConfig.variants[widget.indexVarian!].toString());
+    navigateBack(context);
+  }
 
   void dataCheck() {
     String emptyField = '';
@@ -64,6 +95,15 @@ class _AddEditVariantsScreenState extends State<AddEditVariantsScreen> {
       return;
     }
 
+    if(listOpsiVarian == []) {
+      setState(() {
+        buttonLoad = false;
+        emptyField = 'Opsi Varian Tidak boleh kosong';
+      });
+      showToast(emptyField);
+      return;
+    }
+
     VariantDatas newVariant = VariantDatas(
       variantName: variantNameController.text,
       isRequired: variantRequired,
@@ -77,6 +117,7 @@ class _AddEditVariantsScreenState extends State<AddEditVariantsScreen> {
       buttonLoad = false;
     });
     log(MenuConfig.variants.toString());
+    navigateBack(context);
   }
 
   void addVariantOption() {
@@ -92,6 +133,24 @@ class _AddEditVariantsScreenState extends State<AddEditVariantsScreen> {
     setState(() {
       varianOptionController.clear();
       varianOptionPriceController.clear();
+    });
+  }
+
+  void editVariantOption(int index) {
+    setState(() {
+      listOpsiVarian[index] = VariantOption(
+        variantOptionName: varianOptionController.text,
+        variantOptionPrice: int.parse(varianOptionPriceController.text),
+      );
+    });
+    log(listOpsiVarian.toString());
+    varianOptionController.clear();
+    varianOptionPriceController.clear();
+  }
+
+  void deleteVariantOption(int index) {
+    setState(() {
+      listOpsiVarian.removeAt(index);
     });
   }
 
@@ -178,11 +237,13 @@ class _AddEditVariantsScreenState extends State<AddEditVariantsScreen> {
               const SizedBox(
                 height: 20,
               ),
-               const Text(
-                      'Opsi Varian',
-                      style: AppTextStyles.labelInput,
-                    ),
-                    const SizedBox(height: 10,),
+              const Text(
+                'Opsi Varian',
+                style: AppTextStyles.labelInput,
+              ),
+              const SizedBox(
+                height: 10,
+              ),
               listOpsiVarian.isNotEmpty
                   ? ListView.builder(
                       itemCount: listOpsiVarian.length,
@@ -193,10 +254,22 @@ class _AddEditVariantsScreenState extends State<AddEditVariantsScreen> {
                           padding: const EdgeInsets.symmetric(vertical: 7),
                           child: opsiVarianItem(
                             name: listOpsiVarian[idx].variantOptionName,
-                            price:
-                                listOpsiVarian[idx].variantOptionPrice.toString(),
-                            onTapEdit: () {},
-                            onTapDelete: () {},
+                            price: listOpsiVarian[idx]
+                                .variantOptionPrice
+                                .toString(),
+                            onTapEdit: () {
+                              variantOptionSheet(
+                                context,
+                                editIndex: idx,
+                                editName: listOpsiVarian[idx].variantOptionName,
+                                editPrice: listOpsiVarian[idx]
+                                    .variantOptionPrice
+                                    .toString(),
+                              );
+                            },
+                            onTapDelete: () {
+                              deleteVariantOption(idx);
+                            },
                           ),
                         );
                       })
@@ -235,7 +308,9 @@ class _AddEditVariantsScreenState extends State<AddEditVariantsScreen> {
                 width: double.infinity,
                 child: CBlueButton(
                   isLoading: buttonLoad,
-                  onPressed: () {
+                  onPressed: widget.isEdit ? () {
+                    tapEditVariant();
+                  } : () {
                     dataCheck();
                   },
                   text: 'Simpan',
@@ -295,13 +370,17 @@ class _AddEditVariantsScreenState extends State<AddEditVariantsScreen> {
   }
 
   Future variantOptionSheet(
-    BuildContext? context,
-  ) {
+    BuildContext context, {
+    int? editIndex,
+    String? editName,
+    String? editPrice,
+  }) {
+    varianOptionController.text = editName ?? '';
+    varianOptionPriceController.text = editPrice ?? '';
+
     return showModalBottomSheet(
-      context: context!,
-      // barrierColor: Colors.transparent,
+      context: context,
       backgroundColor: Colors.white,
-      // isDismissible: false,
       enableDrag: false,
       showDragHandle: true,
       isScrollControlled: true,
@@ -319,35 +398,35 @@ class _AddEditVariantsScreenState extends State<AddEditVariantsScreen> {
             return GestureDetector(
               onVerticalDragUpdate: (details) {
                 if (details.primaryDelta! > 0) {
-                  // Dragging down
-                  scrollController.jumpTo(
-                      0.1); // Set to minimum size (10% of screen height)
+                  scrollController.jumpTo(0.1);
                 } else if (details.primaryDelta! < 0) {
-                  // Dragging up
-                  scrollController.jumpTo(
-                      0.45); // Set to initial size (45% of screen height)
+                  scrollController.jumpTo(0.45);
                 }
               },
               child: DraggableScrollableSheet(
                   shouldCloseOnMinExtent: false,
                   controller: scrollController,
-                  initialChildSize:
-                      0.5, // Initial height when sheet is first opened
-                  minChildSize: 0.2, // Minimum height when sheet is collapsed
-                  maxChildSize:
-                      0.9, // Maximum height when sheet is fully expanded
-                  expand: false, // Set to false to prevent full expansion
+                  initialChildSize: 0.5,
+                  minChildSize: 0.2,
+                  maxChildSize: 0.9,
+                  expand: false,
                   builder: (context, scrollController) {
                     return SingleChildScrollView(
                       controller: scrollController,
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 25),
+                        padding: EdgeInsets.only(
+                          left: 25,
+                          right: 25,
+                          bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+                        ),
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
-                              'Tambah Opsi Varian',
+                            Text(
+                              editIndex == null
+                                  ? 'Tambah Opsi Varian'
+                                  : 'Edit Opsi Varian',
                               style: AppTextStyles.labelInput,
                             ),
                             const SizedBox(
@@ -369,16 +448,21 @@ class _AddEditVariantsScreenState extends State<AddEditVariantsScreen> {
                               height: 20,
                             ),
                             SizedBox(
-                                height: 50,
-                                width: double.infinity,
-                                child: CBlueButton(
-                                  onPressed: () {
+                              height: 50,
+                              width: double.infinity,
+                              child: CBlueButton(
+                                onPressed: () {
+                                  if (editIndex == null) {
                                     addVariantOption();
-                                    navigateBack(context);
-                                  },
-                                  text: 'Tambah',
-                                  borderRadius: 55,
-                                )),
+                                  } else {
+                                    editVariantOption(editIndex);
+                                  }
+                                  navigateBack(context);
+                                },
+                                text: editIndex == null ? 'Tambah' : 'Edit',
+                                borderRadius: 55,
+                              ),
+                            ),
                           ],
                         ),
                       ),

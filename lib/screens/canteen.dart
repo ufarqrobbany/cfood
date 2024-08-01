@@ -8,12 +8,14 @@ import 'package:cfood/custom/CPageMover.dart';
 import 'package:cfood/custom/CTextField.dart';
 import 'package:cfood/custom/CToast.dart';
 import 'package:cfood/custom/card.dart';
+import 'package:cfood/custom/page_item_void.dart';
 import 'package:cfood/custom/popup_dialog.dart';
 import 'package:cfood/custom/reload_indicator.dart';
 import 'package:cfood/model/add_merchants_response.dart';
 import 'package:cfood/model/error_response.dart';
 import 'package:cfood/model/follow_merchant_response.dart';
 import 'package:cfood/model/get_detail_merchant_response.dart';
+import 'package:cfood/model/get_specific_menu_response.dart';
 import 'package:cfood/model/post_menu_like_response.dart';
 import 'package:cfood/model/post_menu_unlike_response.dart';
 import 'package:cfood/model/reponse_handler.dart';
@@ -70,6 +72,10 @@ class _CanteenScreenState extends State<CanteenScreen>
   List<MenusMerchant>? menusMerchant;
   Map<String, List<Menu>> menuMaps = {};
 
+  DataSpecificMenu? dataSpecificMenu;
+
+  int selectedMenuId = 0;
+
   @override
   void initState() {
     super.initState();
@@ -99,11 +105,8 @@ class _CanteenScreenState extends State<CanteenScreen>
   Future<void> onEnterPage() async {
     fetchDetailDataMerchant();
     if (widget.menuId != null) {
-      WidgetsBinding.instance.addPostFrameCallback(
-        (_) {
-          menuFrameSheet(context);
-        },
-      );
+      log('menu id > ${widget.menuId}');
+      getSpecificMenu(context);
     }
   }
 
@@ -211,7 +214,8 @@ class _CanteenScreenState extends State<CanteenScreen>
     bool isLike = false,
     int menuId = 0,
     Function? updateState,
-    Menu? menuItem,
+    // Menu? menuItem,
+    dynamic menuItem,
   }) {
     if (isLike) {
       unLikeMenu(context,
@@ -228,11 +232,14 @@ class _CanteenScreenState extends State<CanteenScreen>
     }
   }
 
-  Future<void> likeMenu(BuildContext context,
-      {bool isLike = false,
-      int menuId = 0,
-      Function? updateState,
-      Menu? menuItem}) async {
+  Future<void> likeMenu(
+    BuildContext context, {
+    bool isLike = false,
+    int menuId = 0,
+    Function? updateState,
+    // Menu? menuItem,
+    dynamic menuItem,
+  }) async {
     PostMenuLikeResponse response = await FetchController(
       endpoint: 'menus/$menuId/like?userId=${AppConfig.USER_ID}',
       fromJson: (json) => PostMenuLikeResponse.fromJson(json),
@@ -255,11 +262,14 @@ class _CanteenScreenState extends State<CanteenScreen>
     }
   }
 
-  Future<void> unLikeMenu(BuildContext context,
-      {bool isLike = false,
-      int menuId = 0,
-      Function? updateState,
-      Menu? menuItem}) async {
+  Future<void> unLikeMenu(
+    BuildContext context, {
+    bool isLike = false,
+    int menuId = 0,
+    Function? updateState,
+    // Menu? menuItem,
+    dynamic menuItem,
+  }) async {
     PostMenuUnlikeResponse response = await FetchController(
       endpoint: 'menus/$menuId/unlike?userId=${AppConfig.USER_ID}',
       fromJson: (json) => PostMenuUnlikeResponse.fromJson(json),
@@ -282,51 +292,47 @@ class _CanteenScreenState extends State<CanteenScreen>
     }
   }
 
-  // void tapLikeMenu(BuildContext context, {bool isLike = false, int menuId = 0}) {
-  //   if(isLike){
-  //     unLikeMenu(context, isLike: isLike, menuId: menuId);
-  //   } else {
-  //     likeMenu(context, isLike: isLike, menuId: menuId);
-  //   }
-  // }
+  Future<void> getSpecificMenu(BuildContext context) async {
+    GetSpecificMenuResponse? response = await FetchController(
+        endpoint: 'menus/${widget.menuId}?userId=${AppConfig.USER_ID}',
+        fromJson: (json) => GetSpecificMenuResponse.fromJson(json)).getData();
 
-  // Future<void> likeMenu(BuildContext context, {bool isLike = false, int menuId = 0}) async {
-  //   PostMenuLikeResponse response = await FetchController(
-  //     endpoint:
-  //         'menus/$menuId/like?userId=${AppConfig.USER_ID}',
-  //     fromJson: (json) => PostMenuLikeResponse.fromJson(json),
-  //   ).postData({});
+    log('specific menu > ${response?.data}');
+    if (response != null) {
+      dataSpecificMenu = response.data!;
+    }
 
-  //   if (response.statusCode == 201 || response.status == 'success') {
-  //     setState(() {
-  //       isLike = true;
-  //     });
-  //     log('tap like menu');
-  //   } else {
-  //     // Handle error here
-  //     log('Failed to like menu');
-  //     showToast('Gagal Menyukai Menu');
-  //   }
-  // }
-
-  // Future<void> unLikeMenu(BuildContext context, {bool isLike = false, int menuId = 0}) async {
-  //   PostMenuUnlikeResponse response = await FetchController(
-  //     endpoint:
-  //         'menus/$menuId/unlike?userId=${AppConfig.USER_ID}',
-  //     fromJson: (json) => PostMenuUnlikeResponse.fromJson(json),
-  //   ).deleteData();
-
-  //   if (response.statusCode == 201 || response.status == 'success') {
-  //     setState(() {
-  //       isLike = true;
-  //     });
-  //     log('tap like menu');
-  //   } else {
-  //     // Handle error here
-  //     log('Failed to like menu');
-  //     showToast('Gagal Follow tidak Menyukai Menu');
-  //   }
-  // }
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) {
+        menuFrameSheet(
+          context,
+          menuId: dataSpecificMenu?.id!,
+          merchantId: dataMerchant?.merchantId!,
+          imgUrl: "${AppConfig.URL_IMAGES_PATH}${dataSpecificMenu?.menuPhoto}",
+          productName: dataSpecificMenu?.menuName!,
+          description: dataSpecificMenu?.menuDesc!,
+          price: dataSpecificMenu?.menuPrice!,
+          likes: dataSpecificMenu!.likes!.toString(),
+          count: dataSpecificMenu?.menuStock!.toString(),
+          // sold: dataSpecificMenu?.so ?? 0,
+          sold: 0,
+          rate: dataSpecificMenu?.rating.toString(),
+          innerContentSize: 110,
+          isLike: dataSpecificMenu!.isLike!,
+          onTapLike: (updateState) {
+            tapLikeMenu(context,
+                isLike: dataSpecificMenu!.isLike!,
+                menuId: dataSpecificMenu!.id!,
+                updateState: updateState,
+                menuItem: dataSpecificMenu);
+          },
+          onPressed: () {},
+          onTapAdd: () {},
+          onTapRemove: () {},
+        );
+      },
+    );
+  }
 
   Future<void> finishDanus(BuildContext context) async {
     try {
@@ -350,14 +356,9 @@ class _CanteenScreenState extends State<CanteenScreen>
     int? price,
     int? menuCount,
   }) async {
-    orderMenuCount.add(
-      {
-        'id': menuId,
-        'nama': menuName,
-        'price': price,
-        'count': menuCount,
-      },
-    );
+    // fungsi penjumlahan data data
+
+    // lalu post api
 
     orderCount = orderMenuCount.length;
     // var priceTotal = orderMenuCount['price'].;
@@ -374,11 +375,9 @@ class _CanteenScreenState extends State<CanteenScreen>
     int? price,
     int? menuCount,
   }) async {
-    orderMenuCount.removeWhere((element) =>
-        element['id'] == menuId &&
-        element['nama'] == menuName &&
-        element['price'] == price &&
-        element['count'] == menuCount);
+    // fungsi penjumlahan data dat
+
+    // lalu post ke api
 
     if (orderMenuCount.isEmpty) {
       setState(() {
@@ -387,6 +386,49 @@ class _CanteenScreenState extends State<CanteenScreen>
     }
 
     log(orderMenuCount.toString());
+  }
+
+  Future<void> addToCart(
+    BuildContext context, {
+    int menuId = 0,
+    int quantity = 0,
+    List<Map<String, dynamic>>? variants,
+  }) async {
+    await FetchController(
+      endpoint: '',
+      fromJson: (json) => ResponseHendler.fromJson(json),
+    ).postData({
+      'userId': AppConfig.USER_ID,
+      'merchantId': dataMerchant!.merchantId,
+      'menuId': menuId,
+      'quantity': quantity,
+      'variants': variants,
+    });
+
+    // Contoh data variants
+    //  'variants': [
+    //     {
+    //       'variantId': 0,
+    //       'variantOptionIds': [1, 2],
+    //     }
+    //   ]
+  }
+
+  Future<void> updateCart({
+    required int menuId,
+    required int quantity,
+    List<Map<String, dynamic>>? variants,
+  }) async {
+    await FetchController(
+      endpoint: '',
+      fromJson: (json) => ResponseHendler.fromJson(json),
+    ).postData({
+      'userId': AppConfig.USER_ID,
+      'merchantId': dataMerchant!.merchantId,
+      'menuId': menuId,
+      'quantity': quantity, // positif untuk tambah, negatif untuk kurangi
+      'variants': variants,
+    });
   }
 
   @override
@@ -470,8 +512,8 @@ class _CanteenScreenState extends State<CanteenScreen>
               child: SizedBox(
                 width: double.infinity,
                 height: double.infinity,
-                child: dataMerchant == null
-                    ? Container()
+                child: dataMerchant == null && dataSpecificMenu == null
+                    ? pageOnLoading(context)
                     : CustomScrollView(
                         physics: const BouncingScrollPhysics(
                           parent: AlwaysScrollableScrollPhysics(),
@@ -1050,7 +1092,8 @@ class _CanteenScreenState extends State<CanteenScreen>
                             description: item.menuDesc!,
                             price: item.menuPrice!,
                             likes: item.menuLikes!.toString(),
-                            count: item.menuStock!.toString(),
+                            // count: item.menuStock!.toString(),
+                            count: item.selectedCount!.toString(),
                             sold: item.menuSolds ?? 0,
                             rate: item.menuRate.toString(),
                             innerContentSize: 110,
@@ -1093,7 +1136,8 @@ class _CanteenScreenState extends State<CanteenScreen>
                             description: item.menuDesc!,
                             price: item.menuPrice!,
                             likes: item.menuLikes!.toString(),
-                            count: item.menuStock!.toString(),
+                            // count: item.menuStock!.toString(),
+                            count: item.selectedCount!.toString(),
                             sold: item.menuSolds ?? 0,
                             rate: item.menuRate.toString(),
                             innerContentSize: 110,
@@ -1116,11 +1160,12 @@ class _CanteenScreenState extends State<CanteenScreen>
                         price: item.menuPrice,
                         likes: item.menuLikes.toString(),
                         rate: item.menuRate.toString(),
-                        count: item.menuStock.toString(),
+                        // count: item.menuStock!.toString(),
+                        count: item.selectedCount!.toString(),
                         // isCustom: item.isDanus!,
-                        isCustom: item.variants!.isNotEmpty? true : false,
+                        isCustom: item.variants!.isNotEmpty ? true : false,
                         onTapAdd: () {
-                          if (item.isDanus!) {
+                          if (item.variants!.isNotEmpty) {
                             menuCustomeFrameSheet(
                               context,
                               productName: item.menuName!,
@@ -1128,7 +1173,7 @@ class _CanteenScreenState extends State<CanteenScreen>
                               price: item.menuPrice,
                               likes: item.menuLikes.toString(),
                               rate: item.menuRate.toString(),
-                              count: item.menuStock.toString(),
+                              count: item.selectedCount.toString(),
                               sold: item.menuSolds ?? 0,
                               innerContentSize: 110,
                               variantTypeList: variantMenuTypeList,
@@ -1137,28 +1182,33 @@ class _CanteenScreenState extends State<CanteenScreen>
                               onPressedAddOrder: () {},
                             );
                           } else {
-                            // menuFrameSheet(context);
-                            setState(() {
-                              item.menuStock = item.menuStock! + 1;
-                            });
-                            addOrderMenu(
-                                menuId: item.id!,
-                                menuName: item.menuName!,
-                                price: item.menuPrice!,
-                                menuCount: item.menuStock!);
-                            // print(menuItem[index]['count']);
+                            if (item.selectedCount! < item.menuStock!) {
+                              setState(() {
+                                item.selectedCount = item.selectedCount! + 1;
+                                item.menuPrice =
+                                    (item.menuPrice! * item.selectedCount!);
+                              });
+                              // updateCart(
+                              //   menuId: item.id!,
+                              //   quantity: item.selectedCount!,
+                              // );
+                            } else {
+                              // Show a message that stock limit has been reached
+                              showToast('Stock tidak mencukupi');
+                            }
                           }
                         },
                         onTapRemove: () {
-                          setState(() {
-                            item.menuStock = item.menuStock! - 1;
-                          });
-                          deleteOrderMenu(
-                              menuId: item.id!,
-                              menuName: item.menuName!,
-                              price: item.menuPrice!,
-                              menuCount: item.menuStock!);
-                          // print(orderCount);
+                          if (item.selectedCount! > 1) {
+                            setState(() {
+                              item.selectedCount = item.selectedCount! - 1;
+                              item.menuPrice = (item.menuPrice! / item.selectedCount!).toInt();
+                            });
+                            // updateCart(
+                            //   menuId: item.id!,
+                            //   quantity: -item.selectedCount!,
+                            // );
+                          }
                         },
                       ),
               );
