@@ -23,7 +23,9 @@ import 'package:uicons/uicons.dart';
 
 class AddEditMenuScreen extends StatefulWidget {
   final bool isEdit;
-  const AddEditMenuScreen({super.key, this.isEdit = false});
+  final bool merchantIsDanus;
+  const AddEditMenuScreen(
+      {super.key, this.isEdit = false, this.merchantIsDanus = false});
 
   @override
   State<AddEditMenuScreen> createState() => _AddEditMenuScreenState();
@@ -387,26 +389,31 @@ class _AddEditMenuScreenState extends State<AddEditMenuScreen> {
                 ),
               ),
 
-              const SizedBox(
-                height: 20,
-              ),
-
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Checkbox(
-                    value: isDanusan,
-                    onChanged: (value) {
-                      setState(() {
-                        isDanusan = value!;
-                      });
-                    },
-                  ),
-                  const SizedBox(
-                      width: 8), // Add some spacing between checkbox and text
-                  Text('Produk Danus'),
-                ],
-              ),
+              // kerjain
+              widget.merchantIsDanus
+                  ? const SizedBox(
+                      height: 20,
+                    )
+                  : Container(),
+              widget.merchantIsDanus
+                  ? Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Checkbox(
+                          value: isDanusan,
+                          onChanged: (value) {
+                            setState(() {
+                              isDanusan = value!;
+                            });
+                          },
+                        ),
+                        const SizedBox(
+                            width:
+                                8), // Add some spacing between checkbox and text
+                        Text('Produk Danus'),
+                      ],
+                    )
+                  : Container(),
 
               const SizedBox(
                 height: 40,
