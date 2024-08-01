@@ -10,13 +10,8 @@ import 'package:uicons/uicons.dart';
 
 Future menuFrameSheet(
   BuildContext? context, {
-<<<<<<< HEAD
   final int? menuId,
   final int? merchantId,
-=======
-    final int? menuId,
-    final int? merchantId,
->>>>>>> 7a2ecbe89105a2ec9e37de807b5a4d779d376b7d
   final String? imgUrl,
   final String? productName,
   final String? description,
@@ -89,41 +84,6 @@ Future menuFrameSheet(
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-<<<<<<< HEAD
-                      location != null
-                          ? Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 6, vertical: 1),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(4),
-                                border: Border.all(
-                                    color: Warna.hijau.withOpacity(0.60),
-                                    width: 1),
-                                color: Warna.hijau.withOpacity(0.10),
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(
-                                    Icons.location_pin,
-                                    size: 15,
-                                    color: Warna.hijau,
-                                  ),
-                                  const Text(
-                                    'Lokasi',
-                                    style: TextStyle(fontSize: 12),
-                                  ),
-                                ],
-                              ),
-                            )
-                          : Container(),
-                      location != null
-                          ? const SizedBox(
-                              width: 8,
-                            )
-                          : Container(),
-=======
                       location != null ?
                       Container(
                         padding: const EdgeInsets.symmetric(
@@ -153,7 +113,6 @@ Future menuFrameSheet(
                       location != null ? const SizedBox(
                         width: 8,
                       ) : Container(),
->>>>>>> 7a2ecbe89105a2ec9e37de807b5a4d779d376b7d
                       Container(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 6, vertical: 1),
@@ -275,17 +234,9 @@ Future menuFrameSheet(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       TextButton.icon(
-<<<<<<< HEAD
-                        onPressed: () => onTapLike!(setState(
-                          () {
-                            isLike = !isLike;
-                          },
-                        )),
-=======
                         onPressed: () => onTapLike!(setState(() {
                           isLike = !isLike;
                         },)),
->>>>>>> 7a2ecbe89105a2ec9e37de807b5a4d779d376b7d
                         // onPressed: () {
                         //   setState(() {
                         //     // itsFavorite = !itsFavorite;
@@ -302,14 +253,6 @@ Future menuFrameSheet(
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
-<<<<<<< HEAD
-                            color:
-                                isLike ? Colors.white : Warna.regulerFontColor,
-                          ),
-                        ),
-                        style: TextButton.styleFrom(
-                          backgroundColor: isLike ? Warna.like : Colors.white,
-=======
                             color: isLike
                                 ? Colors.white
                                 : Warna.regulerFontColor,
@@ -318,7 +261,6 @@ Future menuFrameSheet(
                         style: TextButton.styleFrom(
                           backgroundColor:
                               isLike ? Warna.like : Colors.white,
->>>>>>> 7a2ecbe89105a2ec9e37de807b5a4d779d376b7d
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(53)),
                           side: BorderSide(

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 
@@ -181,10 +182,6 @@ class _CanteenScreenState extends State<CanteenScreen>
     ).postData({});
   }
 
-<<<<<<< HEAD
-  
-=======
->>>>>>> 7a2ecbe89105a2ec9e37de807b5a4d779d376b7d
   void tapLikeMenu(
     BuildContext context, {
     bool isLike = false,
@@ -295,10 +292,6 @@ class _CanteenScreenState extends State<CanteenScreen>
   //   }
   // }
 
-<<<<<<< HEAD
-
-=======
->>>>>>> 7a2ecbe89105a2ec9e37de807b5a4d779d376b7d
   Future<void> finishDanus(BuildContext context) async {
     try {
       ResponseHendler response = await FetchController(
@@ -1136,10 +1129,6 @@ class _CanteenScreenState extends State<CanteenScreen>
     );
   }
 
-<<<<<<< HEAD
-
-=======
->>>>>>> 7a2ecbe89105a2ec9e37de807b5a4d779d376b7d
   Widget searchBarStore() {
     return Container(
         // height: 50,

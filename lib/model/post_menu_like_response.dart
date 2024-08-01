@@ -12,12 +12,7 @@ class PostMenuLikeResponse {
     statusCode = json['statusCode'];
     status = json['status'];
     message = json['message'];
-<<<<<<< HEAD
-    data =
-        json['data'] != null ? new DataLikeMenu.fromJson(json['data']) : null;
-=======
     data = json['data'] != null ? new DataLikeMenu.fromJson(json['data']) : null;
->>>>>>> 7a2ecbe89105a2ec9e37de807b5a4d779d376b7d
   }
 
   Map<String, dynamic> toJson() {
