@@ -5,6 +5,7 @@ import 'package:cfood/repository/fetch_controller.dart';
 import 'package:cfood/repository/login_repository.dart';
 import 'package:cfood/screens/main.dart';
 import 'package:cfood/screens/startup.dart';
+import 'package:cfood/screens/wirausaha_pages/main.dart';
 import 'package:cfood/style.dart';
 import 'package:cfood/utils/auth.dart';
 import 'package:cfood/utils/constant.dart';
@@ -48,6 +49,10 @@ class _SplashScreenState extends State<SplashScreen> {
         AppConfig.IS_DRIVER = dataUser['isDriver'] == 'no' ? false : true;
       }
 
+      if(dataUser['merchantId'] != null || dataUser['merchantId'] != '') {
+        AppConfig.MERCHANT_ID = int.parse(dataUser['merchantId']);
+      }
+
       if (dataUser['email'] != '' &&
           dataUser['password'] != '' &&
           dataUser['id'] != '') {
@@ -71,8 +76,12 @@ class _SplashScreenState extends State<SplashScreen> {
         } else if (AppConfig.USER_TYPE == 'kantin') {
           log('go to kantin pages');
         } else if (AppConfig.USER_TYPE == 'wirausaha') {
+          setState(() {
+            AppConfig.ON_DASHBOARD = true;
+          });
           log('go as wirausahawan');
-          navigateToRep(context, const MainScreen());
+          // navigateToRep(context, const MainScreen());
+          navigateToRep(context, const MainScreenMerchant());
         } else if (AppConfig.USER_TYPE == 'kurir') {
           log('go to kurir pages');
         }

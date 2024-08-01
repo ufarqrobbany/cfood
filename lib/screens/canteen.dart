@@ -956,176 +956,180 @@ class _CanteenScreenState extends State<CanteenScreen>
   }
 
   Widget bodyProductList() {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          height: 60,
-          width: double.infinity,
-          color: Colors.white,
-          child: ListView(
-            shrinkWrap: true,
-            scrollDirection: Axis.horizontal,
-            physics: const BouncingScrollPhysics(),
-            padding: const EdgeInsets.symmetric(horizontal: 25),
-            children: menuMaps.keys.map((String key) {
-              return tabMenuItem(
-                onPressed: () {
-                  setState(() {
-                    selectedTab = key;
-                  });
-                },
-                text: key,
-                menuName: key,
-                activeColor: Warna.kuning,
-              );
-            }).toList(),
-          ),
-        ),
-        ListView.builder(
-          itemCount: menuMaps[selectedTab]?.length,
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemBuilder: (context, index) {
-            List<Menu> menuItems = menuMaps[selectedTab]!;
-            Menu item = menuItems[index];
-            log('menu photo -> ${item.menuPhoto}');
-            return Container(
-              color: Colors.white,
+    return Container(
+      color: Colors.white,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            height: 60,
+            width: double.infinity,
+            color: Colors.white,
+            child: ListView(
+              shrinkWrap: true,
+              scrollDirection: Axis.horizontal,
+              physics: const BouncingScrollPhysics(),
               padding: const EdgeInsets.symmetric(horizontal: 25),
-              child: widget.isOwner!
-                  ? ProductCardBoxHorizontal(
-                      onPressed: () {
-                        log('product: ${item.menuName}');
-                        // storeMenuCountSheet();
-                        menuFrameSheet(
-                          context,
-                          menuId: item.id!,
-                          merchantId: dataMerchant?.merchantId!,
-                          imgUrl:
-                              "${AppConfig.URL_IMAGES_PATH}${item.menuPhoto}",
-                          productName: item.menuName!,
-                          description: item.menuDesc!,
-                          price: item.menuPrice!.toString(),
-                          likes: item.menuLikes!.toString(),
-                          count: item.menuStock!.toString(),
-                          sold: item.menuSolds ?? 0,
-                          rate: item.menuRate.toString(),
-                          innerContentSize: 110,
-                          isLike: item.isLike!,
-                          onTapLike: (updateState) {
-                            tapLikeMenu(context,
-                                isLike: item.isLike!,
-                                menuId: item.id!,
-                                updateState: updateState,
-                                menuItem: item);
-                          },
-                          onPressed: () {},
-                          onTapAdd: () {},
-                          onTapRemove: () {},
-                        );
-                      },
-                      imgUrl: "${AppConfig.URL_IMAGES_PATH}${item.menuPhoto}",
-                      productName: item.menuName!,
-                      description: item.menuDesc ?? 'deskripsi menu',
-                      price: item.menuPrice,
-                      likes: item.menuLikes.toString(),
-                      rate: item.menuRate.toString(),
-                      count: item.menuStock.toString(),
-                      // isCustom: item.isDanus!,
-                      isCustom: item.variants != null ? true : false,
-                      isOwner: widget.isOwner!,
-                      onTapEditProduct: () {},
-                    )
-                  : ProductCardBoxHorizontal(
-                      onPressed: () {
-                        log('product: ${item.menuName}');
-                        // storeMenuCountSheet();
-                        menuFrameSheet(
-                          context,
-                          menuId: item.id!,
-                          merchantId: dataMerchant?.merchantId!,
-                          imgUrl:
-                              "${AppConfig.URL_IMAGES_PATH}${item.menuPhoto}",
-                          productName: item.menuName!,
-                          description: item.menuDesc!,
-                          price: item.menuPrice!.toString(),
-                          likes: item.menuLikes!.toString(),
-                          count: item.menuStock!.toString(),
-                          sold: item.menuSolds ?? 0,
-                          rate: item.menuRate.toString(),
-                          innerContentSize: 110,
-                          isLike: item.isLike!,
-                          onTapLike: (updateState) {
-                            tapLikeMenu(context,
-                                isLike: item.isLike!,
-                                menuId: item.id!,
-                                updateState: updateState,
-                                menuItem: item);
-                          },
-                          onPressed: () {},
-                          onTapAdd: () {},
-                          onTapRemove: () {},
-                        );
-                      },
-                      imgUrl: "${AppConfig.URL_IMAGES_PATH}${item.menuPhoto}",
-                      productName: item.menuName!,
-                      description: item.menuDesc ?? 'deskripsi menu',
-                      price: item.menuPrice,
-                      likes: item.menuLikes.toString(),
-                      rate: item.menuRate.toString(),
-                      count: item.menuStock.toString(),
-                      // isCustom: item.isDanus!,
-                      isCustom: item.variants != null ? true : false,
-                      onTapAdd: () {
-                        if (item.isDanus!) {
-                          menuCustomeFrameSheet(
+              children: menuMaps.keys.map((String key) {
+                return tabMenuItem(
+                  onPressed: () {
+                    setState(() {
+                      selectedTab = key;
+                    });
+                  },
+                  text: key,
+                  menuName: key,
+                  activeColor: Warna.kuning,
+                );
+              }).toList(),
+            ),
+          ),
+          ListView.builder(
+            itemCount: menuMaps[selectedTab]?.length,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemBuilder: (context, index) {
+              List<Menu> menuItems = menuMaps[selectedTab]!;
+              Menu item = menuItems[index];
+              // log('menu photo -> ${item.menuPhoto}');
+              // log('${item.menuName} | ${item.variants}');
+              return Container(
+                color: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 25),
+                child: widget.isOwner!
+                    ? ProductCardBoxHorizontal(
+                        onPressed: () {
+                          log('product: ${item.menuName}');
+                          // storeMenuCountSheet();
+                          menuFrameSheet(
                             context,
+                            menuId: item.id!,
+                            merchantId: dataMerchant?.merchantId!,
+                            imgUrl:
+                                "${AppConfig.URL_IMAGES_PATH}${item.menuPhoto}",
                             productName: item.menuName!,
-                            description: item.menuDesc ?? '',
-                            price: item.menuPrice,
-                            likes: item.menuLikes.toString(),
-                            rate: item.menuRate.toString(),
-                            count: item.menuStock.toString(),
+                            description: item.menuDesc!,
+                            price: item.menuPrice!.toString(),
+                            likes: item.menuLikes!.toString(),
+                            count: item.menuStock!.toString(),
                             sold: item.menuSolds ?? 0,
+                            rate: item.menuRate.toString(),
                             innerContentSize: 110,
-                            variantTypeList: variantMenuTypeList,
+                            isLike: item.isLike!,
+                            onTapLike: (updateState) {
+                              tapLikeMenu(context,
+                                  isLike: item.isLike!,
+                                  menuId: item.id!,
+                                  updateState: updateState,
+                                  menuItem: item);
+                            },
+                            onPressed: () {},
                             onTapAdd: () {},
                             onTapRemove: () {},
-                            onPressedAddOrder: () {},
                           );
-                        } else {
-                          // menuFrameSheet(context);
+                        },
+                        imgUrl: "${AppConfig.URL_IMAGES_PATH}${item.menuPhoto}",
+                        productName: item.menuName!,
+                        description: item.menuDesc ?? 'deskripsi menu',
+                        price: item.menuPrice,
+                        likes: item.menuLikes.toString(),
+                        rate: item.menuRate.toString(),
+                        count: item.menuStock.toString(),
+                        // isCustom: item.isDanus!,
+                        isCustom: item.variants!.isNotEmpty ? true : false,
+                        isOwner: widget.isOwner!,
+                        onTapEditProduct: () {},
+                      )
+                    : ProductCardBoxHorizontal(
+                        onPressed: () {
+                          log('product: ${item.menuName}');
+                          // storeMenuCountSheet();
+                          menuFrameSheet(
+                            context,
+                            menuId: item.id!,
+                            merchantId: dataMerchant?.merchantId!,
+                            imgUrl:
+                                "${AppConfig.URL_IMAGES_PATH}${item.menuPhoto}",
+                            productName: item.menuName!,
+                            description: item.menuDesc!,
+                            price: item.menuPrice!.toString(),
+                            likes: item.menuLikes!.toString(),
+                            count: item.menuStock!.toString(),
+                            sold: item.menuSolds ?? 0,
+                            rate: item.menuRate.toString(),
+                            innerContentSize: 110,
+                            isLike: item.isLike!,
+                            onTapLike: (updateState) {
+                              tapLikeMenu(context,
+                                  isLike: item.isLike!,
+                                  menuId: item.id!,
+                                  updateState: updateState,
+                                  menuItem: item);
+                            },
+                            onPressed: () {},
+                            onTapAdd: () {},
+                            onTapRemove: () {},
+                          );
+                        },
+                        imgUrl: "${AppConfig.URL_IMAGES_PATH}${item.menuPhoto}",
+                        productName: item.menuName!,
+                        description: item.menuDesc ?? 'deskripsi menu',
+                        price: item.menuPrice,
+                        likes: item.menuLikes.toString(),
+                        rate: item.menuRate.toString(),
+                        count: item.menuStock.toString(),
+                        // isCustom: item.isDanus!,
+                        isCustom: item.variants!.isNotEmpty? true : false,
+                        onTapAdd: () {
+                          if (item.isDanus!) {
+                            menuCustomeFrameSheet(
+                              context,
+                              productName: item.menuName!,
+                              description: item.menuDesc ?? '',
+                              price: item.menuPrice,
+                              likes: item.menuLikes.toString(),
+                              rate: item.menuRate.toString(),
+                              count: item.menuStock.toString(),
+                              sold: item.menuSolds ?? 0,
+                              innerContentSize: 110,
+                              variantTypeList: variantMenuTypeList,
+                              onTapAdd: () {},
+                              onTapRemove: () {},
+                              onPressedAddOrder: () {},
+                            );
+                          } else {
+                            // menuFrameSheet(context);
+                            setState(() {
+                              item.menuStock = item.menuStock! + 1;
+                            });
+                            addOrderMenu(
+                                menuId: item.id!,
+                                menuName: item.menuName!,
+                                price: item.menuPrice!,
+                                menuCount: item.menuStock!);
+                            // print(menuItem[index]['count']);
+                          }
+                        },
+                        onTapRemove: () {
                           setState(() {
-                            item.menuStock = item.menuStock! + 1;
+                            item.menuStock = item.menuStock! - 1;
                           });
-                          addOrderMenu(
+                          deleteOrderMenu(
                               menuId: item.id!,
                               menuName: item.menuName!,
                               price: item.menuPrice!,
                               menuCount: item.menuStock!);
-                          // print(menuItem[index]['count']);
-                        }
-                      },
-                      onTapRemove: () {
-                        setState(() {
-                          item.menuStock = item.menuStock! - 1;
-                        });
-                        deleteOrderMenu(
-                            menuId: item.id!,
-                            menuName: item.menuName!,
-                            price: item.menuPrice!,
-                            menuCount: item.menuStock!);
-                        // print(orderCount);
-                      },
-                    ),
-            );
-          },
-        ),
-        const SizedBox(
-          height: 150,
-        )
-      ],
+                          // print(orderCount);
+                        },
+                      ),
+              );
+            },
+          ),
+          const SizedBox(
+            height: 150,
+          )
+        ],
+      ),
     );
   }
 

@@ -19,7 +19,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 class SearchScreen extends StatefulWidget {
-  const SearchScreen({super.key});
+  final int campusId;
+  const SearchScreen({super.key, this.campusId = 0,});
 
   @override
   State<SearchScreen> createState() => _SearchScreenState();
@@ -80,7 +81,7 @@ class _SearchScreenState extends State<SearchScreen> {
   void initState() {
     super.initState();
 
-    searchTextController.addListener(_filterSearch);
+    // searchTextController.addListener(_filterSearch);
   }
 
   @override
@@ -93,6 +94,7 @@ class _SearchScreenState extends State<SearchScreen> {
       selectedTab = tab;
     });
     log(selectedTab);
+    searchItemsBy(context, query: searchTextController.text);
   }
 
   void _filterSearch() {
@@ -157,7 +159,7 @@ class _SearchScreenState extends State<SearchScreen> {
   Future<void> getAllOrganizations(BuildContext context,
       {String query = ''}) async {
     dataOrganizationsResponse = await FetchController(
-      endpoint: 'organizations/?campusId=1&page=1&size=5&name=$query',
+      endpoint: 'organizations/?campusId=${widget.campusId}&page=1&size=5&name=$query',
       fromJson: (json) => GetAllOrganizationsResponse.fromJson(json),
     ).getData();
 
@@ -461,28 +463,31 @@ class _SearchScreenState extends State<SearchScreen> {
                     itemCount: dataMerchants?.merchants?.length,
                     physics: const NeverScrollableScrollPhysics(),
                     shrinkWrap: true,
-                    padding: const EdgeInsets.fromLTRB(25, 25, 25, 20),
+                    padding: const EdgeInsets.fromLTRB(25, 15, 25, 20),
                     itemBuilder: (context, index) {
                       MerchantItems? items = dataMerchants?.merchants![index];
-                      return CanteenCardBox(
-                        imgUrl:
-                            '${AppConfig.URL_IMAGES_PATH}${items?.merchantPhoto}',
-                        canteenName: items?.merchantName,
-                        // menuList: 'kosong',
-                        // likes: ' 0',
-                        likes: ' ${items?.followers}',
-                        rate: '${items?.rating}',
-                        type: items?.merchantType,
-                        open: items!.open!,
-                        danus: items.danus!,
-                        onPressed: () => navigateTo(
-                            context,
-                            CanteenScreen(
-                              merchantId: items.merchantId,
-                              isOwner: false,
-                              merchantType: items.merchantType!,
-                              itsDanusan: items.danus,
-                            )),
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        child: CanteenCardBox(
+                          imgUrl:
+                              '${AppConfig.URL_IMAGES_PATH}${items?.merchantPhoto}',
+                          canteenName: items?.merchantName,
+                          // menuList: 'kosong',
+                          // likes: ' 0',
+                          likes: ' ${items?.followers}',
+                          rate: '${items?.rating}',
+                          type: items?.merchantType,
+                          open: items!.open!,
+                          danus: items.danus!,
+                          onPressed: () => navigateTo(
+                              context,
+                              CanteenScreen(
+                                merchantId: items.merchantId,
+                                isOwner: false,
+                                merchantType: items.merchantType!,
+                                itsDanusan: items.danus,
+                              )),
+                        ),
                       );
                     },
                   ); // Default case if selectedTab doesn't match 'menu' or 'kantin'

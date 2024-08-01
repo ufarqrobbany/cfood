@@ -11,7 +11,8 @@ import 'package:toast/toast.dart';
 import 'package:uicons/uicons.dart';
 
 class MainScreenMerchant extends StatefulWidget {
-  const MainScreenMerchant({super.key});
+  final int firstIndexScreen;
+  const MainScreenMerchant({super.key, this.firstIndexScreen = 0});
 
   @override
   State<MainScreenMerchant> createState() => _MainScreenMerchantState();
@@ -37,12 +38,13 @@ List<String> _pageMenuNameCanteen = [
 ];
 
 class _MainScreenMerchantState extends State<MainScreenMerchant> {
-  var selectedScreen = _pageMenuCanteen[3];
+  var selectedScreen;
   DateTime? lastPressed;
   bool canPopNow = false;
 
   @override
   void initState() {
+    selectedScreen = _pageMenuCanteen[widget.firstIndexScreen];
     super.initState();
   }
 

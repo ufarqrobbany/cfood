@@ -105,7 +105,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
         AppConfig.MERCHANT_PHOTO =
             AppConfig.URL_IMAGES_PATH + merchantInformation!.merchantPhoto!;
       });
+      AuthHelper().setMerchantId(id: AppConfig.MERCHANT_ID.toString());
       log('merchant id : ${AppConfig.MERCHANT_ID}');
+      AuthHelper().chackUserData();
     }
   }
 
@@ -759,7 +761,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     setState(() {
                       AppConfig.ON_DASHBOARD = true;
                     });
-                    navigateToRep(context, const MainScreenMerchant());
+                    navigateToRep(context, const MainScreenMerchant(firstIndexScreen: 3,));
                     // navigateTo(
                     //   context,
                     //   UpdateMerchantScreen(

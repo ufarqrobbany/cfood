@@ -93,6 +93,10 @@ class ProductCardBox extends StatelessWidget {
     return InkWell(
       onTap: onPressed,
       child: Container(
+        constraints: const BoxConstraints(
+          minWidth: 160,
+          maxWidth: 170,
+        ),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(8),
@@ -109,10 +113,6 @@ class ProductCardBox extends StatelessWidget {
           children: [
             Container(
               height: 120,
-              constraints: const BoxConstraints(
-                minWidth: 160,
-                maxWidth: 170,
-              ),
               decoration: BoxDecoration(
                 color: Warna.abu,
                 borderRadius: const BorderRadius.only(
@@ -203,6 +203,8 @@ class ProductCardBox extends StatelessWidget {
                       children: [
                         Text(
                           productName!,
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
                           style: AppTextStyles.productName,
                         ),
                         const SizedBox(
@@ -223,9 +225,12 @@ class ProductCardBox extends StatelessWidget {
                             const SizedBox(
                               width: 5,
                             ),
-                            Text(
-                              storeName!,
-                              style: AppTextStyles.productStoreName,
+                            Flexible(
+                              child: Text(
+                                storeName!,
+                                overflow: TextOverflow.ellipsis,
+                                style: AppTextStyles.productStoreName,
+                              ),
                             ),
                           ],
                         ),
@@ -347,7 +352,8 @@ class ProductCardBoxHorizontal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    log(" product image -> $imgUrl");
+    // log(" product image -> $imgUrl");
+    // log('$productName ||| $isCustom');
     return Container(
       padding: isCustom
           ? const EdgeInsets.fromLTRB(0, 25, 0, 15)
@@ -427,7 +433,8 @@ class ProductCardBoxHorizontal extends StatelessWidget {
                     height: innerContentSize ?? 120,
                     constraints: BoxConstraints(
                       minWidth: innerContentSize ?? 120,
-                      maxWidth: double.infinity,
+                      // maxWidth: double.infinity,
+                      maxWidth: 120,
                     ),
                     decoration: BoxDecoration(
                         color: Warna.abu, borderRadius: BorderRadius.circular(8)

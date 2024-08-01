@@ -107,7 +107,7 @@ class AuthHelper {
       password : $password
       type : $type 
       isDriver : $isDriver
-      merhandId : $merchantId
+      merchantId : $merchantId
       ''');
 
     return {
@@ -118,6 +118,7 @@ class AuthHelper {
       'password': password,
       'type': type,
       'isDriver': isDriver,
+      'merchantId' : merchantId,
     };
   }
 }
