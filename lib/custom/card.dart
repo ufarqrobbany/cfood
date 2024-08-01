@@ -427,7 +427,7 @@ class ProductCardBoxHorizontal extends StatelessWidget {
                     height: innerContentSize ?? 120,
                     constraints: BoxConstraints(
                       minWidth: innerContentSize ?? 120,
-                      maxWidth: double.infinity,
+                      maxWidth: 120,
                     ),
                     decoration: BoxDecoration(
                         color: Warna.abu, borderRadius: BorderRadius.circular(8)

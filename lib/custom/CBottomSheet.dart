@@ -4,6 +4,7 @@ import 'package:cfood/custom/card.dart';
 import 'package:cfood/custom/order_status_timeline_tile.dart';
 import 'package:cfood/screens/reviews.dart';
 import 'package:cfood/style.dart';
+import 'package:cfood/utils/common.dart';
 import 'package:cfood/utils/constant.dart';
 import 'package:flutter/material.dart';
 import 'package:uicons/uicons.dart';
@@ -16,7 +17,7 @@ Future menuFrameSheet(
   final String? productName,
   final String? description,
   final String? location,
-  final String? price,
+  final int? price,
   final String? rate,
   final String? likes,
   bool isLike = false,
@@ -84,35 +85,39 @@ Future menuFrameSheet(
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      location != null ?
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 6, vertical: 1),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(4),
-                          border: Border.all(
-                              color: Warna.hijau.withOpacity(0.60), width: 1),
-                          color: Warna.hijau.withOpacity(0.10),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.location_pin,
-                              size: 15,
-                              color: Warna.hijau,
-                            ),
-                            const Text(
-                              'Lokasi',
-                              style: TextStyle(fontSize: 12),
-                            ),
-                          ],
-                        ),
-                      ) : Container(),
-                      location != null ? const SizedBox(
-                        width: 8,
-                      ) : Container(),
+                      location != null
+                          ? Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 6, vertical: 1),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(4),
+                                border: Border.all(
+                                    color: Warna.hijau.withOpacity(0.60),
+                                    width: 1),
+                                color: Warna.hijau.withOpacity(0.10),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    Icons.location_pin,
+                                    size: 15,
+                                    color: Warna.hijau,
+                                  ),
+                                  const Text(
+                                    'Lokasi',
+                                    style: TextStyle(fontSize: 12),
+                                  ),
+                                ],
+                              ),
+                            )
+                          : Container(),
+                      location != null
+                          ? const SizedBox(
+                              width: 8,
+                            )
+                          : Container(),
                       Container(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 6, vertical: 1),
@@ -221,7 +226,7 @@ Future menuFrameSheet(
                   ),
                   // PRICE
                   Text(
-                    '${Constant.currencyCode}$price',
+                    '${Constant.currencyCode}${formatNumberWithThousandsSeparator(price!)}',
                     style: TextStyle(
                         color: Warna.biru,
                         fontSize: 20,
@@ -234,9 +239,11 @@ Future menuFrameSheet(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       TextButton.icon(
-                        onPressed: () => onTapLike!(setState(() {
-                          isLike = !isLike;
-                        },)),
+                        onPressed: () => onTapLike!(setState(
+                          () {
+                            isLike = !isLike;
+                          },
+                        )),
                         // onPressed: () {
                         //   setState(() {
                         //     // itsFavorite = !itsFavorite;
@@ -253,14 +260,12 @@ Future menuFrameSheet(
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
-                            color: isLike
-                                ? Colors.white
-                                : Warna.regulerFontColor,
+                            color:
+                                isLike ? Colors.white : Warna.regulerFontColor,
                           ),
                         ),
                         style: TextButton.styleFrom(
-                          backgroundColor:
-                              isLike ? Warna.like : Colors.white,
+                          backgroundColor: isLike ? Warna.like : Colors.white,
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(53)),
                           side: BorderSide(
@@ -269,27 +274,27 @@ Future menuFrameSheet(
                         ),
                       ),
                       const Spacer(),
-                      // TextButton.icon(
-                      //   onPressed: () {},
-                      //   icon: Icon(
-                      //     Icons.share,
-                      //     color: Warna.abu4,
-                      //     size: 20,
-                      //   ),
-                      //   label: Text(
-                      //     'Bagikan',
-                      //     style: TextStyle(
-                      //       fontSize: 13,
-                      //       fontWeight: FontWeight.w600,
-                      //       color: Warna.regulerFontColor,
-                      //     ),
-                      //   ),
-                      //   style: TextButton.styleFrom(
-                      //     shape: RoundedRectangleBorder(
-                      //         borderRadius: BorderRadius.circular(53)),
-                      //     side: BorderSide(color: Warna.abu4, width: 1),
-                      //   ),
-                      // ),
+                      TextButton.icon(
+                        onPressed: () {},
+                        icon: Icon(
+                          Icons.share,
+                          color: Warna.abu4,
+                          size: 20,
+                        ),
+                        label: Text(
+                          'Bagikan',
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: Warna.regulerFontColor,
+                          ),
+                        ),
+                        style: TextButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(53)),
+                          side: BorderSide(color: Warna.abu4, width: 1),
+                        ),
+                      ),
                     ],
                   ),
                   const SizedBox(

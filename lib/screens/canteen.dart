@@ -58,6 +58,8 @@ class _CanteenScreenState extends State<CanteenScreen>
   int orderCount = 0;
   String selectedTab = 'Semua';
   late TabController categoryTabController;
+  List<Menu> allMenuItems = []; // Original menu items
+  List<Menu> filteredMenuItems = [];
   TextEditingController searchTextController = TextEditingController();
   List<Map<String, dynamic>> orderMenuCount = [];
   Map<String, dynamic> organizationMaps = {};
@@ -73,6 +75,25 @@ class _CanteenScreenState extends State<CanteenScreen>
     super.initState();
     // categoryTabController = TabController(length: menuMaps.length, vsync: this);
     onEnterPage();
+
+    // Listen for changes in the search input
+    searchTextController.addListener(() {
+      filterSearchResults();
+    });
+  }
+
+  void filterSearchResults() {
+    setState(() {
+      if (searchTextController.text.isEmpty) {
+        filteredMenuItems = allMenuItems;
+      } else {
+        filteredMenuItems = allMenuItems.where((menu) {
+          return menu.menuName!.toLowerCase().contains(
+                searchTextController.text.toLowerCase(),
+              );
+        }).toList();
+      }
+    });
   }
 
   Future<void> onEnterPage() async {
@@ -121,6 +142,9 @@ class _CanteenScreenState extends State<CanteenScreen>
 
       photoMerchant = AppConfig.URL_IMAGES_PATH +
           merchantDataResponse!.data!.merchantPhoto!;
+
+      allMenuItems = menuMaps['Semua']!;
+      filteredMenuItems = allMenuItems;
     });
     log("$dataMerchant");
     log("data menu -> ${json.encode(menusMerchant)}");
@@ -191,15 +215,24 @@ class _CanteenScreenState extends State<CanteenScreen>
   }) {
     if (isLike) {
       unLikeMenu(context,
-          isLike: isLike, menuId: menuId, updateState: updateState, menuItem: menuItem);
+          isLike: isLike,
+          menuId: menuId,
+          updateState: updateState,
+          menuItem: menuItem);
     } else {
       likeMenu(context,
-          isLike: isLike, menuId: menuId, updateState: updateState, menuItem: menuItem);
+          isLike: isLike,
+          menuId: menuId,
+          updateState: updateState,
+          menuItem: menuItem);
     }
   }
 
   Future<void> likeMenu(BuildContext context,
-      {bool isLike = false, int menuId = 0, Function? updateState, Menu? menuItem}) async {
+      {bool isLike = false,
+      int menuId = 0,
+      Function? updateState,
+      Menu? menuItem}) async {
     PostMenuLikeResponse response = await FetchController(
       endpoint: 'menus/$menuId/like?userId=${AppConfig.USER_ID}',
       fromJson: (json) => PostMenuLikeResponse.fromJson(json),
@@ -223,7 +256,10 @@ class _CanteenScreenState extends State<CanteenScreen>
   }
 
   Future<void> unLikeMenu(BuildContext context,
-      {bool isLike = false, int menuId = 0, Function? updateState, Menu? menuItem}) async {
+      {bool isLike = false,
+      int menuId = 0,
+      Function? updateState,
+      Menu? menuItem}) async {
     PostMenuUnlikeResponse response = await FetchController(
       endpoint: 'menus/$menuId/unlike?userId=${AppConfig.USER_ID}',
       fromJson: (json) => PostMenuUnlikeResponse.fromJson(json),
@@ -794,8 +830,11 @@ class _CanteenScreenState extends State<CanteenScreen>
                 onPressed: () {
                   navigateTo(
                       context,
-                      const AddEditMenuScreen(
+                      AddEditMenuScreen(
                         isEdit: false,
+                        merchantIsDanus: dataMerchant?.danusInformation != null
+                            ? true
+                            : false,
                       ));
                 },
                 icon: Icon(
@@ -1006,7 +1045,7 @@ class _CanteenScreenState extends State<CanteenScreen>
                               "${AppConfig.URL_IMAGES_PATH}${item.menuPhoto}",
                           productName: item.menuName!,
                           description: item.menuDesc!,
-                          price: item.menuPrice!.toString(),
+                          price: item.menuPrice!,
                           likes: item.menuLikes!.toString(),
                           count: item.menuStock!.toString(),
                           sold: item.menuSolds ?? 0,
@@ -1049,7 +1088,7 @@ class _CanteenScreenState extends State<CanteenScreen>
                               "${AppConfig.URL_IMAGES_PATH}${item.menuPhoto}",
                           productName: item.menuName!,
                           description: item.menuDesc!,
-                          price: item.menuPrice!.toString(),
+                          price: item.menuPrice!,
                           likes: item.menuLikes!.toString(),
                           count: item.menuStock!.toString(),
                           sold: item.menuSolds ?? 0,
@@ -1129,55 +1168,55 @@ class _CanteenScreenState extends State<CanteenScreen>
     );
   }
 
-  Widget searchBarStore() {
-    return Container(
-        // height: 50,
-        // width: double.infinity,
-        // padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 4),
-        margin: const EdgeInsets.symmetric(horizontal: 0, vertical: 4),
-        child: CTextField(
-          controller: searchTextController,
-          hintText: 'Jajan Apa hari ini?',
-          borderColor: Warna.abu4,
-          borderRadius: 58,
-          maxLines: 1,
-          textInputAction: TextInputAction.done,
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 18, vertical: 3),
-          onSubmitted: (p0) {
-            // setState(() {
-            //   searchDone = true;
-            // });
-          },
-          onChanged: (p0) {
-            // _filterSearch();
-            // setState(() {
-            //   searchDone = true;
-            // });
-            // if(searchTextController.text.isNotEmpty) {
-            //   setState(() {
-            //     _showSuggestions = !_showSuggestions;
-            //   });
-            // }
-          },
-          prefixIcon: IconButton(
-              onPressed: () {
-                // setState(() {
-                //   searchDone = !searchDone;
-                // });
-                // setState(() {
-                //   // searchDone = !searchDone;
-                //   _showSuggestions = !_showSuggestions;
-                // });
-              },
-              padding: EdgeInsets.zero,
-              iconSize: 15,
-              color: Warna.biru,
-              icon: const Icon(
-                Icons.search,
-              )),
-        ));
-  }
+  // Widget searchBarStore() {
+  //   return Container(
+  //       // height: 50,
+  //       // width: double.infinity,
+  //       // padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 4),
+  //       margin: const EdgeInsets.symmetric(horizontal: 0, vertical: 4),
+  //       child: CTextField(
+  //         controller: searchTextController,
+  //         hintText: 'Jajan Apa hari ini?',
+  //         borderColor: Warna.abu4,
+  //         borderRadius: 58,
+  //         maxLines: 1,
+  //         textInputAction: TextInputAction.done,
+  //         contentPadding:
+  //             const EdgeInsets.symmetric(horizontal: 18, vertical: 3),
+  //         onSubmitted: (p0) {
+  //           // setState(() {
+  //           //   searchDone = true;
+  //           // });
+  //         },
+  //         onChanged: (p0) {
+  //           // _filterSearch();
+  //           // setState(() {
+  //           //   searchDone = true;
+  //           // });
+  //           // if(searchTextController.text.isNotEmpty) {
+  //           //   setState(() {
+  //           //     _showSuggestions = !_showSuggestions;
+  //           //   });
+  //           // }
+  //         },
+  //         prefixIcon: IconButton(
+  //             onPressed: () {
+  //               // setState(() {
+  //               //   searchDone = !searchDone;
+  //               // });
+  //               // setState(() {
+  //               //   // searchDone = !searchDone;
+  //               //   _showSuggestions = !_showSuggestions;
+  //               // });
+  //             },
+  //             padding: EdgeInsets.zero,
+  //             iconSize: 15,
+  //             color: Warna.biru,
+  //             icon: const Icon(
+  //               Icons.search,
+  //             )),
+  //       ));
+  // }
 
   Widget actionButtonCustom({VoidCallback? onPressed, IconData? icons}) {
     // leadingWidth: 90,
@@ -1689,52 +1728,52 @@ class _CanteenScreenState extends State<CanteenScreen>
     );
   }
 
-  Widget searchMenuBody() {
-    return ReloadIndicatorType1(
-      onRefresh: refreshPage,
-      child: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        child: ListView.builder(
-          itemCount: menuMaps['Semua']?.length ?? 0,
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemBuilder: (context, index) {
-            List<Menu> menuItems = menuMaps['Semua']!;
-            Menu item = menuItems[index];
-            return Container(
-              color: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 25),
-              child: ProductCardBoxHorizontal(
-                onPressed: () {
-                  log('product: ${item.menuName}');
-                  // storeMenuCountSheet();
-                  menuFrameSheet(context);
-                },
-                productName: item.menuName!,
-                description: item.menuDesc ?? 'deskripsi menu',
-                price: item.menuPrice,
-                likes: item.menuLikes.toString(),
-                rate: item.menuRate.toString(),
-                count: item.menuStock.toString(),
-                onTapAdd: () {
-                  setState(() {
-                    item.menuStock = item.menuStock! + 1;
-                  });
-                  // print(menuItem[index]['count']);
-                },
-                onTapRemove: () {
-                  setState(() {
-                    item.menuStock = item.menuStock! - 1;
-                  });
-                  // print(orderCount);
-                },
-              ),
-            );
-          },
-        ),
-      ),
-    );
-  }
+  // Widget searchMenuBody() {
+  //   return ReloadIndicatorType1(
+  //     onRefresh: refreshPage,
+  //     child: SingleChildScrollView(
+  //       physics: const BouncingScrollPhysics(),
+  //       child: ListView.builder(
+  //         itemCount: menuMaps['Semua']?.length ?? 0,
+  //         shrinkWrap: true,
+  //         physics: const NeverScrollableScrollPhysics(),
+  //         itemBuilder: (context, index) {
+  //           List<Menu> menuItems = menuMaps['Semua']!;
+  //           Menu item = menuItems[index];
+  //           return Container(
+  //             color: Colors.white,
+  //             padding: const EdgeInsets.symmetric(horizontal: 25),
+  //             child: ProductCardBoxHorizontal(
+  //               onPressed: () {
+  //                 log('product: ${item.menuName}');
+  //                 // storeMenuCountSheet();
+  //                 menuFrameSheet(context);
+  //               },
+  //               productName: item.menuName!,
+  //               description: item.menuDesc ?? 'deskripsi menu',
+  //               price: item.menuPrice,
+  //               likes: item.menuLikes.toString(),
+  //               rate: item.menuRate.toString(),
+  //               count: item.menuStock.toString(),
+  //               onTapAdd: () {
+  //                 setState(() {
+  //                   item.menuStock = item.menuStock! + 1;
+  //                 });
+  //                 // print(menuItem[index]['count']);
+  //               },
+  //               onTapRemove: () {
+  //                 setState(() {
+  //                   item.menuStock = item.menuStock! - 1;
+  //                 });
+  //                 // print(orderCount);
+  //               },
+  //             ),
+  //           );
+  //         },
+  //       ),
+  //     ),
+  //   );
+  // }
 
   // Widget searchMenuBody() {
   //   return ReloadIndicatorType1(
@@ -1787,93 +1826,87 @@ class _CanteenScreenState extends State<CanteenScreen>
   //   );
   // }
 
-  // Map<String, Map<String, Map<String, dynamic>>> menuMaps = {
-  //   'Semua': {
-  //     'menu 1': {
-  //       'id': '1',
-  //       'nama': 'nama menu',
-  //       'rate': '4.0',
-  //       'likes': '100',
-  //       'price': 10000,
-  //       'count': 0,
-  //       'sold': 100,
-  //       'custom': true,
-  //     },
-  //     'menu 2': {
-  //       'id': '2',
-  //       'nama': 'nama menu',
-  //       'rate': '4.0',
-  //       'likes': '100',
-  //       'price': 10000,
-  //       'count': 0,
-  //       'sold': 100,
-  //       'custom': false,
-  //     },
+  Widget searchMenuBody() {
+    return ReloadIndicatorType1(
+      onRefresh: refreshPage,
+      child: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        child: ListView.builder(
+          itemCount: filteredMenuItems.length,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemBuilder: (context, index) {
+            Menu item = filteredMenuItems[index];
+            return Container(
+              color: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 25),
+              child: ProductCardBoxHorizontal(
+                onPressed: () {
+                  log('product: ${item.menuName}');
+                  // storeMenuCountSheet();
+                  menuFrameSheet(context,
+                      menuId: item.id,
+                      merchantId: item.merchantId,
+                      imgUrl: "${AppConfig.URL_IMAGES_PATH}${item.menuPhoto}",
+                      productName: item.menuName,
+                      description: item.menuDesc,
+                      price: item.menuPrice,
+                      rate: '${item.menuRate}',
+                      likes: '${item.menuLikes}',
+                      isLike: item.isLike!);
+                },
+                isCustom: item.variants!.isEmpty ? false : true,
+                productId: '${item.id}',
+                imgUrl: "${AppConfig.URL_IMAGES_PATH}${item.menuPhoto}",
+                productName: item.menuName!,
+                description: item.menuDesc ?? 'deskripsi menu',
+                price: item.menuPrice,
+                likes: item.menuLikes.toString(),
+                rate: item.menuRate.toString(),
+                count: item.menuStock.toString(),
+                onTapAdd: () {
+                  setState(() {
+                    item.menuStock = item.menuStock! + 1;
+                  });
+                  // print(menuItem[index]['count']);
+                },
+                onTapRemove: () {
+                  setState(() {
+                    item.menuStock = item.menuStock! - 1;
+                  });
+                  // print(orderCount);
+                },
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
 
-  //   },
-  //   'kategori 1': {
-  //     'menu 1': {
-  //       'id': '7',
-  //       'nama': 'nama menu kategori 1',
-  //       'rate': '4.0',
-  //       'likes': '100',
-  //       'price': 10000,
-  //       'count': 0,
-  //       'sold': 100,
-  //       'custom': false,
-  //     },
-  //     'menu 2': {
-  //       'id': '8',
-  //       'nama': 'nama menu',
-  //       'rate': '4.0',
-  //       'likes': '100',
-  //       'price': 10000,
-  //       'count': 0,
-  //       'sold': 100,
-  //       'custom': false,
-  //     },
-
-  //   },
-  //   'kategori 2': {
-  //     'menu 1': {
-  //       'id': '11',
-  //       'nama': 'nama menu kategori 2',
-  //       'rate': '4.0',
-  //       'likes': '100',
-  //       'price': 10000,
-  //       'count': 0,
-  //       'sold': 100,
-  //       'custom': false,
-  //     },
-
-  //   },
-  //   'kategori 3': {
-  //     'menu 1': {
-  //       'id': '15',
-  //       'nama': 'nama menu kategori 3',
-  //       'rate': '4.0',
-  //       'likes': '100',
-  //       'price': 10000,
-  //       'count': 0,
-  //       'sold': 100,
-  //       'custom': false,
-  //     },
-
-  //   },
-  //   'kategori 4': {
-  //     'menu 1': {
-  //       'id': '19',
-  //       'nama': 'nama menu kategori 4',
-  //       'rate': '4.0',
-  //       'likes': '100',
-  //       'price': 10000,
-  //       'count': 0,
-  //       'sold': 100,
-  //       'custom': false,
-  //     },
-
-  //   }
-  // };
+  Widget searchBarStore() {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 0, vertical: 4),
+      child: CTextField(
+        controller: searchTextController,
+        hintText: 'Jajan Apa hari ini?',
+        borderColor: Warna.abu4,
+        borderRadius: 58,
+        maxLines: 1,
+        textInputAction: TextInputAction.done,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 3),
+        prefixIcon: IconButton(
+          onPressed: () {
+            // Optionally, handle search button press here
+          },
+          padding: EdgeInsets.zero,
+          iconSize: 15,
+          color: Warna.biru,
+          icon: const Icon(Icons.search),
+        ),
+      ),
+    );
+  }
 
   List<Map<String, dynamic>> variantMenuTypeList = [
     {
