@@ -5,9 +5,12 @@ import 'package:cfood/custom/CButtons.dart';
 import 'package:cfood/custom/CPageMover.dart';
 import 'package:cfood/custom/card.dart';
 import 'package:cfood/custom/page_item_void.dart';
+import 'package:cfood/custom/popup_dialog.dart';
 import 'package:cfood/custom/reload_indicator.dart';
 import 'package:cfood/model/get_cart_user_response.dart';
+import 'package:cfood/model/update_cartitem_response.dart';
 import 'package:cfood/model/get_calculate_cart_response.dart';
+import 'package:cfood/model/delete_cart_response.dart';
 import 'package:cfood/repository/fetch_controller.dart';
 import 'package:cfood/screens/canteen.dart';
 import 'package:cfood/style.dart';
@@ -34,12 +37,50 @@ class _CartScreenState extends State<CartScreen> {
   CalculateCartResponse? calculateCartResponse;
   CalculateCartData? calculateCartData;
 
+  DeleteCartResponse? deleteCartResponse;
+  bool? deleteCartData;
+
+  UpdateCartItemResponse? updateCartItemResponse;
+  UpdateCartItemData? updateCartItemData;
+
   int? selectCartId;
 
   @override
   void initState() {
     super.initState();
     getAllCarts();
+  }
+
+  Future<void> deleteCart(int cartId) async {
+    deleteCartResponse = await FetchController(
+      endpoint: 'carts/$cartId',
+      fromJson: (json) => DeleteCartResponse.fromJson(json),
+    ).deleteData();
+
+    setState(() {
+      deleteCartData = deleteCartResponse?.data;
+      log(deleteCartData.toString());
+      if (selectCartId == cartId) {
+        selectCartId = -1;
+      }
+      getAllCarts();
+    });
+  }
+
+  String getVariantDescription(List<dynamic> variants) {
+    if (variants.isEmpty) {
+      return '';
+    }
+
+    List<String> variantOptionNames = [];
+
+    for (var variant in variants) {
+      for (var option in variant['variantOptions']) {
+        variantOptionNames.add(option['variantOptionName']);
+      }
+    }
+
+    return variantOptionNames.join(", ");
   }
 
   Future<void> getAllCarts() async {
@@ -66,10 +107,24 @@ class _CartScreenState extends State<CartScreen> {
     });
   }
 
+  Future<void> updateCartItem(int cartItemId, String type) async {
+    updateCartItemResponse = await FetchController(
+      endpoint: 'carts/item/$cartItemId?quantity=${type == "add" ? 1 : -1}',
+      fromJson: (json) => UpdateCartItemResponse.fromJson(json),
+    ).putData({});
+
+    setState(() {
+      updateCartItemData = updateCartItemResponse?.data;
+      log(updateCartItemData.toString());
+      getAllCarts();
+    });
+  }
+
   Future<void> refreshPage() async {
-    await Future.delayed(const Duration(seconds: 10));
+    await Future.delayed(const Duration(seconds: 3));
 
     print('reload...');
+    getAllCarts();
   }
 
   @override
@@ -101,13 +156,14 @@ class _CartScreenState extends State<CartScreen> {
       ),
       backgroundColor: Colors.white,
       body: cartBodyList(),
-      floatingActionButton: calculateCartResponse == null
-          ? Container()
-          : storeMenuCountInfo(
-              calculateCartData!.cartId,
-              calculateCartData!.totalMenus,
-              calculateCartData!.totalItems,
-              calculateCartData!.totalPrices),
+      floatingActionButton:
+          (calculateCartResponse == null || selectCartId != -1)
+              ? Container()
+              : storeMenuCountInfo(
+                  calculateCartData!.cartId,
+                  calculateCartData!.totalMenus,
+                  calculateCartData!.totalItems,
+                  calculateCartData!.totalPrices),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButtonAnimator: FloatingActionButtonAnimator.scaling,
     );
@@ -245,10 +301,22 @@ class _CartScreenState extends State<CartScreen> {
                                     ),
                                   ),
                                   const Spacer(),
-                                  Icon(
-                                    UIcons.solidRounded.trash,
-                                    color: Warna.like,
-                                    size: 25,
+                                  InkWell(
+                                    onTap: () {
+                                      // context.pushReplacementNamed('main');
+                                      showMyCustomDialog(context,
+                                          text:
+                                              'Apakah Anda yakin untuk menghapus keranjang ini?\n',
+                                          colorYes: Warna.like, onTapYes: () {
+                                        navigateBack(context);
+                                        deleteCart(store!.cartId);
+                                      });
+                                    },
+                                    child: Icon(
+                                      UIcons.solidRounded.trash,
+                                      color: Warna.like,
+                                      size: 25,
+                                    ),
                                   )
                                 ],
                               ),
@@ -274,12 +342,28 @@ class _CartScreenState extends State<CartScreen> {
                                     productName: menuItem.menuName,
                                     description: menuItem.variants.isEmpty
                                         ? ''
-                                        : 'Variant',
+                                        : getVariantDescription(
+                                            menuItem.variants),
                                     price: menuItem.totalPriceMenu *
                                         menuItem.quantity,
                                     count: menuItem.quantity.toString(),
-                                    onTapAdd: () {},
-                                    onTapRemove: () {},
+                                    // isCustom: menuItem.variants.isNotEmpty
+                                    // ? true
+                                    // : false,
+                                    onTapAdd: () {
+                                      if (menuItem.quantity < menuItem.stock) {
+                                        
+                                        updateCartItem(
+                                            menuItem.cartItemId, "add");
+                                      }
+                                    },
+                                    onTapRemove: () {
+                                      if (menuItem.quantity > 0) {
+                                       
+                                        updateCartItem(
+                                            menuItem.cartItemId, "reduce");
+                                      }
+                                    },
                                   ),
                                 );
                               },
