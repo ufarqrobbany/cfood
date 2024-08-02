@@ -8,7 +8,10 @@ import 'package:flutter_chat_bubble/chat_bubble.dart';
 import 'package:uicons/uicons.dart';
 
 class ChatScreen extends StatefulWidget {
-  const ChatScreen({super.key});
+  final bool? isMerchant;
+  final int? userId;
+  final int? merchantId;
+  const ChatScreen({super.key, this.isMerchant, this.userId, this.merchantId,});
 
   @override
   State<ChatScreen> createState() => _ChatScreenState();
@@ -68,6 +71,18 @@ class _ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateM
                 ),
               ),
               const SizedBox(width: 20,),
+              widget.isMerchant! ? Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Nama toko / merchant', style: AppTextStyles.subTitle,),
+                  Text('Nama Penjual disii', style: TextStyle(
+                    fontSize: 15,
+                    color: Warna.abu2,
+                    fontWeight: FontWeight.w500,
+                  ),)
+                ],
+              ) :
               const Text('Chat', style: AppTextStyles.subTitle,),
             ],
           ),

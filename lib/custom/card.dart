@@ -377,7 +377,7 @@ class ProductCardBoxHorizontal extends StatelessWidget {
                     constraints: BoxConstraints(
                       minWidth: innerContentSize ?? 120,
                       // maxWidth: double.infinity,
-                      maxWidth: 120,
+                      maxWidth: innerContentSize ?? 120,
                     ),
                     child: Stack(
                       alignment: Alignment.bottomCenter,
@@ -433,7 +433,7 @@ class ProductCardBoxHorizontal extends StatelessWidget {
                     height: innerContentSize ?? 120,
                     constraints: BoxConstraints(
                       minWidth: innerContentSize ?? 120,
-                      maxWidth: 120,
+                      maxWidth: innerContentSize ?? 120,
                     ),
                     decoration: BoxDecoration(
                         color: Warna.abu, borderRadius: BorderRadius.circular(8)
