@@ -1,12 +1,15 @@
 import 'package:cfood/custom/CButtons.dart';
 import 'package:cfood/custom/CPageMover.dart';
+import 'package:cfood/custom/CToast.dart';
 import 'package:cfood/custom/card.dart';
 import 'package:cfood/custom/order_status_timeline_tile.dart';
+import 'package:cfood/model/get_detail_merchant_response.dart';
 import 'package:cfood/screens/reviews.dart';
 import 'package:cfood/style.dart';
 import 'package:cfood/utils/common.dart';
 import 'package:cfood/utils/constant.dart';
 import 'package:flutter/material.dart';
+import 'package:toast/toast.dart';
 import 'package:uicons/uicons.dart';
 
 Future menuFrameSheet(
@@ -326,25 +329,32 @@ Future menuFrameSheet(
 }
 
 Future menuCustomeFrameSheet(
-  BuildContext? context, {
-  final String? imgUrl,
-  final String? productName,
-  final String? description,
-  final int? price,
-  final String? rate,
-  final String? likes,
-  final String? count,
-  final int sold = 0,
-  final VoidCallback? onPressed,
-  final VoidCallback? onTapAdd,
-  final VoidCallback? onTapRemove,
-  final double? innerContentSize,
-  final List<Map<String, dynamic>>? variantTypeList,
-  final VoidCallback? onPressedAddOrder,
+  BuildContext context, {
+  required String imgUrl,
+  required String productName,
+  required String description,
+  required int price,
+  required String rate,
+  required String likes,
+  required int count,
+  required int subTotal,
+  int sold = 0,
+  required VoidCallback onPressed,
+  required Function(int, int, List<VariantOption>) onTapAddOrder,
+  required Function(Function) onTapAdd,
+  required Function(Function) onTapRemove,
+  required double innerContentSize,
+  required List<Variant> variantTypeList,
+  required VariantOption? variantSelected,
+  required int total,
 }) {
+  int selectedCount = count;
+  int calculatedSubTotal = subTotal;
+  int calculatedTotal = total;
+  bool isLoading = false;
+  ToastContext().init(context);
   return showModalBottomSheet(
-    context: context!,
-    // barrierColor: Colors.transparent,
+    context: context,
     backgroundColor: Colors.white,
     enableDrag: true,
     showDragHandle: true,
@@ -368,69 +378,82 @@ Future menuCustomeFrameSheet(
                   ProductCardBoxHorizontal(
                     imgUrl: imgUrl,
                     productName: productName,
-                    price: price,
+                    price: calculatedSubTotal != 0 ?calculatedSubTotal : price,
                     rate: rate,
                     likes: likes,
                     sold: sold,
-                    count: count!,
-                    description: description!,
+                    count: selectedCount.toString(),
+                    description: description,
                     isCustom: false,
-                    // productId: product,
-                    onTapAdd: onTapAdd,
-                    onTapRemove: onTapRemove,
+                    onTapAdd: () {
+                      setState(() {
+                        selectedCount++;
+                        calculatedSubTotal = price * selectedCount;
+                        calculatedTotal = calculatedSubTotal;
+                      });
+                      onTapAdd(() {});
+                    },
+                    onTapRemove: () {
+                      if (selectedCount > 0) {
+                        setState(() {
+                          selectedCount--;
+                          calculatedSubTotal = price * selectedCount;
+                          calculatedTotal = calculatedSubTotal;
+                        });
+                        onTapRemove(() {});
+                      }
+                    },
                     innerContentSize: innerContentSize,
                     hideBorder: true,
                   ),
                   ListView.builder(
-                    itemCount: variantTypeList!.length,
+                    itemCount: variantTypeList.length,
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    // padding: const EdgeInsets.symmetric(horizontal: 25),
                     itemBuilder: (context, indexType) {
-                      List<Map<String, dynamic>> variantItems =
-                          variantTypeList[indexType]['variants'];
+                      List<VariantOption>? variantItems = variantTypeList[indexType].variantOptions;
                       return Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          // Variant TYpe Title
                           Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 15, vertical: 8),
+                            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
                             width: double.infinity,
                             decoration: BoxDecoration(
                               color: Warna.abu,
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(
-                              variantTypeList[indexType]['name'].toString(),
-                              style: const TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w500,
-                              ),
+                              variantTypeList[indexType].variantName.toString(),
+                              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
                             ),
                           ),
-
                           ListView.builder(
-                            itemCount: variantItems.length,
+                            itemCount: variantItems?.length,
                             shrinkWrap: true,
                             physics: const NeverScrollableScrollPhysics(),
                             itemBuilder: (context, indexVariant) {
-                              var variant = variantItems[indexVariant];
-                              return ListTile(
-                                title: Text(variant['name'].toString()),
-                                subtitle: Text(Constant.currencyCode +
-                                    variant['cost'].toString()),
-                                trailing: const Icon(
-                                  Icons.check_box_outline_blank,
-                                ),
-                                shape: indexVariant == variantItems.length - 1
-                                    ? null
-                                    : Border(
-                                        bottom: BorderSide(
-                                            color: Warna.abu, width: 1.5)),
+                              VariantOption variant = variantItems![indexVariant];
+                              return CheckboxListTile(
+                                value: variant.selected,
+                                enabled: variantSelected != null ? variantSelected == variant : true,
+                                onChanged: (value) {
+                                  setState(() {
+                                    variant.selected = value!;
+                                    if (value) {
+                                      calculatedTotal = calculatedSubTotal + variant.variantOptionPrice!;
+                                      variantSelected = variant;
+                                    } else {
+                                      calculatedTotal = calculatedSubTotal - variant.variantOptionPrice!;
+                                      variantSelected = null;
+                                    }
+                                  });
+                                },
+                                title: Text(variant.variantOptionName.toString()),
+                                subtitle: Text(Constant.currencyCode + variant.variantOptionPrice.toString()),
+                                shape: indexVariant == variantItems.length - 1 ? null : Border(bottom: BorderSide(color: Warna.abu, width: 1.5)),
                               );
                             },
-                          )
+                          ),
                         ],
                       );
                     },
@@ -440,11 +463,29 @@ Future menuCustomeFrameSheet(
                     width: double.infinity,
                     margin: const EdgeInsets.symmetric(vertical: 25),
                     child: CBlueButton(
-                      onPressed: onPressedAddOrder!,
-                      text: 'Tambah Pesanan - Rp0',
+                      isLoading: isLoading,
+                      onPressed: () async {
+                        if (calculatedTotal == 0) {
+                          showToast('Masukan input jumlah menu');
+                          return;
+                        }
+                        setState(() {
+                                  isLoading = true;
+                                });
+                        await onTapAddOrder(selectedCount, calculatedTotal, variantTypeList.expand((v) => v.variantOptions!).where((v) => v.selected!).toList());
+                        setState(() {
+                                  isLoading = false;
+                                  selectedCount = count;
+                                  calculatedSubTotal = subTotal;
+                                  calculatedTotal = total;
+                                  variantSelected = null;
+                                });
+                        Navigator.pop(context);
+                      },
+                      text: 'Tambah Pesanan - $calculatedTotal',
                       borderRadius: 54.0,
                     ),
-                  )
+                  ),
                 ],
               ),
             ),
@@ -454,6 +495,204 @@ Future menuCustomeFrameSheet(
     },
   );
 }
+
+
+// Future menuCustomeFrameSheet(
+//   BuildContext? context, {
+//   required String imgUrl,
+//   required String productName,
+//   required String description,
+//   required int price,
+//   required String rate,
+//   required String likes,
+//   required int count,
+//   required int subTotal,
+//   int sold = 0,
+//   required VoidCallback onPressed,
+//   required Function(int, int, List<VariantOption>) onTapAddOrder,
+//   required Function(Function) onTapAdd,
+//   required Function(Function) onTapRemove,
+//   required double innerContentSize,
+//   required List<Variant> variantTypeList,
+//   required VariantOption? variantSelected,
+//   required int total,
+// }) {
+//   int selectedCount = count;
+//   int calculatedSubTotal = subTotal;
+//   int calculatedTotal = total;
+//   return showModalBottomSheet(
+//     context: context!,
+//     // barrierColor: Colors.transparent,
+//     backgroundColor: Colors.white,
+//     enableDrag: true,
+//     showDragHandle: true,
+//     isScrollControlled: true,
+//     shape: const RoundedRectangleBorder(
+//       borderRadius: BorderRadius.only(
+//         topLeft: Radius.circular(20),
+//         topRight: Radius.circular(20),
+//       ),
+//     ),
+//     builder: (context) {
+//       return StatefulBuilder(
+//         builder: (context, setState) {
+//           return SingleChildScrollView(
+//             child: Container(
+//               padding: const EdgeInsets.symmetric(horizontal: 25),
+//               child: Column(
+//                 mainAxisSize: MainAxisSize.min,
+//                 crossAxisAlignment: CrossAxisAlignment.start,
+//                 children: [
+//                   ProductCardBoxHorizontal(
+//                     imgUrl: imgUrl,
+//                     productName: productName,
+//                     // price: subTotal != 0 ? subTotal : price,
+//                     price: calculatedSubTotal,
+//                     rate: rate,
+//                     likes: likes,
+//                     sold: sold,
+//                     count:selectedCount.toString(),
+//                     description: description,
+//                     isCustom: false,
+//                      onTapAdd: () {
+//                       setState(() {
+//                         selectedCount++;
+//                         calculatedSubTotal = price * selectedCount;
+//                       });
+//                       onTapAdd(() {});
+//                     },
+//                     onTapRemove: () {
+//                       if (selectedCount > 0) {
+//                         setState(() {
+//                           selectedCount--;
+//                           calculatedSubTotal = price * selectedCount;
+//                         });
+//                         onTapRemove(() {});
+//                       }
+//                     },
+//                     // productId: product,
+//                     // onTapAdd: () => onTapAdd!(setState(() {
+//                     //   count = count! + 1;
+//                     //   subTotal = (price! * count!);
+//                     // })),
+//                     // onTapRemove: () => onTapRemove!(setState(() {
+//                     //   count = count! - 1;
+//                     //   subTotal = (subTotal! - price!);
+//                     // })),
+//                     innerContentSize: innerContentSize,
+//                     hideBorder: true,
+//                   ),
+//                   ListView.builder(
+//                     itemCount: variantTypeList!.length,
+//                     shrinkWrap: true,
+//                     physics: const NeverScrollableScrollPhysics(),
+//                     // padding: const EdgeInsets.symmetric(horizontal: 25),
+//                     itemBuilder: (context, indexType) {
+//                       List<VariantOption>? variantItems =
+//                           variantTypeList[indexType].variantOptions;
+//                       return Column(
+//                         mainAxisSize: MainAxisSize.min,
+//                         children: [
+//                           // Variant TYpe Title
+//                           Container(
+//                             padding: const EdgeInsets.symmetric(
+//                                 horizontal: 15, vertical: 8),
+//                             width: double.infinity,
+//                             decoration: BoxDecoration(
+//                               color: Warna.abu,
+//                               borderRadius: BorderRadius.circular(8),
+//                             ),
+//                             child: Text(
+//                               variantTypeList[indexType].variantName.toString(),
+//                               style: const TextStyle(
+//                                 fontSize: 13,
+//                                 fontWeight: FontWeight.w500,
+//                               ),
+//                             ),
+//                           ),
+
+//                           ListView.builder(
+//                             itemCount: variantItems?.length,
+//                             shrinkWrap: true,
+//                             physics: const NeverScrollableScrollPhysics(),
+//                             itemBuilder: (context, indexVariant) {
+//                               VariantOption variant =
+//                                   variantItems![indexVariant];
+//                               return CheckboxListTile(
+//                                 value: variant.selected,
+//                                  onChanged: (value) {
+//                                   setState(() {
+//                                     variant.selected = value!;
+//                                     if (value) {
+//                                       calculatedTotal = calculatedSubTotal + variant.variantOptionPrice!;
+//                                       variantSelected = variant;
+//                                     } else {
+//                                       calculatedTotal = calculatedSubTotal - variant.variantOptionPrice!;
+//                                       variantSelected = null;
+//                                     }
+//                                   });
+//                                 },
+//                                 // onChanged: (value) {
+//                                 //    setState(() {
+//                                 //     variant.selected = value;
+//                                 //   });
+//                                 //   if(value == false){
+//                                 //     setState((){
+//                                 //     total = subTotal! - variant.variantOptionPrice!;
+//                                 //     variantSelected = null;
+
+//                                 //     });
+//                                 //   } else {
+//                                 //     setState((){
+//                                 //     total = subTotal! + variant.variantOptionPrice!;
+//                                 //     variantSelected = variant;
+
+//                                 //     });
+//                                 //   }
+                                 
+//                                 // },
+//                                 title:
+//                                     Text(variant.variantOptionName.toString()),
+//                                 subtitle: Text(Constant.currencyCode +
+//                                     variant.variantOptionPrice.toString()),
+//                                 // trailing: const Icon(
+//                                 //   Icons.check_box_outline_blank,
+//                                 // ),
+//                                 shape: indexVariant == variantItems.length - 1
+//                                     ? null
+//                                     : Border(
+//                                         bottom: BorderSide(
+//                                             color: Warna.abu, width: 1.5)),
+//                               );
+//                             },
+//                           )
+//                         ],
+//                       );
+//                     },
+//                   ),
+//                   Container(
+//                     height: 50,
+//                     width: double.infinity,
+//                     margin: const EdgeInsets.symmetric(vertical: 25),
+//                     child: CBlueButton(
+//                       // onPressed: onPressedAddOrder!,
+//                        onPressed: () {
+//                         onTapAddOrder(selectedCount, calculatedTotal, variantTypeList.expand((v) => v.variantOptions).where((v) => v.selected).toList());
+//                         Navigator.pop(context);
+//                       },
+//                       text: 'Tambah Pesanan - $calculatedTotal',
+//                       borderRadius: 54.0,
+//                     ),
+//                   )
+//                 ],
+//               ),
+//             ),
+//           );
+//         },
+//       );
+//     },
+//   );
+// }
 
 Future statusOrderSheet(
   BuildContext? context, {

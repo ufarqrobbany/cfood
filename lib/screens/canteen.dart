@@ -11,6 +11,7 @@ import 'package:cfood/custom/card.dart';
 import 'package:cfood/custom/page_item_void.dart';
 import 'package:cfood/custom/popup_dialog.dart';
 import 'package:cfood/custom/reload_indicator.dart';
+import 'package:cfood/model/add_cart_response.dart';
 import 'package:cfood/model/add_merchants_response.dart';
 import 'package:cfood/model/error_response.dart';
 import 'package:cfood/model/follow_merchant_response.dart';
@@ -75,6 +76,7 @@ class _CanteenScreenState extends State<CanteenScreen>
   DataSpecificMenu? dataSpecificMenu;
 
   int selectedMenuId = 0;
+  DataAddCart? dataAddCartInfo;
 
   @override
   void initState() {
@@ -355,18 +357,29 @@ class _CanteenScreenState extends State<CanteenScreen>
     String? menuName,
     int? price,
     int? menuCount,
+    int? menuStock,
+    int? subTotal,
+    Menu? menuItem,
+    Function? updateState,
   }) async {
-    // fungsi penjumlahan data data
+    if (menuCount! < menuStock!) {
+      setState(() {
+        menuCount = menuCount! + 1;
+        subTotal = (price! * menuCount!);
 
-    // lalu post api
-
-    orderCount = orderMenuCount.length;
-    // var priceTotal = orderMenuCount['price'].;
-    setState(() {
-      menuOrderCountInfo = true;
-    });
-
-    log(orderMenuCount.toString());
+        menuItem = Menu(
+          selectedCount: menuCount,
+          subTotal: subTotal,
+        );
+      });
+      updateState!(() {
+        menuCount = menuCount! + 1;
+        subTotal = (price! * menuCount!);
+      });
+    } else {
+      // Show a message that stock limit has been reached
+      showToast('Stock tidak mencukupi');
+    }
   }
 
   Future<void> deleteOrderMenu({
@@ -374,18 +387,26 @@ class _CanteenScreenState extends State<CanteenScreen>
     String? menuName,
     int? price,
     int? menuCount,
+    int? menuStock,
+    int? subTotal,
+    Menu? menuItem,
+    Function? updateState,
   }) async {
-    // fungsi penjumlahan data dat
-
-    // lalu post ke api
-
-    if (orderMenuCount.isEmpty) {
+    if (menuCount! < 0) {
       setState(() {
-        menuOrderCountInfo = false;
+        menuCount = menuCount! - 1;
+        subTotal = (subTotal! - price!);
+
+        menuItem = Menu(
+          selectedCount: menuCount,
+          subTotal: subTotal,
+        );
+      });
+      updateState!(() {
+        menuCount = menuCount! + 1;
+        subTotal = (price! * menuCount!);
       });
     }
-
-    log(orderMenuCount.toString());
   }
 
   Future<void> addToCart(
@@ -419,16 +440,30 @@ class _CanteenScreenState extends State<CanteenScreen>
     required int quantity,
     List<Map<String, dynamic>>? variants,
   }) async {
-    await FetchController(
-      endpoint: '',
-      fromJson: (json) => ResponseHendler.fromJson(json),
+    AddCartResponse? info = await FetchController(
+      endpoint: 'carts/add',
+      fromJson: (json) => AddCartResponse.fromJson(json),
     ).postData({
       'userId': AppConfig.USER_ID,
       'merchantId': dataMerchant!.merchantId,
       'menuId': menuId,
       'quantity': quantity, // positif untuk tambah, negatif untuk kurangi
-      'variants': variants,
+      'variants': variants ?? [],
     });
+
+    log({
+      'userId': AppConfig.USER_ID,
+      'merchantId': dataMerchant!.merchantId,
+      'menuId': menuId,
+      'quantity': quantity, // positif untuk tambah, negatif untuk kurangi
+      'variants': variants ?? [],
+    }.toString());
+
+    if (info != null) {
+      setState(() {
+        dataAddCartInfo = info.data!;
+      });
+    }
   }
 
   @override
@@ -1126,6 +1161,7 @@ class _CanteenScreenState extends State<CanteenScreen>
                         onPressed: () {
                           log('product: ${item.menuName}');
                           // storeMenuCountSheet();
+
                           menuFrameSheet(
                             context,
                             menuId: item.id!,
@@ -1150,48 +1186,110 @@ class _CanteenScreenState extends State<CanteenScreen>
                                   menuItem: item);
                             },
                             onPressed: () {},
-                            onTapAdd: () {},
+                            onTapAdd: () {
+                              updateCart(menuId: item.id!, quantity: 1,);
+                            },
                             onTapRemove: () {},
                           );
                         },
                         imgUrl: "${AppConfig.URL_IMAGES_PATH}${item.menuPhoto}",
                         productName: item.menuName!,
                         description: item.menuDesc ?? 'deskripsi menu',
-                        price: item.menuPrice,
+                        price:
+                            item.subTotal != 0 ? item.subTotal : item.menuPrice,
                         likes: item.menuLikes.toString(),
                         rate: item.menuRate.toString(),
                         // count: item.menuStock!.toString(),
                         count: item.selectedCount!.toString(),
                         // isCustom: item.isDanus!,
                         isCustom: item.variants!.isNotEmpty ? true : false,
-                        onTapAdd: () {
+                        onTapAdd: () async {
                           if (item.variants!.isNotEmpty) {
+                            int selectedCount = item.selectedCount!;
+                            int price = item.menuPrice!;
+                            int subtotal = price * selectedCount;
                             menuCustomeFrameSheet(
                               context,
+                              imgUrl:
+                                  "${AppConfig.URL_IMAGES_PATH}${item.menuPhoto}",
                               productName: item.menuName!,
                               description: item.menuDesc ?? '',
-                              price: item.menuPrice,
+                              price: item.menuPrice!,
+                              subTotal: item.subTotal!,
                               likes: item.menuLikes.toString(),
                               rate: item.menuRate.toString(),
-                              count: item.selectedCount.toString(),
+                              count: item.selectedCount!,
                               sold: item.menuSolds ?? 0,
                               innerContentSize: 110,
-                              variantTypeList: variantMenuTypeList,
-                              onTapAdd: () {},
-                              onTapRemove: () {},
-                              onPressedAddOrder: () {},
+                              variantSelected: null,
+                              total: subtotal,
+                              variantTypeList: item.variants!,
+                              onPressed: () {
+                                
+                              },
+                              onTapAdd: (Function updateState) {
+                                setState(() {
+                                  selectedCount++;
+                                });
+                                updateState();
+                              },
+                              onTapRemove: (Function updateState) {
+                                if (selectedCount > 0) {
+                                  setState(() {
+                                    selectedCount--;
+                                  });
+                                  updateState();
+                                }
+                              },
+                              onTapAddOrder: (selectedCount, calculatedTotal,
+                                  selectedVariants) {
+                                setState(() {
+                                  // Update UI if needed
+                                });
+                                updateCart(
+                                  menuId: item.id!,
+                                  quantity: selectedCount,
+                                  variants: selectedVariants
+                                      .map((v) => {
+                                            'variantId': v.id,
+                                            'variantOptionIds': [v.id],
+                                          })
+                                      .toList(),
+                                );
+                              },
+                              // onTapAdd: (updateState) {
+                              //   addOrderMenu(
+                              //     updateState: updateState,
+                              //     menuCount: item.selectedCount,
+                              //     menuStock: item.menuStock,
+                              //     price: item.menuPrice,
+                              //     subTotal: item.subTotal,
+                              //     menuItem: menuItems[index],
+                              //   );
+                              // },
+                              // onTapRemove: (updateState) {
+                              //   deleteOrderMenu(
+                              //     updateState: updateState,
+                              //     menuCount: item.selectedCount,
+                              //     menuStock: item.menuStock,
+                              //     price: item.menuPrice,
+                              //     subTotal: item.subTotal,
+                              //     menuItem: menuItems[index],
+                              //   );
+                              // },
+                              // onPressedAddOrder: () {},
                             );
                           } else {
                             if (item.selectedCount! < item.menuStock!) {
                               setState(() {
                                 item.selectedCount = item.selectedCount! + 1;
-                                item.menuPrice =
+                                item.subTotal =
                                     (item.menuPrice! * item.selectedCount!);
                               });
-                              // updateCart(
-                              //   menuId: item.id!,
-                              //   quantity: item.selectedCount!,
-                              // );
+                              updateCart(
+                                menuId: item.id!,
+                                quantity: item.selectedCount!,
+                              );
                             } else {
                               // Show a message that stock limit has been reached
                               showToast('Stock tidak mencukupi');
@@ -1199,15 +1297,16 @@ class _CanteenScreenState extends State<CanteenScreen>
                           }
                         },
                         onTapRemove: () {
-                          if (item.selectedCount! > 1) {
+                          if (item.selectedCount! > 0) {
                             setState(() {
                               item.selectedCount = item.selectedCount! - 1;
-                              item.menuPrice = (item.menuPrice! / item.selectedCount!).toInt();
+                              item.subTotal =
+                                  (item.subTotal! - item.menuPrice!);
                             });
-                            // updateCart(
-                            //   menuId: item.id!,
-                            //   quantity: -item.selectedCount!,
-                            // );
+                            updateCart(
+                              menuId: item.id!,
+                              quantity: -item.selectedCount!,
+                            );
                           }
                         },
                       ),
@@ -1702,7 +1801,7 @@ class _CanteenScreenState extends State<CanteenScreen>
     return AnimatedContainer(
       duration: const Duration(milliseconds: 500),
       curve: Curves.easeIn,
-      height: menuOrderCountInfo ? 116 : 0,
+      height: dataAddCartInfo != null ? 116 : 0,
       width: double.infinity,
       padding: const EdgeInsets.all(25),
       decoration: BoxDecoration(
@@ -1750,20 +1849,20 @@ class _CanteenScreenState extends State<CanteenScreen>
                             fontSize: 13,
                             fontWeight: FontWeight.w800),
                       ),
-                      subtitle: const Text(
-                        '2 Menu | 7 Item',
-                        style: TextStyle(
+                      subtitle: Text(
+                        '${dataAddCartInfo?.totalMenus!} Menu | ${dataAddCartInfo?.totalItems!} Item',
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      trailing: const SizedBox(
+                      trailing: SizedBox(
                         width: 85,
                         child: FittedBox(
                           child: Text(
-                            'Rp100.000',
-                            style: TextStyle(
+                            'Rp${dataAddCartInfo?.totalPrices}',
+                            style: const TextStyle(
                               color: Colors.white,
                               fontSize: 16,
                               fontWeight: FontWeight.w800,
@@ -1892,46 +1991,248 @@ class _CanteenScreenState extends State<CanteenScreen>
           itemBuilder: (context, index) {
             Menu item = filteredMenuItems[index];
             return Container(
-              color: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 25),
-              child: ProductCardBoxHorizontal(
-                onPressed: () {
-                  log('product: ${item.menuName}');
-                  // storeMenuCountSheet();
-                  menuFrameSheet(context,
-                      menuId: item.id,
-                      merchantId: item.merchantId,
-                      imgUrl: "${AppConfig.URL_IMAGES_PATH}${item.menuPhoto}",
-                      productName: item.menuName,
-                      description: item.menuDesc,
-                      price: item.menuPrice,
-                      rate: '${item.menuRate}',
-                      likes: '${item.menuLikes}',
-                      isLike: item.isLike!);
-                },
-                isCustom: item.variants!.isEmpty ? false : true,
-                productId: '${item.id}',
-                imgUrl: "${AppConfig.URL_IMAGES_PATH}${item.menuPhoto}",
-                productName: item.menuName!,
-                description: item.menuDesc ?? 'deskripsi menu',
-                price: item.menuPrice,
-                likes: item.menuLikes.toString(),
-                rate: item.menuRate.toString(),
-                count: item.menuStock.toString(),
-                onTapAdd: () {
-                  setState(() {
-                    item.menuStock = item.menuStock! + 1;
-                  });
-                  // print(menuItem[index]['count']);
-                },
-                onTapRemove: () {
-                  setState(() {
-                    item.menuStock = item.menuStock! - 1;
-                  });
-                  // print(orderCount);
-                },
-              ),
-            );
+                color: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 25),
+                child: widget.isOwner!
+                    ? ProductCardBoxHorizontal(
+                        onPressed: () {
+                          log('product: ${item.menuName}');
+                          // storeMenuCountSheet();
+                          menuFrameSheet(
+                            context,
+                            menuId: item.id!,
+                            merchantId: dataMerchant?.merchantId!,
+                            imgUrl:
+                                "${AppConfig.URL_IMAGES_PATH}${item.menuPhoto}",
+                            productName: item.menuName!,
+                            description: item.menuDesc!,
+                            price: item.menuPrice!,
+                            likes: item.menuLikes!.toString(),
+                            // count: item.menuStock!.toString(),
+                            count: item.selectedCount!.toString(),
+                            sold: item.menuSolds ?? 0,
+                            rate: item.menuRate.toString(),
+                            innerContentSize: 110,
+                            isLike: item.isLike!,
+                            onTapLike: (updateState) {
+                              tapLikeMenu(context,
+                                  isLike: item.isLike!,
+                                  menuId: item.id!,
+                                  updateState: updateState,
+                                  menuItem: item);
+                            },
+                            onPressed: () {},
+                            onTapAdd: () {},
+                            onTapRemove: () {},
+                          );
+                        },
+                        imgUrl: "${AppConfig.URL_IMAGES_PATH}${item.menuPhoto}",
+                        productName: item.menuName!,
+                        description: item.menuDesc ?? 'deskripsi menu',
+                        price: item.menuPrice,
+                        likes: item.menuLikes.toString(),
+                        rate: item.menuRate.toString(),
+                        count: item.menuStock.toString(),
+                        // isCustom: item.isDanus!,
+                        isCustom: item.variants!.isNotEmpty ? true : false,
+                        isOwner: widget.isOwner!,
+                        onTapEditProduct: () {},
+                      )
+                    : ProductCardBoxHorizontal(
+                        onPressed: () {
+                          log('product: ${item.menuName}');
+                          // storeMenuCountSheet();
+
+                          menuFrameSheet(
+                            context,
+                            menuId: item.id!,
+                            merchantId: dataMerchant?.merchantId!,
+                            imgUrl:
+                                "${AppConfig.URL_IMAGES_PATH}${item.menuPhoto}",
+                            productName: item.menuName!,
+                            description: item.menuDesc!,
+                            price: item.menuPrice!,
+                            likes: item.menuLikes!.toString(),
+                            // count: item.menuStock!.toString(),
+                            count: item.selectedCount!.toString(),
+                            sold: item.menuSolds ?? 0,
+                            rate: item.menuRate.toString(),
+                            innerContentSize: 110,
+                            isLike: item.isLike!,
+                            onTapLike: (updateState) {
+                              tapLikeMenu(context,
+                                  isLike: item.isLike!,
+                                  menuId: item.id!,
+                                  updateState: updateState,
+                                  menuItem: item);
+                            },
+                            onPressed: () {
+                              updateCart(menuId: item.id!, quantity: 1,);
+                            },
+                            onTapAdd: () {},
+                            onTapRemove: () {},
+                          );
+                        },
+                        imgUrl: "${AppConfig.URL_IMAGES_PATH}${item.menuPhoto}",
+                        productName: item.menuName!,
+                        description: item.menuDesc ?? 'deskripsi menu',
+                        price:
+                            item.subTotal != 0 ? item.subTotal : item.menuPrice,
+                        likes: item.menuLikes.toString(),
+                        rate: item.menuRate.toString(),
+                        // count: item.menuStock!.toString(),
+                        count: item.selectedCount!.toString(),
+                        // isCustom: item.isDanus!,
+                        isCustom: item.variants!.isNotEmpty ? true : false,
+                        onTapAdd: () async {
+                          if (item.variants!.isNotEmpty) {
+                            int selectedCount = item.selectedCount!;
+                            int price = item.menuPrice!;
+                            int subtotal = price * selectedCount;
+                            menuCustomeFrameSheet(
+                              context,
+                              imgUrl:
+                                  "${AppConfig.URL_IMAGES_PATH}${item.menuPhoto}",
+                              productName: item.menuName!,
+                              description: item.menuDesc ?? '',
+                              price: item.menuPrice!,
+                              subTotal: item.subTotal!,
+                              likes: item.menuLikes.toString(),
+                              rate: item.menuRate.toString(),
+                              count: item.selectedCount!,
+                              sold: item.menuSolds ?? 0,
+                              innerContentSize: 110,
+                              variantSelected: null,
+                              total: subtotal,
+                              variantTypeList: item.variants!,
+                              onPressed: () {
+                                
+                              },
+                              onTapAdd: (Function updateState) {
+                                setState(() {
+                                  selectedCount++;
+                                });
+                                updateState();
+                              },
+                              onTapRemove: (Function updateState) {
+                                if (selectedCount > 0) {
+                                  setState(() {
+                                    selectedCount--;
+                                  });
+                                  updateState();
+                                }
+                              },
+                              onTapAddOrder: (selectedCount, calculatedTotal,
+                                  selectedVariants) {
+                                setState(() {
+                                  // Update UI if needed
+                                });
+                                updateCart(
+                                  menuId: item.id!,
+                                  quantity: selectedCount,
+                                  variants: selectedVariants
+                                      .map((v) => {
+                                            'variantId': v.id,
+                                            'variantOptionIds': [v.id],
+                                          })
+                                      .toList(),
+                                );
+                              },
+                              // onTapAdd: (updateState) {
+                              //   addOrderMenu(
+                              //     updateState: updateState,
+                              //     menuCount: item.selectedCount,
+                              //     menuStock: item.menuStock,
+                              //     price: item.menuPrice,
+                              //     subTotal: item.subTotal,
+                              //     menuItem: menuItems[index],
+                              //   );
+                              // },
+                              // onTapRemove: (updateState) {
+                              //   deleteOrderMenu(
+                              //     updateState: updateState,
+                              //     menuCount: item.selectedCount,
+                              //     menuStock: item.menuStock,
+                              //     price: item.menuPrice,
+                              //     subTotal: item.subTotal,
+                              //     menuItem: menuItems[index],
+                              //   );
+                              // },
+                              // onPressedAddOrder: () {},
+                            );
+                          } else {
+                            if (item.selectedCount! < item.menuStock!) {
+                              setState(() {
+                                item.selectedCount = item.selectedCount! + 1;
+                                item.subTotal =
+                                    (item.menuPrice! * item.selectedCount!);
+                              });
+                              updateCart(
+                                menuId: item.id!,
+                                quantity: item.selectedCount!,
+                              );
+                            } else {
+                              // Show a message that stock limit has been reached
+                              showToast('Stock tidak mencukupi');
+                            }
+                          }
+                        },
+                        onTapRemove: () {
+                          if (item.selectedCount! > 0) {
+                            setState(() {
+                              item.selectedCount = item.selectedCount! - 1;
+                              item.subTotal =
+                                  (item.subTotal! - item.menuPrice!);
+                            });
+                            updateCart(
+                              menuId: item.id!,
+                              quantity: -item.selectedCount!,
+                            );
+                          }
+                        },
+                      ),
+              );
+            // return Container(
+            //   color: Colors.white,
+            //   padding: const EdgeInsets.symmetric(horizontal: 25),
+            //   child: ProductCardBoxHorizontal(
+            //     onPressed: () {
+            //       log('product: ${item.menuName}');
+            //       // storeMenuCountSheet();
+            //       menuFrameSheet(context,
+            //           menuId: item.id,
+            //           merchantId: item.merchantId,
+            //           imgUrl: "${AppConfig.URL_IMAGES_PATH}${item.menuPhoto}",
+            //           productName: item.menuName,
+            //           description: item.menuDesc,
+            //           price: item.menuPrice,
+            //           rate: '${item.menuRate}',
+            //           likes: '${item.menuLikes}',
+            //           isLike: item.isLike!);
+            //     },
+            //     isCustom: item.variants!.isEmpty ? false : true,
+            //     productId: '${item.id}',
+            //     imgUrl: "${AppConfig.URL_IMAGES_PATH}${item.menuPhoto}",
+            //     productName: item.menuName!,
+            //     description: item.menuDesc ?? 'deskripsi menu',
+            //     price: item.menuPrice,
+            //     likes: item.menuLikes.toString(),
+            //     rate: item.menuRate.toString(),
+            //     count: item.menuStock.toString(),
+            //     onTapAdd: () {
+            //       setState(() {
+            //         item.menuStock = item.menuStock! + 1;
+            //       });
+            //       // print(menuItem[index]['count']);
+            //     },
+            //     onTapRemove: () {
+            //       setState(() {
+            //         item.menuStock = item.menuStock! - 1;
+            //       });
+            //       // print(orderCount);
+            //     },
+            //   ),
+            // );
           },
         ),
       ),

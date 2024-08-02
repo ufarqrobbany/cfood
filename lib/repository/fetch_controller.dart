@@ -58,6 +58,7 @@ class FetchController {
         headers: headers, body: body == {} ? null : json.encode(body));
 
     log("data : $body");
+    log("response : ${response.body}");
 
     if (response.statusCode <= 300) {
       log(response.body);
