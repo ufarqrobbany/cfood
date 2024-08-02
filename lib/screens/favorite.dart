@@ -143,6 +143,7 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
                       likes: ' ${items.followers}',
                       rate: '${items.rating}',
                       type: items.merchantType,
+                      danus: items!.danus!,
                       onPressed: () => navigateTo(
                           context,
                           CanteenScreen(

@@ -2,9 +2,18 @@ import 'dart:developer';
 
 import 'package:cfood/custom/CBottomSheet.dart';
 import 'package:cfood/custom/CButtons.dart';
+import 'package:cfood/custom/CPageMover.dart';
 import 'package:cfood/custom/card.dart';
+import 'package:cfood/custom/page_item_void.dart';
 import 'package:cfood/custom/reload_indicator.dart';
+import 'package:cfood/model/get_cart_user_response.dart';
+import 'package:cfood/model/get_calculate_cart_response.dart';
+import 'package:cfood/repository/fetch_controller.dart';
+import 'package:cfood/screens/canteen.dart';
 import 'package:cfood/style.dart';
+import 'package:cfood/utils/common.dart';
+import 'package:cfood/utils/constant.dart';
+import 'package:community_material_icon/community_material_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:uicons/uicons.dart';
 
@@ -17,92 +26,44 @@ class CartScreen extends StatefulWidget {
 
 class _CartScreenState extends State<CartScreen> {
   bool menuOrderCountInfo = true;
-  List<Map<String, dynamic>> cartListItems = [
-    {
-      'id': '0',
-      'store': 'nama toko',
-      'type': 'Kantin',
-      'selected': false,
-      'menu': [
-        {
-          'id': '1',
-          'name': 'nama menu',
-          'image': '/.jpg',
-          'price': 10000,
-          'count': 1,
-          'variants': ['coklat', 'susu', 'tiramusi'],
-        },
-        {
-          'id': '1',
-          'name': 'nama menu',
-          'image': '/.jpg',
-          'price': 10000,
-          'count': 2,
-          'variants': ['coklat', 'tiramusi'],
-        },
-      ],
-    },
-    {
-      'id': '1',
-      'store': 'nama toko',
-      'type': 'Wirausaha',
-      'selected': false,
-      'menu': [
-        {
-          'id': '1',
-          'name': 'nama menu',
-          'image': '/.jpg',
-          'price': 10000,
-          'count': 1,
-          'variants': ['coklat', 'susu', 'tiramusi'],
-        },
-      ],
-    },
-    {
-      'id': '0',
-      'store': 'nama toko',
-      'type': 'Kantin',
-      'selected': false,
-      'menu': [
-        {
-          'id': '1',
-          'name': 'nama menu',
-          'image': '/.jpg',
-          'price': 10000,
-          'count': 3,
-          'variants': ['coklat', 'susu', 'tiramusi'],
-        },
-      ],
-    },
-    {
-      'id': '0',
-      'store': 'nama toko',
-      'type': 'Wirausaha',
-      'selected': false,
-      'menu': [
-        {
-          'id': '1',
-          'name': 'nama menu',
-          'image': '/.jpg',
-          'price': 10000,
-          'count': 1,
-          'variants': ['coklat', 'susu', 'tiramusi'],
-        },
-        {
-          'id': '1',
-          'name': 'nama menu',
-          'image': '/.jpg',
-          'price': 10000,
-          'count': 2,
-          'variants': ['coklat', 'tiramusi'],
-        },
-      ],
-    },
-  ];
+  List<Map<String, dynamic>> cartListItems = [];
+
+  CartResponse? cartResponse;
+  List<CartData>? cartData;
+
+  CalculateCartResponse? calculateCartResponse;
+  CalculateCartData? calculateCartData;
+
+  int? selectCartId;
 
   @override
   void initState() {
     super.initState();
+    getAllCarts();
+  }
+
+  Future<void> getAllCarts() async {
+    cartResponse = await FetchController(
+      endpoint: 'carts/new/user/${AppConfig.USER_ID}',
+      fromJson: (json) => CartResponse.fromJson(json),
+    ).getData();
+
+    setState(() {
+      cartData = cartResponse?.data;
+      log(cartData.toString());
+    });
+  }
+
+  Future<void> getCalculateCart(int cartId) async {
+    calculateCartResponse = await FetchController(
+      endpoint: 'carts/calculate/$cartId',
+      fromJson: (json) => CalculateCartResponse.fromJson(json),
+    ).getData();
+
+    setState(() {
+      calculateCartData = calculateCartResponse?.data;
+      log(calculateCartData.toString());
+    });
   }
 
   Future<void> refreshPage() async {
@@ -140,137 +101,209 @@ class _CartScreenState extends State<CartScreen> {
       ),
       backgroundColor: Colors.white,
       body: cartBodyList(),
-      floatingActionButton: storeMenuCountInfo(),
+      floatingActionButton: calculateCartResponse == null
+          ? Container()
+          : storeMenuCountInfo(
+              calculateCartData!.cartId,
+              calculateCartData!.totalMenus,
+              calculateCartData!.totalItems,
+              calculateCartData!.totalPrices),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButtonAnimator: FloatingActionButtonAnimator.scaling,
     );
   }
 
   Widget cartBodyList() {
-    return ReloadIndicatorType1(
-        onRefresh: refreshPage,
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          child: ListView.builder(
-            itemCount: cartListItems.length,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemBuilder: (context, idxCart) {
-              List<Map<String, dynamic>> storeMenuList =
-                  cartListItems[idxCart]['menu'];
-              var store = cartListItems[idxCart];
-              return Container(
-                margin: idxCart == cartListItems.length - 1
-                    ? const EdgeInsets.only(bottom: 180)
-                    : EdgeInsets.zero,
-                decoration: BoxDecoration(
-                  border: Border(
-                    top: BorderSide(
-                      color: Warna.abu5,
-                      width: 14,
-                    ),
+    return cartResponse == null
+        ? Container()
+        : cartData!.isEmpty
+            ? itemsEmptyBody(context, bgcolors: Warna.pageBackgroundColor)
+            : ReloadIndicatorType1(
+                onRefresh: refreshPage,
+                child: SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  child: ListView.builder(
+                    itemCount: cartData?.length,
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemBuilder: (context, index) {
+                      var store = cartData?[index];
+
+                      return Container(
+                        margin: index == cartData!.length - 1
+                            ? const EdgeInsets.only(bottom: 180)
+                            : EdgeInsets.zero,
+                        decoration: BoxDecoration(
+                          border: Border(
+                            top: BorderSide(
+                              color: Warna.abu5,
+                              width: 14,
+                            ),
+                          ),
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(25, 20, 25, 0),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.max,
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  GestureDetector(
+                                    onTap: () {
+                                      log('Cart selected: ${store?.merchantName}');
+                                      setState(() {
+                                        if (store!.isOpen) {
+                                          selectCartId = store.cartId;
+                                          getCalculateCart(selectCartId!);
+                                        }
+                                      });
+                                    },
+
+                                    // bookmark
+                                    child: store!.isOpen
+                                        ? Icon(
+                                            selectCartId == store?.cartId
+                                                ? Icons
+                                                    .radio_button_checked_rounded
+                                                : Icons.radio_button_unchecked,
+                                            color: Warna.biru,
+                                            size: 25,
+                                          )
+                                        : Container(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 6, vertical: 1),
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(4),
+                                              border: Border.all(
+                                                  color: Warna.like, width: 1),
+                                              color:
+                                                  Warna.like.withOpacity(0.10),
+                                            ),
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Icon(
+                                                  UIcons
+                                                      .solidRounded.time_oclock,
+                                                  size: 13,
+                                                  color: Warna.like,
+                                                ),
+                                                Text(
+                                                  ' Tutup',
+                                                  style: TextStyle(
+                                                      color: Warna.like,
+                                                      fontSize: 12),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                  ),
+                                  const SizedBox(
+                                    width: 10,
+                                  ),
+                                  InkWell(
+                                    onTap: () => navigateTo(
+                                        context,
+                                        CanteenScreen(
+                                          merchantId: store.merchantId,
+                                          isOwner: false,
+                                          merchantType: store.merchantType,
+                                        )),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        Icon(
+                                          store?.merchantType == "WIRAUSAHA"
+                                              ? CommunityMaterialIcons.handshake
+                                              : Icons.store,
+                                          color:
+                                              store?.merchantType == "WIRAUSAHA"
+                                                  ? Warna.kuning
+                                                  : Warna.biru,
+                                          size: 20,
+                                        ),
+                                        const SizedBox(
+                                          width: 8,
+                                        ),
+                                        Flexible(
+                                          child: Text(
+                                            store!.merchantName,
+                                            style: const TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w700,
+                                            ),
+                                            overflow: TextOverflow.ellipsis,
+                                            maxLines: 1,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const Spacer(),
+                                  Icon(
+                                    UIcons.solidRounded.trash,
+                                    color: Warna.like,
+                                    size: 25,
+                                  )
+                                ],
+                              ),
+                            ),
+                            ListView.builder(
+                              itemCount: store.items.length,
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemBuilder: (context, idxMenu) {
+                                var menuItem = store.items[idxMenu];
+                                return Container(
+                                  color: Colors.white,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 25,
+                                  ),
+                                  child: ProductCardBoxHorizontal(
+                                    innerContentSize: 90,
+                                    onPressed: () {
+                                      menuFrameSheet(context);
+                                    },
+                                    imgUrl:
+                                        '${AppConfig.URL_IMAGES_PATH}${menuItem.menuPhoto}',
+                                    productName: menuItem.menuName,
+                                    description: menuItem.variants.isEmpty
+                                        ? ''
+                                        : 'Variant',
+                                    price: menuItem.totalPriceMenu *
+                                        menuItem.quantity,
+                                    count: menuItem.quantity.toString(),
+                                    onTapAdd: () {},
+                                    onTapRemove: () {},
+                                  ),
+                                );
+                              },
+                            )
+                          ],
+                        ),
+                      );
+                    },
                   ),
                 ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(25, 20, 25, 0),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.max,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Icon(
-                            Icons.radio_button_checked_rounded,
-                            color: Warna.biru,
-                            size: 25,
-                          ),
-                          const SizedBox(
-                            width: 25,
-                          ),
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Icon(
-                                Icons.store,
-                                color: Warna.biru,
-                                size: 20,
-                              ),
-                              const SizedBox(
-                                width: 5,
-                              ),
-                              Text(
-                                store['store'].toString(),
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                            ],
-                          ),
-                          const Spacer(),
-                          Icon(
-                            UIcons.solidRounded.trash,
-                            color: Warna.like,
-                            size: 25,
-                          )
-                        ],
-                      ),
-                    ),
-                    ListView.builder(
-                      itemCount: storeMenuList.length,
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemBuilder: (context, idxMenu) {
-                        var menuItem = storeMenuList[idxMenu];
-                        return Container(
-                          color: Colors.white,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 25,
-                          ),
-                          child: ProductCardBoxHorizontal(
-                            innerContentSize: 90,
-                            onPressed: () {
-                              log('product: ${menuItem['nama']}');
-                              // storeMenuCountSheet();
-                              menuFrameSheet(context);
-                            },
-                            productName: menuItem['name'],
-                            description: 'deskripsi menu',
-                            price: menuItem['price'],
-                            count: menuItem['count'].toString(),
-                            onTapAdd: () {
-                              setState(() {
-                                menuItem['count'] += 1;
-                              });
-                            },
-                            onTapRemove: () {
-                              setState(() {
-                                menuItem['count'] -= 1;
-                              });
-                            },
-                          ),
-                        );
-                      },
-                    )
-                  ],
-                ),
               );
-            },
-          ),
-        ),
-      );
   }
 
-  Widget storeMenuCountInfo() {
+  Widget storeMenuCountInfo(
+      int cartId, int totalMenu, int totalItem, int totalPrice) {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 500),
       curve: Curves.easeIn,
       height: menuOrderCountInfo ? 116 : 0,
       width: double.infinity,
       padding: const EdgeInsets.all(25),
-      margin: menuOrderCountInfo ? const EdgeInsets.only(bottom: 80) : EdgeInsets.zero,
+      margin: menuOrderCountInfo
+          ? const EdgeInsets.only(bottom: 80)
+          : EdgeInsets.zero,
       decoration: BoxDecoration(
         color: Colors.transparent,
         borderRadius: BorderRadius.circular(60),
@@ -280,19 +313,6 @@ class _CartScreenState extends State<CartScreen> {
         child: Row(
           mainAxisSize: MainAxisSize.max,
           children: [
-            // Expanded(
-            //   flex: 2,
-            //   child: Container(
-            //     color: Warna.kuning,
-            //     child: Center(
-            //       child: Icon(
-            //         UIcons.solidRounded.comment,
-            //         size: 25,
-            //         color: Colors.white,
-            //       ),
-            //     ),
-            //   ),
-            // ),
             Expanded(
               flex: 8,
               child: Container(
@@ -316,20 +336,20 @@ class _CartScreenState extends State<CartScreen> {
                             fontSize: 13,
                             fontWeight: FontWeight.w800),
                       ),
-                      subtitle: const Text(
-                        '2 Menu | 7 Item',
-                        style: TextStyle(
+                      subtitle: Text(
+                        '$totalMenu Menu | $totalItem Item',
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      trailing: const SizedBox(
+                      trailing: SizedBox(
                         width: 85,
                         child: FittedBox(
                           child: Text(
-                            'Rp100.000',
-                            style: TextStyle(
+                            '${Constant.currencyCode}${formatNumberWithThousandsSeparator(totalPrice)}',
+                            style: const TextStyle(
                               color: Colors.white,
                               fontSize: 16,
                               fontWeight: FontWeight.w800,
