@@ -230,6 +230,7 @@ class Menu {
   int? merchantId;
   List<Variant>? variants;
   int? selectedCount;
+  int? subTotal;
 
   Menu({
     this.id,
@@ -247,6 +248,7 @@ class Menu {
     this.merchantId,
     this.variants,
     this.selectedCount,
+    this.subTotal,
   });
 
   Menu.fromJson(Map<String, dynamic> json) {
@@ -263,6 +265,7 @@ class Menu {
     isLike = json['isLike'];
     categoryMenuName = json['categoryMenuName'];
     selectedCount = 0;
+    subTotal = 0;
     merchantId = json['merchantId'];
     if (json['variants'] != null) {
       variants = <Variant>[];
@@ -343,13 +346,15 @@ class VariantOption {
   int? id;
   String? variantOptionName;
   int? variantOptionPrice;
+  bool? selected;
 
-  VariantOption({this.id, this.variantOptionName, this.variantOptionPrice});
+  VariantOption({this.id, this.variantOptionName, this.variantOptionPrice, this.selected});
 
   VariantOption.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     variantOptionName = json['variantOptionName'];
     variantOptionPrice = json['variantOptionPrice'];
+    selected = false;
   }
 
   Map<String, dynamic> toJson() {
