@@ -55,6 +55,7 @@ dependencies:
   # http_parser: ^4.1.0
   dio: ^5.5.0+1
   http_interceptor: ^2.0.0
+  app_links: ^6.1.4
 
 
 

@@ -22,7 +22,7 @@ class Constant {
 }
 
 class AppConfig {
-  static const String BASE_URL = "http://cfood.id/";
+  static const String BASE_URL = "http://cfood.id/api/";
 
   static int USER_ID = 0;
 
