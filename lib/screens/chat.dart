@@ -8,10 +8,10 @@ import 'package:flutter_chat_bubble/chat_bubble.dart';
 import 'package:uicons/uicons.dart';
 
 class ChatScreen extends StatefulWidget {
-  final bool? isMerchant;
-  final int? userId;
-  final int? merchantId;
-  const ChatScreen({super.key, this.isMerchant, this.userId, this.merchantId,});
+   bool? isMerchant;
+   int? userId;
+   int? merchantId;
+   ChatScreen({super.key, this.isMerchant = false, this.userId = 0, this.merchantId = 0,});
 
   @override
   State<ChatScreen> createState() => _ChatScreenState();
@@ -41,6 +41,10 @@ class _ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateM
 
   @override
   Widget build(BuildContext context) {
+    // Object? args = ModalRoute.of(context)!.settings.arguments;
+    // setState(() {
+    //   widget.isMerchant = args.isMerchant;
+    // });
 
     bool isKeyboardOpen = MediaQuery.of(context).viewInsets.bottom > 0;
 
@@ -258,7 +262,7 @@ class _ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateM
             ),
             customChatBubble(
               isSender: true,
-              text: 'Text chat ',
+              text: '''Text chat http://cfood.id/splash/''',
               times: '12.02',
               timePrevChat: '12.02',
               itsAutoSend: false,

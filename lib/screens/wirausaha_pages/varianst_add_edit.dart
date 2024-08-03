@@ -16,7 +16,8 @@ import 'package:uicons/uicons.dart';
 class AddEditVariantsScreen extends StatefulWidget {
   final bool isEdit;
   final int? indexVarian;
-  const AddEditVariantsScreen({super.key, this.isEdit = false, this.indexVarian});
+  const AddEditVariantsScreen(
+      {super.key, this.isEdit = false, this.indexVarian});
 
   @override
   State<AddEditVariantsScreen> createState() => _AddEditVariantsScreenState();
@@ -37,20 +38,27 @@ class _AddEditVariantsScreenState extends State<AddEditVariantsScreen> {
   void initState() {
     super.initState();
 
-    if(widget.isEdit) {
+    if (widget.isEdit) {
       isEditVariant();
     }
+    setState(() {
+      minController.text = '0';
+      maxController.text = '0';
+    });
   }
 
-  void isEditVariant(){
-    variantNameController.text = MenuConfig.variants[widget.indexVarian!].variantName!;
-    minController.text = MenuConfig.variants[widget.indexVarian!].minimal!.toString();
-    maxController.text = MenuConfig.variants[widget.indexVarian!].maximal!.toString();
+  void isEditVariant() {
+    variantNameController.text =
+        MenuConfig.variants[widget.indexVarian!].variantName!;
+    minController.text =
+        MenuConfig.variants[widget.indexVarian!].minimal!.toString();
+    maxController.text =
+        MenuConfig.variants[widget.indexVarian!].maximal!.toString();
     variantRequired = MenuConfig.variants[widget.indexVarian!].isRequired!;
     listOpsiVarian = MenuConfig.variants[widget.indexVarian!].variantOption!;
   }
 
-  void tapEditVariant(){
+  void tapEditVariant() {
     MenuConfig.variants[widget.indexVarian!] = VariantDatas(
       variantName: variantNameController.text,
       isRequired: variantRequired,
@@ -65,6 +73,8 @@ class _AddEditVariantsScreenState extends State<AddEditVariantsScreen> {
 
   void dataCheck() {
     String emptyField = '';
+    int minimal = int.parse(minController.text);
+    int maksimal = int.parse(maxController.text);
     setState(() {
       buttonLoad = true;
     });
@@ -95,7 +105,7 @@ class _AddEditVariantsScreenState extends State<AddEditVariantsScreen> {
       return;
     }
 
-    if(listOpsiVarian == []) {
+    if (listOpsiVarian == []) {
       setState(() {
         buttonLoad = false;
         emptyField = 'Opsi Varian Tidak boleh kosong';
@@ -104,6 +114,106 @@ class _AddEditVariantsScreenState extends State<AddEditVariantsScreen> {
       return;
     }
 
+    if (minimal > maksimal) {
+      log('min = $minimal || maks = $maksimal');
+      setState(() {
+        buttonLoad = false;
+      });
+      showToast('mana ada minimal lebih besar dari maksimal');
+      return;
+    }
+
+    if (variantRequired) {
+      if (minimal < 1) {
+        log('min = $minimal || maks = $maksimal');
+        setState(() {
+          buttonLoad = false;
+        });
+        showToast(
+            'Pilih wajib tapi minimalnya diisi kurang dari 1, membingungkan');
+        return;
+      }
+    }
+
+    if (maksimal > listOpsiVarian.length) {
+      log('min = $minimal || maks = $maksimal');
+      setState(() {
+        buttonLoad = false;
+      });
+      showToast('maksimal melebihi jumlah opsi, tambahin dulu opsi nya');
+      return;
+    }
+
+    log('min = $minimal || maks = $maksimal');
+    showToast('Berhasil disimpan');
+    saveDataVariant();
+
+    // if (minimal >= maksimal) {
+    //   if (variantRequired) {
+    //     if (minimal > 0) {
+    //       if (maksimal <= listOpsiVarian.length) {
+    //         log('min = $minimal || maks = $maksimal');
+    //         showToast('Berhasil Disimpan');
+    //         saveDataVariant();
+    //         setState(() {
+    //           buttonLoad = false;
+    //         });
+    //         // berhasil simpan
+    //       } else {
+    //         // maksimal melebihi jumlah opsi, tambahin dulu opsi nya
+    //         setState(() {
+    //           buttonLoad = false;
+    //         });
+    //         log('min = $minimal || maks = $maksimal');
+    //         log('maksimal melebihi jumlah opsi\ntambahin dulu opsi nya cuy');
+    //         showToast(
+    //             'maksimal melebihi jumlah opsi\ntambahin dulu opsi nya cuy');
+    //         return;
+    //       }
+    //     } else {
+    //       // pilih wajib tapi minimalnya diisi kurang dari 1, membingungkan
+    //       setState(() {
+    //           buttonLoad = false;
+    //         });
+    //         log('min = $minimal || maks = $maksimal');
+    //         log('Pilih wajib tapi minimalnya diisi kurang dari 1, membingungkan');
+    //       showToast(
+    //           'Pilih wajib tapi minimalnya diisi kurang dari 1, membingungkan');
+    //       return;
+    //     }
+    //   } else {
+    //     if (maksimal <= listOpsiVarian.length) {
+    //       // berhasil simpan
+    //       setState(() {
+    //           buttonLoad = false;
+    //         });
+    //         log('min = $minimal || maks = $maksimal');
+    //       showToast('Berhasil disimpan');
+    //       saveDataVariant();
+    //     } else {
+    //       // maksimal melebihi jumlah opsi, tambahin dulu opsi nya
+    //       showToast('maksimal melebihi jumlah opsi, tambahin dulu opsi nya');
+    //       log('maksimal melebihi jumlah opsi, tambahin dulu opsi nya');
+    //       setState(() {
+    //           buttonLoad = false;
+    //         });
+    //         log('min = $minimal || maks = $maksimal');
+    //       return;
+    //     }
+    //   }
+    // } else {
+    //   log('min = $minimal || maks = $maksimal');
+    //   // mana ada minimal lebih besar dari maksimal
+    //   setState(() {
+    //           buttonLoad = false;
+    //         });
+    //         log('mana ada minimal lebih besar dari maksimal');
+    //   showToast('mana ada minimal lebih besar dari maksimal');
+    //   return;
+    // }
+  }
+
+  void saveDataVariant() {
     VariantDatas newVariant = VariantDatas(
       variantName: variantNameController.text,
       isRequired: variantRequired,
@@ -117,7 +227,7 @@ class _AddEditVariantsScreenState extends State<AddEditVariantsScreen> {
       buttonLoad = false;
     });
     log(MenuConfig.variants.toString());
-    navigateBack(context);
+    navigateBack(context, result: true);
   }
 
   void addVariantOption() {
@@ -204,6 +314,17 @@ class _AddEditVariantsScreenState extends State<AddEditVariantsScreen> {
                       setState(() {
                         variantRequired = value!;
                       });
+                      if (variantRequired) {
+                        setState(() {
+                          minController.text = '1';
+                          maxController.text = '1';
+                        });
+                      } else {
+                        setState(() {
+                          minController.text = '0';
+                          maxController.text = '0';
+                        });
+                      }
                     },
                   ),
                   const SizedBox(
@@ -308,11 +429,13 @@ class _AddEditVariantsScreenState extends State<AddEditVariantsScreen> {
                 width: double.infinity,
                 child: CBlueButton(
                   isLoading: buttonLoad,
-                  onPressed: widget.isEdit ? () {
-                    tapEditVariant();
-                  } : () {
-                    dataCheck();
-                  },
+                  onPressed: widget.isEdit
+                      ? () {
+                          tapEditVariant();
+                        }
+                      : () {
+                          dataCheck();
+                        },
                   text: 'Simpan',
                 ),
               )

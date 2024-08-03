@@ -43,7 +43,7 @@ class AuthHelper {
   setMerchantId({
     String? id,
   }) {
-    prefs.setMerchantId(id!);
+    prefs.setMerchantId(id ?? '0');
   }
 
   clearUserData() {
@@ -97,7 +97,6 @@ class AuthHelper {
     String? password = await SessionManager().getPassword();
     String? type = await SessionManager().getType();
     String? isDriver = await SessionManager().getIsDriver();
-    String? merchantId = await SessionManager().getMerchantId();
 
     log('''
       token : $token
@@ -107,7 +106,6 @@ class AuthHelper {
       password : $password
       type : $type 
       isDriver : $isDriver
-      merchantId : $merchantId
       ''');
 
     return {
@@ -118,7 +116,17 @@ class AuthHelper {
       'password': password,
       'type': type,
       'isDriver': isDriver,
-      'merchantId' : merchantId,
+      
+    };
+  }
+
+  Future<Map<String, dynamic>> getDataMerchantId() async {
+    String? merchantId = await SessionManager().getMerchantId();
+
+    log('merchantId : $merchantId');
+
+    return {
+      'merchantId' : merchantId ?? '0',
     };
   }
 }
