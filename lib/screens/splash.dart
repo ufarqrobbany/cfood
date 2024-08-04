@@ -41,21 +41,24 @@ class _SplashScreenState extends State<SplashScreen> {
       // AuthHelper().setUserData(); // Uncomment if needed
       Map<String, dynamic> dataUser = await AuthHelper().getkUserData();
 
-      if (dataUser['userid'] != '') {
-        AppConfig.USER_ID = int.parse(dataUser['userid']);
-        AppConfig.NAME = dataUser['username'];
-        AppConfig.EMAIL = dataUser['email'];
-        AppConfig.USER_TYPE = dataUser['type'];
-        AppConfig.IS_DRIVER = dataUser['isDriver'] == 'no' ? false : true;
-      }
+      if (dataUser['id'] == '' &&
+          dataUser['email'] == '' &&
+          dataUser['password'] == '') {
+        log('go to startup');
+        // context.pushReplacementNamed('startup');
+        Timer(const Duration(seconds: 1), () {
+          // context.pushReplacementNamed('startup');
+          navigateToRep(context, const StartUpScreen());
+        });
+      } else {
+        if (dataUser['userid'] != '') {
+          AppConfig.USER_ID = int.parse(dataUser['userid']);
+          AppConfig.NAME = dataUser['username'];
+          AppConfig.EMAIL = dataUser['email'];
+          AppConfig.USER_TYPE = dataUser['type'];
+          AppConfig.IS_DRIVER = dataUser['isDriver'] == 'no' ? false : true;
+        }
 
-      if(dataUser['merchantId'] != null || dataUser['merchantId'] != '') {
-        AppConfig.MERCHANT_ID = int.parse(dataUser['merchantId']);
-      }
-
-      if (dataUser['email'] != '' &&
-          dataUser['password'] != '' &&
-          dataUser['id'] != '') {
         LoginResponse loginResponse = await FetchController(
           endpoint: 'users/login',
           fromJson: (json) => LoginResponse.fromJson(json),
@@ -76,22 +79,30 @@ class _SplashScreenState extends State<SplashScreen> {
         } else if (AppConfig.USER_TYPE == 'kantin') {
           log('go to kantin pages');
         } else if (AppConfig.USER_TYPE == 'wirausaha') {
-          setState(() {
-            AppConfig.ON_DASHBOARD = true;
-          });
-          log('go as wirausahawan');
-          // navigateToRep(context, const MainScreen());
-          navigateToRep(context, const MainScreenMerchant());
+          try {
+            Map<String, dynamic> merchantData =
+                await AuthHelper().getDataMerchantId();
+
+            log('cek merchantId : ${merchantData['merchantId']}');
+            if (merchantData['merchantId'] != null ||
+                merchantData['merchantId'] != '') {
+              AppConfig.MERCHANT_ID = int.parse(merchantData['merchantId']);
+            }
+
+            setState(() {
+              AppConfig.ON_DASHBOARD = true;
+            });
+            log('go as wirausahawan');
+            // navigateToRep(context, const MainScreen());
+            navigateToRep(context, const MainScreenMerchant());
+          } on Exception catch (e) {
+            log(e.toString());
+            log('go to homepages');
+            navigateToRep(context, const MainScreen());
+          }
         } else if (AppConfig.USER_TYPE == 'kurir') {
           log('go to kurir pages');
         }
-      } else {
-        log('go to startup');
-        // context.pushReplacementNamed('startup');
-        Timer(const Duration(seconds: 3), () {
-          // context.pushReplacementNamed('startup');
-          navigateToRep(context, const StartUpScreen());
-        });
       }
     } catch (e) {
       // Handle error and log it

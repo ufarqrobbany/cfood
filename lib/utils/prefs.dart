@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SessionManager {
@@ -106,6 +108,7 @@ class SessionManager {
   Future<String?> getMerchantId() async {
     final SharedPreferences pref = await SharedPreferences.getInstance();
     String? merchantId = pref.getString('merchant_id');
-    return merchantId ?? '0';
+    log('pref merchandId : $merchantId');
+    return merchantId;
   }
 }

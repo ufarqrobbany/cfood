@@ -42,3 +42,5 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 /key.properties
+/keystore/cfood.keystore
+/keystore/assetlinks.json

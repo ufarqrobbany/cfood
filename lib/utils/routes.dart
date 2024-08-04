@@ -323,7 +323,7 @@ import 'package:go_router/go_router.dart';
         // builder: (context, state) => const ChatScreen(),
          pageBuilder: (context, state) {
           return CustomTransitionPage(
-            child: const ChatScreen(), 
+            child: ChatScreen(), 
             transitionDuration: const Duration(milliseconds: 200),
             transitionsBuilder: (context, animation, secondaryAnimation, child) {
               return FadeTransition(
@@ -557,7 +557,7 @@ class AppRoutes{
       case '/inbox':
         return _buildRoute(InboxScreen(), settings);
       case '/chat':
-        return _buildRoute(const ChatScreen(), settings);
+        return _buildRoute( ChatScreen(), settings);
       case '/organization':
         return _buildRoute(const OrganizationScreen(), settings);
       case '/see-all':

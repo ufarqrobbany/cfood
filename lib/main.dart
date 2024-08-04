@@ -1,5 +1,7 @@
-import 'dart:developer';
+import 'dart:async';
 
+import 'package:app_links/app_links.dart';
+import 'package:cfood/custom/CPageMover.dart';
 import 'package:cfood/screens/canteen.dart';
 import 'package:cfood/screens/cart.dart';
 import 'package:cfood/screens/chat.dart';
@@ -28,27 +30,34 @@ import 'package:cfood/screens/user_info.dart';
 import 'package:cfood/screens/verification.dart';
 
 import 'package:cfood/style.dart';
+// import 'package:cfood/utils/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-// import 'package:cfood/utils/routes.dart';
 
 // import 'package:'
 
 void main() {
-  FlutterError.onError = (FlutterErrorDetails details) {
-    // Log or handle the error details
-    log('${details.exception}');
-    log('${details.context}');
-  };
+  // FlutterError.onError = (FlutterErrorDetails details) {
+  //   // Log or handle the error details
+  //   log('${details.exception}');
+  //   log('${details.context}');
+  // };
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
-  Widget build(BuildContext context) {
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  final _navigatorKey = GlobalKey<NavigatorState>();
+  late AppLinks _appLinks;
+  StreamSubscription<Uri>? _linkSubscription;
+  @override
+  void initState() {
     // Mengatur gaya overlay sistem saat aplikasi diinisialisasi
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
       statusBarColor:
@@ -56,84 +65,119 @@ class MyApp extends StatelessWidget {
       statusBarIconBrightness:
           Brightness.light, // Mengatur ikon status bar menjadi putih
     ));
+    super.initState();
 
+    initDeepLinks();
+  }
+
+  @override
+  void dispose() {
+    _linkSubscription?.cancel();
+
+    super.dispose();
+  }
+
+  Future<void> initDeepLinks() async {
+    _appLinks = AppLinks();
+
+    // Handle links
+    _linkSubscription = _appLinks.uriLinkStream.listen((uri) {
+      debugPrint('onAppLink: $uri');
+      openAppLink(uri);
+    });
+  }
+
+  void openAppLink(Uri uri) {
+    _navigatorKey.currentState?.pushNamed(uri.fragment);
+  }
+
+  // This widget is the root of your application.
+  @override
+  Widget build(BuildContext context) {
     debugPrint('on main main');
     return MaterialApp(
       initialRoute: '/splash',
-     onGenerateInitialRoutes: (String initialRouteName) {
+      navigatorObservers: [RouteLogger()], 
+      onGenerateInitialRoutes: (String initialRouteName) {
         debugPrint('Generating initial route: $initialRouteName');
         List<Route<dynamic>> initialRoutes;
         if (initialRouteName == '/splash') {
-          initialRoutes = [MaterialPageRoute(builder: (context) => const SplashScreen())];
+          initialRoutes = [
+            MaterialPageRoute(builder: (context) => const SplashScreen())
+          ];
         } else if (initialRouteName == '/home') {
-          initialRoutes = [MaterialPageRoute(builder: (context) => const HomeScreen())];
+          initialRoutes = [
+            MaterialPageRoute(builder: (context) => const HomeScreen())
+          ];
         } else {
-          initialRoutes = [MaterialPageRoute(builder: (context) => const StartUpScreen())];
+          initialRoutes = [
+            MaterialPageRoute(builder: (context) => const StartUpScreen())
+          ];
         }
         return initialRoutes;
       },
-     onGenerateRoute: (settings) {
+      onGenerateRoute: (settings) {
         debugPrint('Navigating to ${settings.name}');
         switch (settings.name) {
           case '/splash':
-            return _buildRoute(const SplashScreen(), settings);
+            return MaterialPageRoute(settings: settings, builder: (context) => const SplashScreen(), );
           case '/startup':
-            return _buildRoute(const StartUpScreen(), settings);
+            return MaterialPageRoute(settings: settings, builder: (context) => const StartUpScreen(), );
           case '/login':
-            return _buildRoute(const LoginScreen(), settings);
+            return MaterialPageRoute(settings: settings, builder: (context) => const LoginScreen(),);
           case '/register':
-            return _buildRoute(const SignupScreen(), settings);
+            return MaterialPageRoute(settings: settings, builder: (context) => const SignupScreen(),);
           case '/register-student':
-            return _buildRoute(const SignUpStudentScreen(), settings);
+            return MaterialPageRoute(settings: settings, builder: (context) => const SignUpStudentScreen(),);
           case '/verification':
-            return _buildRoute(VerificationScreen(), settings);
+            return MaterialPageRoute(settings: settings, builder: (context) => VerificationScreen(),);
           case '/verification-success':
-            return _buildRoute(VerificationSuccess(), settings);
+            return MaterialPageRoute(settings: settings, builder: (context) => VerificationSuccess(),);
           case '/create-pass':
-            return _buildRoute(CreatePasswordScreen(), settings);
+            return MaterialPageRoute(settings: settings, builder: (context) => CreatePasswordScreen(),);
           case '/forgot-pass':
-            return _buildRoute(const ForgotPasswordScreen(), settings);
+            return MaterialPageRoute(settings: settings, builder: (context) => const ForgotPasswordScreen(),);
           case '/':
-            return _buildRoute(const MainScreen(), settings);
+            return MaterialPageRoute(settings: settings, builder: (context) => const MainScreen(),);
           case '/home':
-            return _buildRoute(const HomeScreen(), settings);
+            return MaterialPageRoute(settings: settings, builder: (context) => const HomeScreen(),);
           case '/cart':
-            return _buildRoute(const CartScreen(), settings);
+            return MaterialPageRoute(settings: settings, builder: (context) => const CartScreen(),);
           case '/order':
-            return _buildRoute(const OrderScreen(), settings);
+            return MaterialPageRoute(settings: settings, builder: (context) => const OrderScreen(),);
           case '/order-detail':
-            return _buildRoute(const OrderDetailScreen(), settings);
+            return MaterialPageRoute(settings: settings, builder: (context) => const OrderDetailScreen(),);
           case '/order-status':
-            return _buildRoute(const OrderStatusScreen(), settings);
+            return MaterialPageRoute(settings: settings, builder: (context) => const OrderStatusScreen(),);
           case '/inbox':
-            return _buildRoute(InboxScreen(), settings);
+            return MaterialPageRoute(settings: settings, builder: (context) => InboxScreen(),);
           case '/chat':
-            return _buildRoute(const ChatScreen(), settings);
+            return MaterialPageRoute(settings: settings, builder: (context) => ChatScreen(),);
           case '/organization':
-            return _buildRoute(const OrganizationScreen(), settings);
+            return MaterialPageRoute(settings: settings, builder: (context) => const OrganizationScreen(),);
           case '/see-all':
-            return _buildRoute(const SeeAllItemsScreen(), settings);
+            return MaterialPageRoute(settings: settings, builder: (context) => const SeeAllItemsScreen(),);
           case '/profile':
-            return _buildRoute(ProfileScreen(), settings);
+            return MaterialPageRoute(settings: settings, builder: (context) => ProfileScreen(),);
           case '/user-info':
-            return _buildRoute(const UserInformationScreen(), settings);
+            return MaterialPageRoute(settings: settings, builder: (context) => const UserInformationScreen(),);
           case '/favorite':
-            return _buildRoute(const FavoriteScreen(), settings);
+            return MaterialPageRoute(settings: settings, builder: (context) => const FavoriteScreen(),);
           case '/canteen':
-            return _buildRoute(const CanteenScreen(), settings);
+            return MaterialPageRoute(settings: settings, builder: (context) => const CanteenScreen(),);
           case '/review':
-            return _buildRoute(const ReviewScreen(), settings);
+            return MaterialPageRoute(settings: settings, builder: (context) => const ReviewScreen(),);
           case '/main-canteen':
-            return _buildRoute(const MainScreenCanteen(), settings);
+            return MaterialPageRoute(settings: settings, builder: (context) => const MainScreenCanteen(),);
           case '/order-canteen':
-            return _buildRoute(const OrderCanteenScreen(), settings);
+            return MaterialPageRoute(settings: settings, builder: (context) => const OrderCanteenScreen(),);
           case '/transaction':
-            return _buildRoute(const TransactionScreen(), settings);
+            return MaterialPageRoute(settings: settings, builder: (context) => const TransactionScreen(),);
           default:
-            return _buildRoute(const SplashScreen(), settings);
+            return MaterialPageRoute(settings: settings, builder: (context) => const SplashScreen(),);
         }
       },
-       routes: {
+      routes: {
         '/splash': (context) => const SplashScreen(),
         '/startup': (context) => const StartUpScreen(),
         '/login': (context) => const LoginScreen(),
@@ -150,7 +194,7 @@ class MyApp extends StatelessWidget {
         '/order-detail': (context) => const OrderDetailScreen(),
         '/order-status': (context) => const OrderStatusScreen(),
         '/inbox': (context) => InboxScreen(),
-        '/chat': (context) => const ChatScreen(),
+        '/chat': (context) => ChatScreen(),
         '/organization': (context) => const OrganizationScreen(),
         '/see-all': (context) => const SeeAllItemsScreen(),
         '/profile': (context) => ProfileScreen(),
@@ -183,16 +227,10 @@ class MyApp extends StatelessWidget {
     // );
   }
 
-  
-
-   
-
-
   MaterialPageRoute _buildRoute(Widget child, RouteSettings settings) {
     return MaterialPageRoute(
       settings: settings,
-      builder: (context) => child,);
+      builder: (context) => child,
+    );
   }
-
-  // HomeScreen() {}
 }

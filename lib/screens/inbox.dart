@@ -4,6 +4,7 @@ import 'package:cfood/custom/card.dart';
 import 'package:cfood/screens/chat.dart';
 import 'package:cfood/style.dart';
 import 'package:flutter/material.dart';
+import 'package:share_plus/share_plus.dart';
 
 // ignore: must_be_immutable
 class InboxScreen extends StatefulWidget {
@@ -98,7 +99,11 @@ class _InboxScreenState extends State<InboxScreen> {
         totalNewMessage: '3',
         lastDateTime: '01-7-2024',
         onPressed: () {
-          navigateTo(context, const ChatScreen());
+  //         final bool? isMerchant;
+  // final int? userId;
+  // final int? merchantId;
+          // Navigator.pushNamed(context, '/chat', arguments: {'isMerchant': true, 'userId': 0, 'merchantId': 0},);
+          navigateTo(context, ChatScreen(isMerchant: true, merchantId: 0,userId: 0,), routeName: '/chat');
           // Navigator.push(context, MaterialPageRoute(builder: (context) => const ChatScreen(),));
         },
       );
@@ -121,7 +126,8 @@ class _InboxScreenState extends State<InboxScreen> {
         totalNewMessage: '3',
         lastDateTime: '01-7-2024',
         onPressed: () {
-          navigateTo(context, const ChatScreen());
+          // Share.share('https://campusfood.id/splash',);
+          navigateTo(context, ChatScreen(isMerchant: false, merchantId: 0, userId: 0,));
         },
       );
     },);

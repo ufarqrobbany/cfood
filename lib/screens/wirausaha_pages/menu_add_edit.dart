@@ -49,11 +49,15 @@ class _AddEditMenuScreenState extends State<AddEditMenuScreen> {
   String selectedCategory = '';
   int selectedCategoryId = 0;
   bool showCategoryBox = false;
+  List<VariantDatas> dataListVariant = [];
 
   @override
   void initState() {
     super.initState();
     getCategory();
+    setState(() {
+      dataListVariant = MenuConfig.variants;
+    });
   }
 
   Future<void> getCategory() async {
@@ -146,7 +150,7 @@ class _AddEditMenuScreenState extends State<AddEditMenuScreen> {
           "menuStock": int.parse(stockController.text),
           "isDanus": isDanusan,
           "merchantId": AppConfig.MERCHANT_ID,
-          "variants": MenuConfig.variants,
+          "variants": dataListVariant,
         },
         fileKeyName: 'photo',
         file: _image!,
@@ -156,6 +160,7 @@ class _AddEditMenuScreenState extends State<AddEditMenuScreen> {
         buttonLoad = false;
       });
       MenuConfig.variants.clear();
+      dataListVariant.clear();
       log('go to canteen');
       navigateBack(context);
     } on Exception catch (e) {
@@ -170,292 +175,308 @@ class _AddEditMenuScreenState extends State<AddEditMenuScreen> {
   void deleteVariant(int index) {
     setState(() {
       MenuConfig.variants.removeAt(index);
+      dataListVariant.removeAt(index);
     });
   }
 
   @override
   Widget build(BuildContext context) {
     ToastContext().init(context);
-    return Scaffold(
-      appBar: AppBar(
-        leading: backButtonCustom(context: context, customTap: () {
-          MenuConfig.variants.clear();
-          navigateBack(context);
-        }),
-        leadingWidth: 90,
-        title: Text(
-          'Tambah Menu',
-          style: AppTextStyles.appBarTitle,
+    return PopScope(
+      canPop: true,
+      onPopInvoked: (didPop) {
+        MenuConfig.variants.clear();
+        dataListVariant.clear();
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          leading: backButtonCustom(
+              context: context,
+              customTap: () {
+                MenuConfig.variants.clear();
+                dataListVariant.clear();
+                navigateBack(context);
+              }),
+          leadingWidth: 90,
+          title: Text(
+            'Tambah Menu',
+            style: AppTextStyles.appBarTitle,
+          ),
+          foregroundColor: Colors.white,
+          backgroundColor: Colors.white,
+          scrolledUnderElevation: 0,
         ),
-        foregroundColor: Colors.white,
         backgroundColor: Colors.white,
-        scrolledUnderElevation: 0,
-      ),
-      backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 25),
-          child: Column(
-            mainAxisSize: MainAxisSize.max,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(
-                height: 25,
-              ),
-              // Upload photo
-              InkWell(
-                onTap: () {
-                  showOptionsPicker();
-                },
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: Container(
-                    height: 200,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: Warna.abu,
-                      borderRadius: BorderRadius.circular(8),
-                      border: _image == null
-                          ? DashedBorder.fromBorderSide(
-                              dashLength: 12,
-                              side: BorderSide(
-                                color: Warna.biru,
-                                width: 3,
-                              ),
-                            )
-                          : null,
-                    ),
-                    child: _image != null
-                        ? Image.file(
-                            _image!,
-                            fit: BoxFit.cover,
-                          )
-                        : Center(
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  UIcons.solidRounded.camera,
+        body: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 25),
+            child: Column(
+              mainAxisSize: MainAxisSize.max,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(
+                  height: 25,
+                ),
+                // Upload photo
+                InkWell(
+                  onTap: () {
+                    showOptionsPicker();
+                  },
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Container(
+                      height: 200,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: Warna.abu,
+                        borderRadius: BorderRadius.circular(8),
+                        border: _image == null
+                            ? DashedBorder.fromBorderSide(
+                                dashLength: 12,
+                                side: BorderSide(
                                   color: Warna.biru,
-                                  size: 30,
+                                  width: 3,
                                 ),
-                                Text(
-                                  'Tambah foto',
-                                  style: TextStyle(
+                              )
+                            : null,
+                      ),
+                      child: _image != null
+                          ? Image.file(
+                              _image!,
+                              fit: BoxFit.cover,
+                            )
+                          : Center(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    UIcons.solidRounded.camera,
                                     color: Warna.biru,
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w400,
+                                    size: 30,
                                   ),
-                                )
-                              ],
+                                  Text(
+                                    'Tambah foto',
+                                    style: TextStyle(
+                                      color: Warna.biru,
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                  )
+                                ],
+                              ),
                             ),
-                          ),
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              CTextField(
-                controller: nameProductController,
-                hintText: '',
-                labelText: 'Nama Produk',
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              CTextField(
-                controller: produckCategoryController,
-                hintText: '',
-                labelText: 'Kategori Produk',
-                onChanged: (p0) {
-                  _categoryItemsFilter();
-                  // getActivity(context, id: selectedActivityId);
-                },
-                suffixIcon: IconButton(
-                  icon: Icon(showCategoryBox &&
-                          produckCategoryController.text.isNotEmpty
-                      ? Icons.arrow_drop_down_rounded
-                      : Icons.arrow_left_rounded),
-                  onPressed: () {
-                    log(produckCategoryController.text);
-                    // print("not filter : " + _campusList.toString());
-                    log("filtered : $filterCategoryList");
-                    setState(() {
-                      showCategoryBox = !showCategoryBox;
-                    });
-                  },
+                const SizedBox(
+                  height: 20,
                 ),
-              ),
-              if (showCategoryBox && produckCategoryController.text.isNotEmpty)
-                activitySelection(),
-
-              const SizedBox(
-                height: 10,
-              ),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: TextButton(
+                CTextField(
+                  controller: nameProductController,
+                  hintText: '',
+                  labelText: 'Nama Produk',
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                CTextField(
+                  controller: produckCategoryController,
+                  hintText: '',
+                  labelText: 'Kategori Produk',
+                  onChanged: (p0) {
+                    _categoryItemsFilter();
+                    // getActivity(context, id: selectedActivityId);
+                  },
+                  suffixIcon: IconButton(
+                    icon: Icon(showCategoryBox &&
+                            produckCategoryController.text.isNotEmpty
+                        ? Icons.arrow_drop_down_rounded
+                        : Icons.arrow_left_rounded),
                     onPressed: () {
-                      // setState(() {
-                      //   loadState = false;
-                      // });
-                      navigateTo(context, const AddCategoryScreen())
-                          .then((result) {
-                        if (result == true) {
-                          getCategory();
+                      log(produckCategoryController.text);
+                      // print("not filter : " + _campusList.toString());
+                      log("filtered : $filterCategoryList");
+                      setState(() {
+                        showCategoryBox = !showCategoryBox;
+                      });
+                    },
+                  ),
+                ),
+                if (showCategoryBox &&
+                    produckCategoryController.text.isNotEmpty)
+                  activitySelection(),
+
+                const SizedBox(
+                  height: 10,
+                ),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: TextButton(
+                      onPressed: () {
+                        // setState(() {
+                        //   loadState = false;
+                        // });
+                        navigateTo(context, const AddCategoryScreen())
+                            .then((result) {
+                          if (result == true) {
+                            getCategory();
+                          }
+                        });
+                      },
+                      style: TextButton.styleFrom(
+                        padding: EdgeInsets.zero,
+                      ),
+                      child: Text(
+                        'Tambah Kategori',
+                        style: TextStyle(
+                          color: Warna.biru,
+                          fontSize: 15,
+                        ),
+                      )),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                CTextField(
+                  controller: descriptionController,
+                  hintText: '',
+                  labelText: 'Deskripsi',
+                  subLabelText:
+                      '  ${descriptionController.text.length}/100 karakter',
+                  minLines: 5,
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                CTextField(
+                  controller: priceController,
+                  hintText: '',
+                  labelText: 'Harga Produk',
+                  keyboardType: TextInputType.number,
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                CTextField(
+                  controller: stockController,
+                  hintText: '',
+                  labelText: 'Stok',
+                  keyboardType: TextInputType.number,
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+
+                const Text(
+                  'Varian Produk',
+                  style: AppTextStyles.labelInput,
+                ),
+
+                dataListVariant.isEmpty
+                    ? const SizedBox(
+                        height: 10,
+                      )
+                    : ListView.builder(
+                        itemCount: dataListVariant.length,
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        itemBuilder: (context, index) {
+                          VariantDatas variant = dataListVariant[index];
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 5),
+                            child: varianProductBox(
+                              varianName: variant.variantName,
+                              listOption: variant.variantOption,
+                              varianIdx: index,
+                            ),
+                          );
+                        },
+                      ),
+                SizedBox(
+                  height: 50,
+                  width: double.infinity,
+                  child: DynamicColorButton(
+                    onPressed: () {
+                      navigateTo(context, const AddEditVariantsScreen())
+                          .then((value) {
+                        if (value == true) {
+                          log('load variant');
+                          // initState();
+                          setState(() {
+                            dataListVariant = MenuConfig.variants;
+                          });
                         }
                       });
                     },
-                    style: TextButton.styleFrom(
-                      padding: EdgeInsets.zero,
+                    text: 'Tambah Varian',
+                    textColor: Warna.biru1,
+                    backgroundColor: Colors.white,
+                    borderRadius: 55,
+                    border: BorderSide(color: Warna.biru1, width: 1),
+                    icon: Icon(
+                      Icons.add,
+                      color: Warna.biru1,
                     ),
-                    child: Text(
-                      'Tambah Kategori',
-                      style: TextStyle(
-                        color: Warna.biru,
-                        fontSize: 15,
-                      ),
-                    )),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              CTextField(
-                controller: descriptionController,
-                hintText: '',
-                labelText: 'Deskripsi',
-                subLabelText:
-                    '  ${descriptionController.text.length}/100 karakter',
-                minLines: 5,
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              CTextField(
-                controller: priceController,
-                hintText: '',
-                labelText: 'Harga Produk',
-                keyboardType: TextInputType.number,
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              CTextField(
-                controller: stockController,
-                hintText: '',
-                labelText: 'Stok',
-                keyboardType: TextInputType.number,
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-
-              const Text(
-                'Varian Produk',
-                style: AppTextStyles.labelInput,
-              ),
-
-              MenuConfig.variants.isEmpty
-                  ? const SizedBox(
-                      height: 10,
-                    )
-                  : ListView.builder(
-                      itemCount: MenuConfig.variants.length,
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                      itemBuilder: (context, index) {
-                        VariantDatas variant = MenuConfig.variants[index];
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 5),
-                          child: varianProductBox(
-                            varianName: variant.variantName,
-                            listOption: variant.variantOption,
-                            varianIdx: index,
-                          ),
-                        );
-                      },
-                    ),
-              SizedBox(
-                height: 50,
-                width: double.infinity,
-                child: DynamicColorButton(
-                  onPressed: () {
-                    navigateTo(context, const AddEditVariantsScreen())
-                        .then((value) {
-                      if (value == 'load variant') {
-                        log('load variant');
-                      }
-                    });
-                  },
-                  text: 'Tambah Varian',
-                  textColor: Warna.biru1,
-                  backgroundColor: Colors.white,
-                  borderRadius: 55,
-                  border: BorderSide(color: Warna.biru1, width: 1),
-                  icon: Icon(
-                    Icons.add,
-                    color: Warna.biru1,
                   ),
                 ),
-              ),
 
-              // kerjain
-              widget.merchantIsDanus
-                  ? const SizedBox(
-                      height: 20,
-                    )
-                  : Container(),
-              widget.merchantIsDanus
-                  ? Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Checkbox(
-                          value: isDanusan,
-                          onChanged: (value) {
-                            setState(() {
-                              isDanusan = value!;
-                            });
-                          },
-                        ),
-                        const SizedBox(
-                            width:
-                                8), // Add some spacing between checkbox and text
-                        Text('Produk Danus'),
-                      ],
-                    )
-                  : Container(),
+                // kerjain
+                widget.merchantIsDanus
+                    ? const SizedBox(
+                        height: 20,
+                      )
+                    : Container(),
+                widget.merchantIsDanus
+                    ? Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Checkbox(
+                            value: isDanusan,
+                            onChanged: (value) {
+                              setState(() {
+                                isDanusan = value!;
+                              });
+                            },
+                          ),
+                          const SizedBox(
+                              width:
+                                  8), // Add some spacing between checkbox and text
+                          Text('Produk Danus'),
+                        ],
+                      )
+                    : Container(),
 
-              const SizedBox(
-                height: 40,
-              ),
-            ],
+                const SizedBox(
+                  height: 40,
+                ),
+              ],
+            ),
           ),
         ),
-      ),
-      bottomNavigationBar: Container(
-        height: 90,
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 20),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-                blurRadius: 20,
-                spreadRadius: 0,
-                color: Warna.shadow.withOpacity(0.12),
-                offset: const Offset(0, 0))
-          ],
-        ),
-        child: CBlueButton(
-          isLoading: buttonLoad,
-          onPressed: () {
-            dataCheck(context);
-          },
-          text: 'Tambah',
+        bottomNavigationBar: Container(
+          height: 90,
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 20),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            boxShadow: [
+              BoxShadow(
+                  blurRadius: 20,
+                  spreadRadius: 0,
+                  color: Warna.shadow.withOpacity(0.12),
+                  offset: const Offset(0, 0))
+            ],
+          ),
+          child: CBlueButton(
+            isLoading: buttonLoad,
+            onPressed: () {
+              dataCheck(context);
+            },
+            text: 'Tambah',
+          ),
         ),
       ),
     );

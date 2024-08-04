@@ -70,7 +70,7 @@ class _ChatSellerScreenState extends State<ChatSellerScreen> {
           totalNewMessage: '3',
           lastDateTime: '01-7-2024',
           onPressed: () {
-            navigateTo(context, const ChatScreen());
+            navigateTo(context, ChatScreen());
             // Navigator.push(context, MaterialPageRoute(builder: (context) => const ChatScreen(),));
           },
         );

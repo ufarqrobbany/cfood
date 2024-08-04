@@ -273,7 +273,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                 margin: const EdgeInsets.symmetric(vertical: 10),
                 child: DynamicColorButton(
                   onPressed: () {
-                    navigateTo(context, const ChatScreen(isMerchant: true, merchantId: 1, userId: 1,),);
+                    navigateTo(context, ChatScreen(isMerchant: true, merchantId: 1, userId: 1,),);
                   },
                   icon: Icon(
                     UIcons.solidRounded.comment,
