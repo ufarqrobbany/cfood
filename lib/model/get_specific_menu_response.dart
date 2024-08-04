@@ -1,3 +1,6 @@
+import 'package:cfood/model/get_detail_merchant_response.dart'
+    as detailmerchant;
+
 class GetSpecificMenuResponse {
   int? statusCode;
   String? status;
@@ -39,7 +42,7 @@ class DataSpecificMenu {
   bool? isLike;
   String? categoryMenuName;
   int? merchantId;
-  List<Variants>? variants;
+  List<detailmerchant.Variant>? variants;
 
   DataSpecificMenu(
       {this.id,
@@ -70,9 +73,9 @@ class DataSpecificMenu {
     categoryMenuName = json['categoryMenuName'];
     merchantId = json['merchantId'];
     if (json['variants'] != null) {
-      variants = <Variants>[];
+      variants = <detailmerchant.Variant>[];
       json['variants'].forEach((v) {
-        variants!.add(new Variants.fromJson(v));
+        variants!.add(new detailmerchant.Variant.fromJson(v));
       });
     }
   }
@@ -98,69 +101,69 @@ class DataSpecificMenu {
   }
 }
 
-class Variants {
-  int? id;
-  String? variantName;
-  bool? isRequired;
-  int? minimal;
-  int? maximal;
-  List<VariantOptions>? variantOptions;
+// class Variants {
+//   int? id;
+//   String? variantName;
+//   bool? isRequired;
+//   int? minimal;
+//   int? maximal;
+//   List<VariantOptions>? variantOptions;
 
-  Variants(
-      {this.id,
-      this.variantName,
-      this.isRequired,
-      this.minimal,
-      this.maximal,
-      this.variantOptions});
+//   Variants(
+//       {this.id,
+//       this.variantName,
+//       this.isRequired,
+//       this.minimal,
+//       this.maximal,
+//       this.variantOptions});
 
-  Variants.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    variantName = json['variantName'];
-    isRequired = json['isRequired'];
-    minimal = json['minimal'];
-    maximal = json['maximal'];
-    if (json['variantOptions'] != null) {
-      variantOptions = <VariantOptions>[];
-      json['variantOptions'].forEach((v) {
-        variantOptions!.add(new VariantOptions.fromJson(v));
-      });
-    }
-  }
+//   Variants.fromJson(Map<String, dynamic> json) {
+//     id = json['id'];
+//     variantName = json['variantName'];
+//     isRequired = json['isRequired'];
+//     minimal = json['minimal'];
+//     maximal = json['maximal'];
+//     if (json['variantOptions'] != null) {
+//       variantOptions = <VariantOptions>[];
+//       json['variantOptions'].forEach((v) {
+//         variantOptions!.add(new VariantOptions.fromJson(v));
+//       });
+//     }
+//   }
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['variantName'] = this.variantName;
-    data['isRequired'] = this.isRequired;
-    data['minimal'] = this.minimal;
-    data['maximal'] = this.maximal;
-    if (this.variantOptions != null) {
-      data['variantOptions'] =
-          this.variantOptions!.map((v) => v.toJson()).toList();
-    }
-    return data;
-  }
-}
+//   Map<String, dynamic> toJson() {
+//     final Map<String, dynamic> data = new Map<String, dynamic>();
+//     data['id'] = this.id;
+//     data['variantName'] = this.variantName;
+//     data['isRequired'] = this.isRequired;
+//     data['minimal'] = this.minimal;
+//     data['maximal'] = this.maximal;
+//     if (this.variantOptions != null) {
+//       data['variantOptions'] =
+//           this.variantOptions!.map((v) => v.toJson()).toList();
+//     }
+//     return data;
+//   }
+// }
 
-class VariantOptions {
-  int? id;
-  String? variantOptionName;
-  int? variantOptionPrice;
+// class VariantOptions {
+//   int? id;
+//   String? variantOptionName;
+//   int? variantOptionPrice;
 
-  VariantOptions({this.id, this.variantOptionName, this.variantOptionPrice});
+//   VariantOptions({this.id, this.variantOptionName, this.variantOptionPrice});
 
-  VariantOptions.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    variantOptionName = json['variantOptionName'];
-    variantOptionPrice = json['variantOptionPrice'];
-  }
+//   VariantOptions.fromJson(Map<String, dynamic> json) {
+//     id = json['id'];
+//     variantOptionName = json['variantOptionName'];
+//     variantOptionPrice = json['variantOptionPrice'];
+//   }
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['variantOptionName'] = this.variantOptionName;
-    data['variantOptionPrice'] = this.variantOptionPrice;
-    return data;
-  }
-}
+//   Map<String, dynamic> toJson() {
+//     final Map<String, dynamic> data = new Map<String, dynamic>();
+//     data['id'] = this.id;
+//     data['variantOptionName'] = this.variantOptionName;
+//     data['variantOptionPrice'] = this.variantOptionPrice;
+//     return data;
+//   }
+// }

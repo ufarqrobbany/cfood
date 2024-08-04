@@ -1,3 +1,5 @@
+import 'package:cfood/model/get_specific_menu_response.dart' as detailmenu;
+
 class CartResponse {
   final int statusCode;
   final String status;
@@ -16,7 +18,8 @@ class CartResponse {
       statusCode: json['statusCode'],
       status: json['status'],
       message: json['message'],
-      data: List<CartData>.from(json['data'].map((item) => CartData.fromJson(item))),
+      data: List<CartData>.from(
+          json['data'].map((item) => CartData.fromJson(item))),
     );
   }
 }
@@ -45,81 +48,81 @@ class CartData {
       merchantName: json['merchantName'],
       merchantType: json['merchantType'],
       isOpen: json['open'],
-      items: List<CartItem>.from(json['items'].map((item) => CartItem.fromJson(item))),
+      items: List<CartItem>.from(
+          json['items'].map((item) => CartItem.fromJson(item))),
     );
   }
 }
 
 class CartItem {
   final int cartItemId;
-  final int menuId;
-  final String menuName;
-  final String menuPhoto;
   final int stock;
+  final int solds;
   final int quantity;
-  final int totalPriceMenu;
-  final List<Variant> variants;
+  final int totalPriceItem;
+  final detailmenu.DataSpecificMenu detailMenu;
+  final List<CartVariant> cartVariants;
 
   CartItem({
     required this.cartItemId,
-    required this.menuId,
-    required this.menuName,
-    required this.menuPhoto,
     required this.stock,
+    required this.solds,
     required this.quantity,
-    required this.totalPriceMenu,
-    required this.variants,
+    required this.totalPriceItem,
+    required this.detailMenu,
+    required this.cartVariants,
   });
 
   factory CartItem.fromJson(Map<String, dynamic> json) {
     return CartItem(
       cartItemId: json['cartItemId'],
-      menuId: json['menuId'],
-      menuName: json['menuName'],
-      menuPhoto: json['menuPhoto'],
       stock: json['stock'],
+      solds: json['solds'],
       quantity: json['quantity'],
-      totalPriceMenu: json['totalPriceMenu'],
-      variants: List<Variant>.from(json['variants'].map((item) => Variant.fromJson(item))),
+      totalPriceItem: json['totalPriceItem'],
+      detailMenu: detailmenu.DataSpecificMenu.fromJson(json['detailMenu']),
+      cartVariants: List<CartVariant>.from(
+          json['cartVariants'].map((item) => CartVariant.fromJson(item))),
     );
   }
 }
 
-class Variant {
+class CartVariant {
   final int variantId;
   final String variantName;
-  final List<VariantOption> variantOptions;
+  final List<CartVariantOption> variantOptions;
 
-  Variant({
+  CartVariant({
     required this.variantId,
     required this.variantName,
     required this.variantOptions,
   });
 
-  factory Variant.fromJson(Map<String, dynamic> json) {
-    return Variant(
+  factory CartVariant.fromJson(Map<String, dynamic> json) {
+    return CartVariant(
       variantId: json['variantId'],
       variantName: json['variantName'],
-      variantOptions: List<VariantOption>.from(json['variantOptions'].map((item) => VariantOption.fromJson(item))),
+      variantOptions: List<CartVariantOption>.from(json['variantOptions']
+          .map((item) => CartVariantOption.fromJson(item))),
     );
   }
 }
 
-class VariantOption {
+class CartVariantOption {
   final int cartVariantId;
   final int variantOptionId;
   final String variantOptionName;
   final int variantOptionPrice;
 
-  VariantOption({
+  CartVariantOption({
     required this.cartVariantId,
     required this.variantOptionId,
     required this.variantOptionName,
     required this.variantOptionPrice,
   });
 
-  factory VariantOption.fromJson(Map<String, dynamic> json) {
-    return VariantOption(
+  factory CartVariantOption.fromJson(Map<String, dynamic> json) {
+    return CartVariantOption(
       cartVariantId: json['cartVariantId'],
       variantOptionId: json['variantOptionId'],
       variantOptionName: json['variantOptionName'],
