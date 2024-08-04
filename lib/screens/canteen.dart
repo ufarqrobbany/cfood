@@ -1293,7 +1293,7 @@ class _CanteenScreenState extends State<CanteenScreen>
                                       quantity: 1,
                                     );
                                     showToast(
-                                        'Menu di tambahkan kedalam keranjang');
+                                        'Menu ditambahkan ke dalam keranjang');
                                   },
                             onTapAdd: () {},
                             onTapRemove: () {},
@@ -1467,16 +1467,13 @@ class _CanteenScreenState extends State<CanteenScreen>
                             if (item.selectedCount! < item.menuStock!) {
                               setState(() {
                                 item.selectedCount = item.selectedCount! + 1;
-                                // item.subTotal =
-                                //     (item.menuPrice! * item.selectedCount!);
                               });
                               updateCart(
                                 menuId: item.id!,
                                 quantity: 1,
                               );
                             } else {
-                              // Show a message that stock limit has been reached
-                              showToast('Stock tidak mencukupi');
+                              showToast('Stok tidak mencukupi');
                             }
                           }
                         },
@@ -1484,9 +1481,7 @@ class _CanteenScreenState extends State<CanteenScreen>
                           if (item.selectedCount! > 0) {
                             setState(() {
                               item.selectedCount = item.selectedCount! - 1;
-                              // item.subTotal =
-                              //     (item.subTotal! - item.menuPrice!);
-                            });
+                             });
                             updateCart(
                               menuId: item.id!,
                               quantity: -1,
@@ -1505,58 +1500,7 @@ class _CanteenScreenState extends State<CanteenScreen>
     );
   }
 
-  // Widget searchBarStore() {
-  //   return Container(
-  //       // height: 50,
-  //       // width: double.infinity,
-  //       // padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 4),
-  //       margin: const EdgeInsets.symmetric(horizontal: 0, vertical: 4),
-  //       child: CTextField(
-  //         controller: searchTextController,
-  //         hintText: 'Jajan Apa hari ini?',
-  //         borderColor: Warna.abu4,
-  //         borderRadius: 58,
-  //         maxLines: 1,
-  //         textInputAction: TextInputAction.done,
-  //         contentPadding:
-  //             const EdgeInsets.symmetric(horizontal: 18, vertical: 3),
-  //         onSubmitted: (p0) {
-  //           // setState(() {
-  //           //   searchDone = true;
-  //           // });
-  //         },
-  //         onChanged: (p0) {
-  //           // _filterSearch();
-  //           // setState(() {
-  //           //   searchDone = true;
-  //           // });
-  //           // if(searchTextController.text.isNotEmpty) {
-  //           //   setState(() {
-  //           //     _showSuggestions = !_showSuggestions;
-  //           //   });
-  //           // }
-  //         },
-  //         prefixIcon: IconButton(
-  //             onPressed: () {
-  //               // setState(() {
-  //               //   searchDone = !searchDone;
-  //               // });
-  //               // setState(() {
-  //               //   // searchDone = !searchDone;
-  //               //   _showSuggestions = !_showSuggestions;
-  //               // });
-  //             },
-  //             padding: EdgeInsets.zero,
-  //             iconSize: 15,
-  //             color: Warna.biru,
-  //             icon: const Icon(
-  //               Icons.search,
-  //             )),
-  //       ));
-  // }
-
   Widget actionButtonCustom({VoidCallback? onPressed, IconData? icons}) {
-    // leadingWidth: 90,
     return IconButton(
       onPressed: onPressed,
       icon: Icon(
@@ -1703,190 +1647,9 @@ class _CanteenScreenState extends State<CanteenScreen>
           ),
           text: 'Lihat Ulasan >',
         ),
-        // const SizedBox(
-        //   width: 8,
-        // ),
-
-        // const Text(
-        //   '100 Penilaian',
-        //   style: AppTextStyles.textRegular,
-        // ),
       ],
     );
   }
-
-  // Future menuFrameSheet() {
-  //   bool itsFavorite = false;
-  //   return showModalBottomSheet(
-  //     context: context,
-  //     // barrierColor: Colors.transparent,
-  //     backgroundColor: Colors.white,
-  //     enableDrag: true,
-  //     showDragHandle: true,
-  //     isScrollControlled: true,
-  //     shape: const RoundedRectangleBorder(
-  //         borderRadius: BorderRadius.only(
-  //             topLeft: Radius.circular(20), topRight: Radius.circular(20))),
-  //     builder: (context) {
-  //       return StatefulBuilder(
-  //         builder: (context, setState) {
-  //           return SingleChildScrollView(
-  //             child: Container(
-  //               padding: const EdgeInsets.symmetric(horizontal: 25),
-  //               child: Column(
-  //                 mainAxisSize: MainAxisSize.min,
-  //                 crossAxisAlignment: CrossAxisAlignment.start,
-  //                 children: [
-  //                   // Menu Image
-  //                   ClipRRect(
-  //                     borderRadius: BorderRadius.circular(8),
-  //                     child: Image.network(
-  //                       '/.jpg',
-  //                       width: double.infinity,
-  //                       height: 300,
-  //                       fit: BoxFit.cover,
-  //                       errorBuilder: (context, error, stackTrace) {
-  //                         return Container(
-  //                           width: double.infinity,
-  //                           height: 300,
-  //                           decoration: BoxDecoration(
-  //                             color: Warna.abu2,
-  //                             borderRadius: BorderRadius.circular(8),
-  //                           ),
-  //                         );
-  //                       },
-  //                     ),
-  //                   ),
-  //                   const SizedBox(
-  //                     height: 20,
-  //                   ),
-  //                   // MENU NAME
-  //                   const Text(
-  //                     '[Nama Menu]',
-  //                     style: AppTextStyles.title,
-  //                   ),
-  //                   const SizedBox(
-  //                     height: 8,
-  //                   ),
-  //                   // MENU REVIEW
-  //                   storeReviewContainer(),
-  //                   const SizedBox(
-  //                     height: 8,
-  //                   ),
-  //                   // MENU DESCRIPTION
-  //                   const SizedBox(
-  //                     height: 40,
-  //                     child: SingleChildScrollView(
-  //                       scrollDirection: Axis.vertical,
-  //                       physics: AlwaysScrollableScrollPhysics(),
-  //                       child: Text(
-  //                         '''Nasi Goreng Spesial kami adalah perpaduan sempurna antara rasa dan aroma yang menggugah selera. Dibuat dari nasi putih berkualitas, kami menggorengnya dengan bumbu pilihan seperti bawang putih, bawang merah, dan cabai merah yang dihaluskan. Ditambah dengan potongan ayam, udang segar, dan sayuran seperti wortel, kacang polong, serta irisan daun bawang, menciptakan tekstur yang beragam dalam setiap suapan. Tak lupa, tambahan kecap manis dan saus tiram memberikan sentuhan manis dan gurih yang seimbang. Disajikan dengan telur mata sapi setengah matang di atasnya, serta kerupuk udang yang renyah, membuat hidangan ini semakin istimewa. Sebagai pelengkap, acar mentimun dan tomat segar memberikan kesegaran yang kontras dengan rasa gurih nasi goreng. Cocok dinikmati kapan saja, baik untuk sarapan, makan siang, maupun makan malam. Nikmati kelezatan Nasi Goreng Spesial yang akan memanjakan lidah Anda dan memberikan pengalaman kuliner yang tak terlupakan.''',
-  //                         style: AppTextStyles.textRegular,
-  //                         // maxLines: 5,
-  //                         // maxLines: 5,
-  //                         // softWrap: true,
-  //                         // overflow: TextOverflow.visible,
-  //                       ),
-  //                     ),
-  //                   ),
-  //                   const SizedBox(
-  //                     height: 8,
-  //                   ),
-  //                   // PRICE
-  //                   Text(
-  //                     'Rp10.000',
-  //                     style: TextStyle(
-  //                         color: Warna.biru,
-  //                         fontSize: 20,
-  //                         fontWeight: FontWeight.w700),
-  //                   ),
-  //                   const SizedBox(
-  //                     height: 15,
-  //                   ),
-  //                   Row(
-  //                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //                     children: [
-  //                       TextButton.icon(
-  //                         onPressed: () {
-  //                           setState(() {
-  //                             itsFavorite = !itsFavorite;
-  //                           });
-  //                         },
-  //                         icon: Icon(
-  //                           Icons.favorite,
-  //                           color: itsFavorite ? Colors.white : Warna.abu4,
-  //                           size: 20,
-  //                         ),
-  //                         label: Text(
-  //                           'Favorit',
-  //                           style: TextStyle(
-  //                             fontSize: 13,
-  //                             fontWeight: FontWeight.w600,
-  //                             color: itsFavorite
-  //                                 ? Colors.white
-  //                                 : Warna.regulerFontColor,
-  //                           ),
-  //                         ),
-  //                         style: TextButton.styleFrom(
-  //                           backgroundColor:
-  //                               itsFavorite ? Warna.like : Colors.white,
-  //                           shape: RoundedRectangleBorder(
-  //                               borderRadius: BorderRadius.circular(53)),
-  //                           side: BorderSide(
-  //                               color: itsFavorite ? Warna.like : Warna.abu4,
-  //                               width: 1),
-  //                         ),
-  //                       ),
-  //                       TextButton.icon(
-  //                         onPressed: () {},
-  //                         icon: Icon(
-  //                           Icons.share,
-  //                           color: Warna.abu4,
-  //                           size: 20,
-  //                         ),
-  //                         label: Text(
-  //                           'Bagikan',
-  //                           style: TextStyle(
-  //                             fontSize: 13,
-  //                             fontWeight: FontWeight.w600,
-  //                             color: Warna.regulerFontColor,
-  //                           ),
-  //                         ),
-  //                         style: TextButton.styleFrom(
-  //                           shape: RoundedRectangleBorder(
-  //                               borderRadius: BorderRadius.circular(53)),
-  //                           side: BorderSide(color: Warna.abu4, width: 1),
-  //                         ),
-  //                       ),
-  //                     ],
-  //                   ),
-  //                   const SizedBox(
-  //                     height: 15,
-  //                   ),
-  //                   SizedBox(
-  //                     width: double.infinity,
-  //                     height: 55,
-  //                     child: CBlueButton(
-  //                       onPressed: () {},
-  //                       borderRadius: 55,
-  //                       text: 'Tambah Pesanan',
-  //                     ),
-  //                   ),
-  //                   const SizedBox(
-  //                     height: 25,
-  //                   ),
-  //                   // const SizedBox(
-  //                   //   height: 250,
-  //                   // ),
-  //                 ],
-  //               ),
-  //             ),
-  //           );
-  //         },
-  //       );
-  //     },
-  //   );
-  // }
 
   Future storeMenuCountSheet() {
     return showModalBottomSheet(
@@ -1932,7 +1695,6 @@ class _CanteenScreenState extends State<CanteenScreen>
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20),
                         child: ListTile(
-                          // contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 0),
                           contentPadding: EdgeInsets.zero,
                           dense: true,
                           leading: Icon(
@@ -2067,104 +1829,6 @@ class _CanteenScreenState extends State<CanteenScreen>
           );
   }
 
-  // Widget searchMenuBody() {
-  //   return ReloadIndicatorType1(
-  //     onRefresh: refreshPage,
-  //     child: SingleChildScrollView(
-  //       physics: const BouncingScrollPhysics(),
-  //       child: ListView.builder(
-  //         itemCount: menuMaps['Semua']?.length ?? 0,
-  //         shrinkWrap: true,
-  //         physics: const NeverScrollableScrollPhysics(),
-  //         itemBuilder: (context, index) {
-  //           List<Menu> menuItems = menuMaps['Semua']!;
-  //           Menu item = menuItems[index];
-  //           return Container(
-  //             color: Colors.white,
-  //             padding: const EdgeInsets.symmetric(horizontal: 25),
-  //             child: ProductCardBoxHorizontal(
-  //               onPressed: () {
-  //                 log('product: ${item.menuName}');
-  //                 // storeMenuCountSheet();
-  //                 menuFrameSheet(context);
-  //               },
-  //               productName: item.menuName!,
-  //               description: item.menuDesc ?? 'deskripsi menu',
-  //               price: item.menuPrice,
-  //               likes: item.menuLikes.toString(),
-  //               rate: item.menuRate.toString(),
-  //               count: item.menuStock.toString(),
-  //               onTapAdd: () {
-  //                 setState(() {
-  //                   item.menuStock = item.menuStock! + 1;
-  //                 });
-  //                 // print(menuItem[index]['count']);
-  //               },
-  //               onTapRemove: () {
-  //                 setState(() {
-  //                   item.menuStock = item.menuStock! - 1;
-  //                 });
-  //                 // print(orderCount);
-  //               },
-  //             ),
-  //           );
-  //         },
-  //       ),
-  //     ),
-  //   );
-  // }
-
-  // Widget searchMenuBody() {
-  //   return ReloadIndicatorType1(
-  //     onRefresh: refreshPage,
-  //     child: SingleChildScrollView(
-  //       physics: const BouncingScrollPhysics(),
-  //       child: ListView.builder(
-  //         itemCount: menuMaps['Semua']?.length,
-  //         shrinkWrap: true,
-  //         physics: const NeverScrollableScrollPhysics(),
-  //         itemBuilder: (context, index) {
-  //           Map<String, dynamic> menuItems = menuMaps['Semua']!;
-  //           String menuKey = menuItems.keys.elementAt(index);
-  //           var item = menuItems[menuKey];
-  //           return Container(
-  //             color: Colors.white,
-  //             padding: const EdgeInsets.symmetric(
-  //               horizontal: 25,
-  //             ),
-  //             child: ProductCardBoxHorizontal(
-  //               onPressed: () {
-  //                 log('product: ${item['nama']}');
-  //                 // storeMenuCountSheet();
-  //                 menuFrameSheet(context);
-  //               },
-  //               productName: item['nama'],
-  //               // description: menuItem[index]['desc'],
-  //               description: 'deskripsi menu',
-  //               price: item['price'].toString(),
-  //               likes: item['likes'],
-  //               rate: item['rate'],
-  //               count: item['count'].toString(),
-  //               onTapAdd: () {
-  //                 setState(() {
-  //                   item['count'] += 1;
-  //                 });
-  //                 // print(menuItem[index]['count']);
-  //               },
-  //               onTapRemove: () {
-  //                 setState(() {
-  //                   item['count'] -= 1;
-  //                 });
-  //                 // print(orderCount);
-  //               },
-  //             ),
-  //           );
-  //         },
-  //       ),
-  //     ),
-  //   );
-  // }
-
   Widget searchMenuBody() {
     return ReloadIndicatorType1(
       onRefresh: refreshPage,
@@ -2183,7 +1847,6 @@ class _CanteenScreenState extends State<CanteenScreen>
                   ? ProductCardBoxHorizontal(
                       onPressed: () {
                         log('product: ${item.menuName}');
-                        // storeMenuCountSheet();
                         menuFrameSheet(
                           context,
                           menuId: item.id!,
@@ -2194,7 +1857,6 @@ class _CanteenScreenState extends State<CanteenScreen>
                           description: item.menuDesc!,
                           price: item.menuPrice!,
                           likes: item.menuLikes!.toString(),
-                          // count: item.menuStock!.toString(),
                           count: item.selectedCount!.toString(),
                           sold: item.menuSolds ?? 0,
                           rate: item.menuRate.toString(),
@@ -2227,8 +1889,6 @@ class _CanteenScreenState extends State<CanteenScreen>
                   : ProductCardBoxHorizontal(
                       onPressed: () {
                         log('product: ${item.menuName}');
-                        // storeMenuCountSheet();
-
                         menuFrameSheet(
                           context,
                           menuId: item.id!,
@@ -2239,7 +1899,6 @@ class _CanteenScreenState extends State<CanteenScreen>
                           description: item.menuDesc!,
                           price: item.menuPrice!,
                           likes: item.menuLikes!.toString(),
-                          // count: item.menuStock!.toString(),
                           count: item.selectedCount!.toString(),
                           sold: item.menuSolds ?? 0,
                           rate: item.menuRate.toString(),
@@ -2269,9 +1928,7 @@ class _CanteenScreenState extends State<CanteenScreen>
                           item.subTotal != 0 ? item.subTotal : item.menuPrice,
                       likes: item.menuLikes.toString(),
                       rate: item.menuRate.toString(),
-                      // count: item.menuStock!.toString(),
                       count: item.selectedCount!.toString(),
-                      // isCustom: item.isDanus!,
                       isCustom: item.variants!.isNotEmpty ? true : false,
                       onTapAdd: () async {
                         if (item.variants!.isNotEmpty) {
@@ -2325,27 +1982,6 @@ class _CanteenScreenState extends State<CanteenScreen>
                                     .toList(),
                               );
                             },
-                            // onTapAdd: (updateState) {
-                            //   addOrderMenu(
-                            //     updateState: updateState,
-                            //     menuCount: item.selectedCount,
-                            //     menuStock: item.menuStock,
-                            //     price: item.menuPrice,
-                            //     subTotal: item.subTotal,
-                            //     menuItem: menuItems[index],
-                            //   );
-                            // },
-                            // onTapRemove: (updateState) {
-                            //   deleteOrderMenu(
-                            //     updateState: updateState,
-                            //     menuCount: item.selectedCount,
-                            //     menuStock: item.menuStock,
-                            //     price: item.menuPrice,
-                            //     subTotal: item.subTotal,
-                            //     menuItem: menuItems[index],
-                            //   );
-                            // },
-                            // onPressedAddOrder: () {},
                           );
                         } else {
                           if (item.selectedCount! < item.menuStock!) {
@@ -2378,47 +2014,6 @@ class _CanteenScreenState extends State<CanteenScreen>
                       },
                     ),
             );
-            // return Container(
-            //   color: Colors.white,
-            //   padding: const EdgeInsets.symmetric(horizontal: 25),
-            //   child: ProductCardBoxHorizontal(
-            //     onPressed: () {
-            //       log('product: ${item.menuName}');
-            //       // storeMenuCountSheet();
-            //       menuFrameSheet(context,
-            //           menuId: item.id,
-            //           merchantId: item.merchantId,
-            //           imgUrl: "${AppConfig.URL_IMAGES_PATH}${item.menuPhoto}",
-            //           productName: item.menuName,
-            //           description: item.menuDesc,
-            //           price: item.menuPrice,
-            //           rate: '${item.menuRate}',
-            //           likes: '${item.menuLikes}',
-            //           isLike: item.isLike!);
-            //     },
-            //     isCustom: item.variants!.isEmpty ? false : true,
-            //     productId: '${item.id}',
-            //     imgUrl: "${AppConfig.URL_IMAGES_PATH}${item.menuPhoto}",
-            //     productName: item.menuName!,
-            //     description: item.menuDesc ?? 'deskripsi menu',
-            //     price: item.menuPrice,
-            //     likes: item.menuLikes.toString(),
-            //     rate: item.menuRate.toString(),
-            //     count: item.menuStock.toString(),
-            //     onTapAdd: () {
-            //       setState(() {
-            //         item.menuStock = item.menuStock! + 1;
-            //       });
-            //       // print(menuItem[index]['count']);
-            //     },
-            //     onTapRemove: () {
-            //       setState(() {
-            //         item.menuStock = item.menuStock! - 1;
-            //       });
-            //       // print(orderCount);
-            //     },
-            //   ),
-            // );
           },
         ),
       ),
@@ -2448,42 +2043,4 @@ class _CanteenScreenState extends State<CanteenScreen>
       ),
     );
   }
-
-  List<Map<String, dynamic>> variantMenuTypeList = [
-    {
-      'name': 'koclat',
-      'variants': [
-        {
-          'name': 'coclat deme',
-          'cost': 1000,
-          'selected': false,
-        },
-        {
-          'name': 'keju deme',
-          'cost': 1000,
-          'selected': false,
-        },
-      ],
-    },
-    {
-      'name': 'tiramusi',
-      'variants': [
-        {
-          'name': 'coclat tiramese',
-          'cost': 1000,
-          'selected': false,
-        },
-      ],
-    },
-    {
-      'name': 'vanila',
-      'variants': [
-        {
-          'name': 'vanila tiramese',
-          'cost': 1000,
-          'selected': false,
-        },
-      ],
-    },
-  ];
 }

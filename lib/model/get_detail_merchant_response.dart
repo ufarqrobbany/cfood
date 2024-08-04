@@ -303,6 +303,7 @@ class Variant {
   bool? isRequired;
   int? minimal;
   int? maximal;
+  bool? selected;
   List<VariantOption>? variantOptions;
 
   Variant({
@@ -311,6 +312,7 @@ class Variant {
     this.isRequired,
     this.minimal,
     this.maximal,
+    this.selected,
     this.variantOptions,
   });
 
@@ -320,6 +322,7 @@ class Variant {
     isRequired = json['isRequired'];
     minimal = json['minimal'];
     maximal = json['maximal'];
+    selected = false;
     if (json['variantOptions'] != null) {
       variantOptions = <VariantOption>[];
       json['variantOptions'].forEach((v) {
@@ -348,7 +351,11 @@ class VariantOption {
   int? variantOptionPrice;
   bool? selected;
 
-  VariantOption({this.id, this.variantOptionName, this.variantOptionPrice, this.selected});
+  VariantOption(
+      {this.id,
+      this.variantOptionName,
+      this.variantOptionPrice,
+      this.selected});
 
   VariantOption.fromJson(Map<String, dynamic> json) {
     id = json['id'];

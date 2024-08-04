@@ -3,22 +3,30 @@ import 'dart:developer';
 import 'package:cfood/custom/CBottomSheet.dart';
 import 'package:cfood/custom/CButtons.dart';
 import 'package:cfood/custom/CPageMover.dart';
+import 'package:cfood/custom/CToast.dart';
 import 'package:cfood/custom/card.dart';
 import 'package:cfood/custom/page_item_void.dart';
 import 'package:cfood/custom/popup_dialog.dart';
 import 'package:cfood/custom/reload_indicator.dart';
+import 'package:cfood/model/add_cart_response.dart';
 import 'package:cfood/model/get_cart_user_response.dart';
 import 'package:cfood/model/update_cartitem_response.dart';
 import 'package:cfood/model/get_calculate_cart_response.dart';
+import 'package:cfood/model/get_detail_merchant_response.dart'
+    as detailmerchant;
 import 'package:cfood/model/delete_cart_response.dart';
 import 'package:cfood/repository/fetch_controller.dart';
+import 'package:cfood/model/post_menu_like_response.dart';
+import 'package:cfood/model/post_menu_unlike_response.dart';
 import 'package:cfood/screens/canteen.dart';
 import 'package:cfood/style.dart';
 import 'package:cfood/utils/common.dart';
 import 'package:cfood/utils/constant.dart';
 import 'package:community_material_icon/community_material_icon.dart';
 import 'package:flutter/material.dart';
+import 'package:toast/toast.dart';
 import 'package:uicons/uicons.dart';
+import 'package:cfood/model/get_specific_menu_response.dart';
 
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
@@ -51,6 +59,214 @@ class _CartScreenState extends State<CartScreen> {
     getAllCarts();
   }
 
+  void getSpecificMenu(int cartId, CartItem item, int merchantId) {
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) {
+        menuFrameSheet(
+          context,
+          menuId: item.detailMenu.id,
+          merchantId: merchantId,
+          imgUrl: "${AppConfig.URL_IMAGES_PATH}${item.detailMenu.menuPhoto}",
+          productName: item.detailMenu.menuName,
+          description: item.detailMenu.menuDesc,
+          price: item.detailMenu.menuPrice,
+          likes: item.detailMenu.likes.toString(),
+          // sold: dataSpecificMenu?.so ?? 0,
+          sold: item.solds,
+          rate: item.detailMenu.rating.toString(),
+          innerContentSize: 110,
+          isLike: item.detailMenu.isLike!,
+          onTapLike: (updateState) {
+            tapLikeMenu(context,
+                isLike: item.detailMenu.isLike!,
+                menuId: item.detailMenu.id!,
+                updateState: updateState,
+                menuItem: item.detailMenu);
+          },
+          onPressed: () {
+            if (item.detailMenu.variants!.isEmpty) {
+              updateCartItem(item.cartItemId, "add", cartId);
+              Navigator.pop(context);
+            } else {
+              Navigator.pop(context);
+              int selectedCount = 0;
+              int price = item.detailMenu.menuPrice!;
+              int subtotal = price;
+              menuCustomeFrameSheet(
+                context,
+                imgUrl:
+                    "${AppConfig.URL_IMAGES_PATH}${item.detailMenu.menuPhoto}",
+                productName: item.detailMenu.menuName!,
+                description: item.detailMenu.menuDesc!,
+                price: item.detailMenu.menuPrice!,
+                subTotal: 100,
+                likes: item.detailMenu.likes.toString(),
+                rate: item.detailMenu.rating.toString(),
+                count: selectedCount,
+                sold: item.solds,
+                innerContentSize: 110,
+                variantSelected: null,
+                total: subtotal,
+                variantTypeList: item.detailMenu.variants!,
+                onPressed: () {},
+                onTapAdd: (Function updateState) {
+                  setState(() {
+                    selectedCount++;
+                  });
+                  updateState();
+                },
+                onTapRemove: (Function updateState) {
+                  if (selectedCount > 0) {
+                    setState(() {
+                      selectedCount--;
+                    });
+                    updateState();
+                  }
+                },
+                onTapAddOrder:
+                    (selectedCount, calculatedTotal, selectedVariants) {
+                  setState(() {
+                    // Update UI if needed
+                  });
+                  updateCart(
+                      menuId: item.detailMenu.id!,
+                      quantity: selectedCount,
+                      variants: selectedVariants
+                          .map((v) => {
+                                'variantId': v.id,
+                                'variantOptionIds': [v.id],
+                              })
+                          .toList(),
+                      merchantId: merchantId);
+                },
+              );
+            }
+          },
+          onTapAdd: () {},
+          onTapRemove: () {},
+        );
+      },
+    );
+  }
+
+  Future<void> updateCart(
+      {required int menuId,
+      required int quantity,
+      List<Map<String, dynamic>>? variants,
+      required int merchantId}) async {
+    AddCartResponse? info = await FetchController(
+      endpoint: 'carts/add',
+      fromJson: (json) => AddCartResponse.fromJson(json),
+    ).postData({
+      'userId': AppConfig.USER_ID,
+      'merchantId': merchantId,
+      'menuId': menuId,
+      'quantity': quantity, // positif untuk tambah, negatif untuk kurangi
+      'variants': variants ?? [],
+    });
+
+    log({
+      'userId': AppConfig.USER_ID,
+      'merchantId': merchantId,
+      'menuId': menuId,
+      'quantity': quantity, // positif untuk tambah, negatif untuk kurangi
+      'variants': variants ?? [],
+    }.toString());
+
+    if (info != null) {
+      setState(() {
+        getAllCarts();
+      });
+    }
+  }
+
+  void tapLikeMenu(
+    BuildContext context, {
+    bool isLike = false,
+    int menuId = 0,
+    Function? updateState,
+    // Menu? menuItem,
+    dynamic menuItem,
+  }) {
+    if (isLike) {
+      unLikeMenu(context,
+          isLike: isLike,
+          menuId: menuId,
+          updateState: updateState,
+          menuItem: menuItem);
+    } else {
+      likeMenu(context,
+          isLike: isLike,
+          menuId: menuId,
+          updateState: updateState,
+          menuItem: menuItem);
+    }
+  }
+
+  Future<void> likeMenu(
+    BuildContext context, {
+    bool isLike = false,
+    int menuId = 0,
+    Function? updateState,
+    // Menu? menuItem,
+    dynamic menuItem,
+  }) async {
+    PostMenuLikeResponse response = await FetchController(
+      endpoint: 'menus/$menuId/like?userId=${AppConfig.USER_ID}',
+      fromJson: (json) => PostMenuLikeResponse.fromJson(json),
+    ).postData({});
+
+    if (response.statusCode == 201 || response.status == 'success') {
+      setState(() {
+        isLike = true;
+        menuItem!.isLike = isLike;
+      });
+      updateState != null
+          ? (() {
+              isLike = true;
+              menuItem!.isLike = isLike;
+            })
+          : ();
+      log('tap like menu');
+    } else {
+      // Handle error here
+      log('Failed to like menu');
+      showToast('Gagal Menyukai Menu');
+    }
+  }
+
+  Future<void> unLikeMenu(
+    BuildContext context, {
+    bool isLike = false,
+    int menuId = 0,
+    Function? updateState,
+    // Menu? menuItem,
+    dynamic menuItem,
+  }) async {
+    PostMenuUnlikeResponse response = await FetchController(
+      endpoint: 'menus/$menuId/unlike?userId=${AppConfig.USER_ID}',
+      fromJson: (json) => PostMenuUnlikeResponse.fromJson(json),
+    ).deleteData();
+
+    if (response.statusCode == 201 || response.status == 'success') {
+      setState(() {
+        isLike = false;
+        menuItem!.isLike = isLike;
+      });
+      updateState != null
+          ? (() {
+              isLike = false;
+              menuItem!.isLike = isLike;
+            })
+          : ();
+      log('tap unlike menu');
+    } else {
+      // Handle error here
+      log('Failed to unlike menu');
+      showToast('Gagal Tidak Menyukai Menu');
+    }
+  }
+
   Future<void> deleteCart(int cartId) async {
     deleteCartResponse = await FetchController(
       endpoint: 'carts/$cartId',
@@ -75,8 +291,8 @@ class _CartScreenState extends State<CartScreen> {
     List<String> variantOptionNames = [];
 
     for (var variant in variants) {
-      for (var option in variant['variantOptions']) {
-        variantOptionNames.add(option['variantOptionName']);
+      for (var option in variant.variantOptions) {
+        variantOptionNames.add(option.variantOptionName);
       }
     }
 
@@ -107,7 +323,7 @@ class _CartScreenState extends State<CartScreen> {
     });
   }
 
-  Future<void> updateCartItem(int cartItemId, String type) async {
+  Future<void> updateCartItem(int cartItemId, String type, int cartId) async {
     updateCartItemResponse = await FetchController(
       endpoint: 'carts/item/$cartItemId?quantity=${type == "add" ? 1 : -1}',
       fromJson: (json) => UpdateCartItemResponse.fromJson(json),
@@ -117,6 +333,9 @@ class _CartScreenState extends State<CartScreen> {
       updateCartItemData = updateCartItemResponse?.data;
       log(updateCartItemData.toString());
       getAllCarts();
+      if (cartId == selectCartId) {
+        getCalculateCart(cartId);
+      }
     });
   }
 
@@ -129,6 +348,7 @@ class _CartScreenState extends State<CartScreen> {
 
   @override
   Widget build(BuildContext context) {
+    ToastContext().init(context);
     return Scaffold(
       appBar: AppBar(
         leading: Container(
@@ -154,10 +374,10 @@ class _CartScreenState extends State<CartScreen> {
           ),
         ],
       ),
-      backgroundColor: Colors.white,
+      backgroundColor: Warna.pageBackgroundColor,
       body: cartBodyList(),
       floatingActionButton:
-          (calculateCartResponse == null || selectCartId != -1)
+          (calculateCartResponse == null || selectCartId == -1)
               ? Container()
               : storeMenuCountInfo(
                   calculateCartData!.cartId,
@@ -173,7 +393,7 @@ class _CartScreenState extends State<CartScreen> {
     return cartResponse == null
         ? Container()
         : cartData!.isEmpty
-            ? itemsEmptyBody(context, bgcolors: Warna.pageBackgroundColor)
+            ? itemsEmptyBody(context, bgcolors: Colors.white)
             : ReloadIndicatorType1(
                 onRefresh: refreshPage,
                 child: SingleChildScrollView(
@@ -200,125 +420,134 @@ class _CartScreenState extends State<CartScreen> {
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Padding(
-                              padding: const EdgeInsets.fromLTRB(25, 20, 25, 0),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.max,
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  GestureDetector(
-                                    onTap: () {
-                                      log('Cart selected: ${store?.merchantName}');
-                                      setState(() {
-                                        if (store!.isOpen) {
-                                          selectCartId = store.cartId;
-                                          getCalculateCart(selectCartId!);
-                                        }
-                                      });
-                                    },
+                            Container(
+                              color: Colors.white,
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.fromLTRB(25, 20, 25, 0),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.max,
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    GestureDetector(
+                                      onTap: () {
+                                        log('Cart selected: ${store?.merchantName}');
+                                        setState(() {
+                                          if (store!.isOpen) {
+                                            selectCartId = store.cartId;
+                                            getCalculateCart(selectCartId!);
+                                          }
+                                        });
+                                      },
 
-                                    // bookmark
-                                    child: store!.isOpen
-                                        ? Icon(
-                                            selectCartId == store?.cartId
-                                                ? Icons
-                                                    .radio_button_checked_rounded
-                                                : Icons.radio_button_unchecked,
-                                            color: Warna.biru,
-                                            size: 25,
-                                          )
-                                        : Container(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 6, vertical: 1),
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(4),
-                                              border: Border.all(
-                                                  color: Warna.like, width: 1),
-                                              color:
-                                                  Warna.like.withOpacity(0.10),
+                                      // bookmark
+                                      child: store!.isOpen
+                                          ? Icon(
+                                              selectCartId == store?.cartId
+                                                  ? Icons
+                                                      .radio_button_checked_rounded
+                                                  : Icons
+                                                      .radio_button_unchecked,
+                                              color: Warna.biru,
+                                              size: 25,
+                                            )
+                                          : Container(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 6,
+                                                      vertical: 1),
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(4),
+                                                border: Border.all(
+                                                    color: Warna.like,
+                                                    width: 1),
+                                                color: Warna.like
+                                                    .withOpacity(0.10),
+                                              ),
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  Icon(
+                                                    UIcons.solidRounded
+                                                        .time_oclock,
+                                                    size: 13,
+                                                    color: Warna.like,
+                                                  ),
+                                                  Text(
+                                                    ' Tutup',
+                                                    style: TextStyle(
+                                                        color: Warna.like,
+                                                        fontSize: 12),
+                                                  ),
+                                                ],
+                                              ),
                                             ),
-                                            child: Row(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                Icon(
-                                                  UIcons
-                                                      .solidRounded.time_oclock,
-                                                  size: 13,
-                                                  color: Warna.like,
-                                                ),
-                                                Text(
-                                                  ' Tutup',
-                                                  style: TextStyle(
-                                                      color: Warna.like,
-                                                      fontSize: 12),
-                                                ),
-                                              ],
+                                    ),
+                                    const SizedBox(
+                                      width: 10,
+                                    ),
+                                    InkWell(
+                                      onTap: () => navigateTo(
+                                          context,
+                                          CanteenScreen(
+                                            merchantId: store.merchantId,
+                                            isOwner: false,
+                                            merchantType: store.merchantType,
+                                          )),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: [
+                                          Icon(
+                                            store?.merchantType == "WIRAUSAHA"
+                                                ? CommunityMaterialIcons
+                                                    .handshake
+                                                : Icons.store,
+                                            color: store?.merchantType ==
+                                                    "WIRAUSAHA"
+                                                ? Warna.kuning
+                                                : Warna.biru,
+                                            size: 20,
+                                          ),
+                                          const SizedBox(
+                                            width: 8,
+                                          ),
+                                          Flexible(
+                                            child: Text(
+                                              store!.merchantName,
+                                              style: const TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w700,
+                                              ),
+                                              overflow: TextOverflow.ellipsis,
+                                              maxLines: 1,
                                             ),
                                           ),
-                                  ),
-                                  const SizedBox(
-                                    width: 10,
-                                  ),
-                                  InkWell(
-                                    onTap: () => navigateTo(
-                                        context,
-                                        CanteenScreen(
-                                          merchantId: store.merchantId,
-                                          isOwner: false,
-                                          merchantType: store.merchantType,
-                                        )),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: [
-                                        Icon(
-                                          store?.merchantType == "WIRAUSAHA"
-                                              ? CommunityMaterialIcons.handshake
-                                              : Icons.store,
-                                          color:
-                                              store?.merchantType == "WIRAUSAHA"
-                                                  ? Warna.kuning
-                                                  : Warna.biru,
-                                          size: 20,
-                                        ),
-                                        const SizedBox(
-                                          width: 8,
-                                        ),
-                                        Flexible(
-                                          child: Text(
-                                            store!.merchantName,
-                                            style: const TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.w700,
-                                            ),
-                                            overflow: TextOverflow.ellipsis,
-                                            maxLines: 1,
-                                          ),
-                                        ),
-                                      ],
+                                        ],
+                                      ),
                                     ),
-                                  ),
-                                  const Spacer(),
-                                  InkWell(
-                                    onTap: () {
-                                      // context.pushReplacementNamed('main');
-                                      showMyCustomDialog(context,
-                                          text:
-                                              'Apakah Anda yakin untuk menghapus keranjang ini?\n',
-                                          colorYes: Warna.like, onTapYes: () {
-                                        navigateBack(context);
-                                        deleteCart(store!.cartId);
-                                      });
-                                    },
-                                    child: Icon(
-                                      UIcons.solidRounded.trash,
-                                      color: Warna.like,
-                                      size: 25,
-                                    ),
-                                  )
-                                ],
+                                    const Spacer(),
+                                    InkWell(
+                                      onTap: () {
+                                        // context.pushReplacementNamed('main');
+                                        showMyCustomDialog(context,
+                                            text:
+                                                'Apakah Anda yakin untuk menghapus keranjang ini?\n',
+                                            colorYes: Warna.like, onTapYes: () {
+                                          navigateBack(context);
+                                          deleteCart(store!.cartId);
+                                        });
+                                      },
+                                      child: Icon(
+                                        UIcons.solidRounded.trash,
+                                        color: Warna.like,
+                                        size: 25,
+                                      ),
+                                    )
+                                  ],
+                                ),
                               ),
                             ),
                             ListView.builder(
@@ -335,33 +564,42 @@ class _CartScreenState extends State<CartScreen> {
                                   child: ProductCardBoxHorizontal(
                                     innerContentSize: 90,
                                     onPressed: () {
-                                      menuFrameSheet(context);
+                                      getSpecificMenu(store.cartId, menuItem,
+                                          store.merchantId);
                                     },
                                     imgUrl:
-                                        '${AppConfig.URL_IMAGES_PATH}${menuItem.menuPhoto}',
-                                    productName: menuItem.menuName,
-                                    description: menuItem.variants.isEmpty
+                                        '${AppConfig.URL_IMAGES_PATH}${menuItem.detailMenu.menuPhoto}',
+                                    productName: menuItem.detailMenu.menuName,
+                                    description: menuItem.cartVariants.isEmpty
                                         ? ''
                                         : getVariantDescription(
-                                            menuItem.variants),
-                                    price: menuItem.totalPriceMenu *
+                                            menuItem.cartVariants),
+                                    price: menuItem.totalPriceItem *
                                         menuItem.quantity,
                                     count: menuItem.quantity.toString(),
-                                    // isCustom: menuItem.variants.isNotEmpty
-                                    // ? true
-                                    // : false,
                                     onTapAdd: () {
                                       if (menuItem.quantity < menuItem.stock) {
-                                        
-                                        updateCartItem(
-                                            menuItem.cartItemId, "add");
+                                        updateCartItem(menuItem.cartItemId,
+                                            "add", store.cartId);
+                                      } else {
+                                        showToast('Stok tidak mencukupi');
                                       }
                                     },
                                     onTapRemove: () {
-                                      if (menuItem.quantity > 0) {
-                                       
-                                        updateCartItem(
-                                            menuItem.cartItemId, "reduce");
+                                      if (menuItem.quantity > 1) {
+                                        updateCartItem(menuItem.cartItemId,
+                                            "reduce", store.cartId);
+                                      } else {
+                                        // showDialog(context: context, builder: builder)
+                                        showMyCustomDialog(context,
+                                            text:
+                                                'Apakah Anda yakin untuk menghapus menu ini di keranjang?\n',
+                                            colorYes: Warna.like, onTapYes: () {
+                                          navigateBack(context);
+                                          updateCartItem(menuItem.cartItemId,
+                                              "reduce", store.cartId);
+                                          // deleteCart(store!.cartId);
+                                        });
                                       }
                                     },
                                   ),
