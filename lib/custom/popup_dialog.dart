@@ -14,6 +14,7 @@ Future<void> showMyCustomDialog(
   final String? noText,
   final Color? colorYes,
   final Color? colorNO,
+  final bool justYEs = false,
 }) async {
   return showDialog<void>(
     context: context,
@@ -40,6 +41,7 @@ Future<void> showMyCustomDialog(
               mainAxisAlignment: MainAxisAlignment.center,
               mainAxisSize: MainAxisSize.max,
               children: [
+                justYEs == true ? Container() :
                 Expanded(
                   child: SizedBox(
                     height: 50,

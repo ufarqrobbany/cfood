@@ -111,4 +111,16 @@ class SessionManager {
     log('pref merchandId : $merchantId');
     return merchantId;
   }
+
+    Future<void> setAppVersion(String appVersion) async {
+    final SharedPreferences pref = await SharedPreferences.getInstance();
+    pref.setString('app_version', appVersion);
+  }
+
+  Future<String?> getAppVersion() async {
+    final SharedPreferences pref = await SharedPreferences.getInstance();
+    String? appVersion = pref.getString('app_version');
+    log('pref app version : $appVersion');
+    return appVersion;
+  }
 }

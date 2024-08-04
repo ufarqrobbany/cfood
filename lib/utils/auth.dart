@@ -116,7 +116,6 @@ class AuthHelper {
       'password': password,
       'type': type,
       'isDriver': isDriver,
-      
     };
   }
 
@@ -126,7 +125,25 @@ class AuthHelper {
     log('merchantId : $merchantId');
 
     return {
-      'merchantId' : merchantId ?? '0',
+      'merchantId': merchantId ?? '0',
+    };
+  }
+
+  setAppVersion({
+    String? version,
+  }) {
+    prefs.setAppVersion(version ?? '0.0.0');
+  }
+
+  Future<Map<String, dynamic>> getPrefVersionApp() async {
+    String? appVersion = await SessionManager().getAppVersion();
+    
+    appVersion ??= '0.0.0';
+
+    log('Current AppVersion : $appVersion');
+
+    return {
+      'version': appVersion, 
     };
   }
 }

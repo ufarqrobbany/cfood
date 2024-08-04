@@ -1311,59 +1311,158 @@ class _CanteenScreenState extends State<CanteenScreen>
                         isCustom: item.variants!.isNotEmpty ? true : false,
                         onTapAdd: () async {
                           if (item.variants!.isNotEmpty) {
-                            int selectedCount = item.selectedCount!;
-                            int price = item.menuPrice!;
-                            int subtotal = price * selectedCount;
-                            menuCustomeFrameSheet(
-                              context,
-                              imgUrl:
-                                  "${AppConfig.URL_IMAGES_PATH}${item.menuPhoto}",
-                              productName: item.menuName!,
-                              description: item.menuDesc ?? '',
-                              price: item.menuPrice!,
-                              subTotal: item.subTotal!,
-                              likes: item.menuLikes.toString(),
-                              rate: item.menuRate.toString(),
-                              count: item.selectedCount!,
-                              sold: item.menuSolds ?? 0,
-                              innerContentSize: 110,
-                              variantSelected: null,
-                              total: subtotal,
-                              variantTypeList: item.variants!,
-                              onPressed: () {},
-                              onTapAdd: (Function updateState) {
-                                setState(() {
-                                  selectedCount++;
-                                  item.selectedCount = selectedCount;
-                                });
-                                updateState();
-                              },
-                              onTapRemove: (Function updateState) {
-                                if (selectedCount > 0) {
-                                  setState(() {
-                                    selectedCount--;
-                                    item.selectedCount = selectedCount;
-                                  });
-                                  updateState();
-                                }
-                              },
-                              onTapAddOrder: (selectedCount, calculatedTotal,
-                                  selectedVariants) {
-                                setState(() {
-                                  // Update UI if needed
-                                });
-                                updateCart(
+                            log('product: ${item.menuName}');
+                          // storeMenuCountSheet();
+
+                          menuFrameSheet(
+                            context,
+                            menuId: item.id!,
+                            merchantId: dataMerchant?.merchantId!,
+                            imgUrl:
+                                "${AppConfig.URL_IMAGES_PATH}${item.menuPhoto}",
+                            productName: item.menuName!,
+                            description: item.menuDesc!,
+                            price: item.menuPrice!,
+                            likes: item.menuLikes!.toString(),
+                            // count: item.menuStock!.toString(),
+                            count: item.selectedCount!.toString(),
+                            sold: item.menuSolds ?? 0,
+                            rate: item.menuRate.toString(),
+                            innerContentSize: 110,
+                            isLike: item.isLike!,
+                            onTapLike: (updateState) {
+                              tapLikeMenu(context,
+                                  isLike: item.isLike!,
                                   menuId: item.id!,
-                                  quantity: selectedCount,
-                                  variants: selectedVariants
-                                      .map((v) => {
-                                            'variantId': v.id,
-                                            'variantOptionIds': [v.id],
-                                          })
-                                      .toList(),
-                                );
-                              },
-                            );
+                                  updateState: updateState,
+                                  menuItem: item);
+                            },
+                            onPressed: item.variants!.isNotEmpty
+                                ? () {
+                                    int selectedCount = item.selectedCount!;
+                                    int price = item.menuPrice!;
+                                    int subtotal = price * selectedCount;
+                                    menuCustomeFrameSheet(
+                                      context,
+                                      imgUrl:
+                                          "${AppConfig.URL_IMAGES_PATH}${item.menuPhoto}",
+                                      productName: item.menuName!,
+                                      description: item.menuDesc ?? '',
+                                      price: item.menuPrice!,
+                                      subTotal: item.subTotal!,
+                                      likes: item.menuLikes.toString(),
+                                      rate: item.menuRate.toString(),
+                                      count: item.selectedCount!,
+                                      sold: item.menuSolds ?? 0,
+                                      innerContentSize: 110,
+                                      variantSelected: null,
+                                      total: subtotal,
+                                      variantTypeList: item.variants!,
+                                      onPressed: () {},
+                                      onTapAdd: (Function updateState) {
+                                        setState(() {
+                                          selectedCount++;
+                                          item.selectedCount = selectedCount;
+                                        });
+                                        updateState();
+                                      },
+                                      onTapRemove: (Function updateState) {
+                                        if (selectedCount > 0) {
+                                          setState(() {
+                                            selectedCount--;
+                                            item.selectedCount = selectedCount;
+                                          });
+                                          updateState();
+                                        }
+                                      },
+                                      onTapAddOrder: (selectedCount,
+                                          calculatedTotal, selectedVariants) {
+                                        setState(() {
+                                          // Update UI if needed
+                                        });
+                                        updateCart(
+                                          menuId: item.id!,
+                                          quantity: selectedCount,
+                                          variants: selectedVariants
+                                              .map((v) => {
+                                                    'variantId': v.id,
+                                                    'variantOptionIds': [v.id],
+                                                  })
+                                              .toList(),
+                                        );
+                                      },
+                                    );
+                                  }
+                                : () {
+                                    setState(() {
+                                      item.selectedCount =
+                                          item.selectedCount! + 1;
+                                      // item.subTotal =
+                                      //     (item.menuPrice! * item.selectedCount!);
+                                    });
+                                    updateCart(
+                                      menuId: item.id!,
+                                      quantity: 1,
+                                    );
+                                    showToast(
+                                        'Menu di tambahkan kedalam keranjang');
+                                  },
+                            onTapAdd: () {},
+                            onTapRemove: () {},
+                          );
+                            // int selectedCount = item.selectedCount!;
+                            // int price = item.menuPrice!;
+                            // int subtotal = price * selectedCount;
+                            // menuCustomeFrameSheet(
+                            //   context,
+                            //   imgUrl:
+                            //       "${AppConfig.URL_IMAGES_PATH}${item.menuPhoto}",
+                            //   productName: item.menuName!,
+                            //   description: item.menuDesc ?? '',
+                            //   price: item.menuPrice!,
+                            //   subTotal: item.subTotal!,
+                            //   likes: item.menuLikes.toString(),
+                            //   rate: item.menuRate.toString(),
+                            //   count: item.selectedCount!,
+                            //   sold: item.menuSolds ?? 0,
+                            //   innerContentSize: 110,
+                            //   variantSelected: null,
+                            //   total: subtotal,
+                            //   variantTypeList: item.variants!,
+                            //   onPressed: () {},
+                            //   onTapAdd: (Function updateState) {
+                            //     setState(() {
+                            //       selectedCount++;
+                            //       item.selectedCount = selectedCount;
+                            //     });
+                            //     updateState();
+                            //   },
+                            //   onTapRemove: (Function updateState) {
+                            //     if (selectedCount > 0) {
+                            //       setState(() {
+                            //         selectedCount--;
+                            //         item.selectedCount = selectedCount;
+                            //       });
+                            //       updateState();
+                            //     }
+                            //   },
+                            //   onTapAddOrder: (selectedCount, calculatedTotal,
+                            //       selectedVariants) {
+                            //     setState(() {
+                            //       // Update UI if needed
+                            //     });
+                            //     updateCart(
+                            //       menuId: item.id!,
+                            //       quantity: selectedCount,
+                            //       variants: selectedVariants
+                            //           .map((v) => {
+                            //                 'variantId': v.id,
+                            //                 'variantOptionIds': [v.id],
+                            //               })
+                            //           .toList(),
+                            //     );
+                            //   },
+                            // );
                           } else {
                             if (item.selectedCount! < item.menuStock!) {
                               setState(() {

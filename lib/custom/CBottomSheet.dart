@@ -361,6 +361,10 @@ Future menuCustomeFrameSheet(
     enableDrag: true,
     showDragHandle: true,
     isScrollControlled: true,
+    constraints: BoxConstraints(
+      maxHeight: MediaQuery.of(context).size.height * 0.60,
+      minHeight: MediaQuery.of(context).size.height * 0.60,
+    ),
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.only(
         topLeft: Radius.circular(20),
@@ -381,48 +385,49 @@ Future menuCustomeFrameSheet(
                                     variantSelected = null;
                                   });
             },
-            child: SingleChildScrollView(
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 25),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ProductCardBoxHorizontal(
-                      imgUrl: imgUrl,
-                      productName: productName,
-                      price: price,
-                      rate: rate,
-                      likes: likes,
-                      sold: sold,
-                      count: selectedCount.toString(),
-                      description: description,
-                      isCustom: false,
-                      onTapAdd: () {
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 25),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ProductCardBoxHorizontal(
+                    imgUrl: imgUrl,
+                    productName: productName,
+                    price: price,
+                    rate: rate,
+                    likes: likes,
+                    sold: sold,
+                    count: selectedCount.toString(),
+                    description: description,
+                    isCustom: false,
+                    onTapAdd: () {
+                      setState(() {
+                        selectedCount++;
+                        calculatedSubTotal = price * selectedCount;
+                        calculatedTotal = calculatedSubTotal;
+                      });
+                      onTapAdd(() {});
+                    },
+                    onTapRemove: () {
+                      if (selectedCount > 0) {
                         setState(() {
-                          selectedCount++;
+                          selectedCount--;
                           calculatedSubTotal = price * selectedCount;
                           calculatedTotal = calculatedSubTotal;
                         });
-                        onTapAdd(() {});
-                      },
-                      onTapRemove: () {
-                        if (selectedCount > 0) {
-                          setState(() {
-                            selectedCount--;
-                            calculatedSubTotal = price * selectedCount;
-                            calculatedTotal = calculatedSubTotal;
-                          });
-                          onTapRemove(() {});
-                        }
-                      },
-                      innerContentSize: innerContentSize,
-                      hideBorder: true,
-                    ),
-                    ListView.builder(
+                        onTapRemove(() {});
+                      }
+                    },
+                    innerContentSize: innerContentSize,
+                    hideBorder: true,
+                  ),
+                  Flexible(
+                    child: ListView.builder(
                       itemCount: variantTypeList.length,
                       shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
+                      // physics: const NeverScrollableScrollPhysics(),
+                      physics: const BouncingScrollPhysics(),
                       itemBuilder: (context, indexType) {
                         List<VariantOption>? variantItems = variantTypeList[indexType].variantOptions;
                         return Column(
@@ -474,36 +479,36 @@ Future menuCustomeFrameSheet(
                         );
                       },
                     ),
-                    Container(
-                      height: 50,
-                      width: double.infinity,
-                      margin: const EdgeInsets.symmetric(vertical: 25),
-                      child: CBlueButton(
-                        isLoading: isLoading,
-                        onPressed: () async {
-                          if (calculatedTotal == 0) {
-                            showToast('Masukan input jumlah menu');
-                            return;
-                          }
-                          setState(() {
-                                    isLoading = true;
-                                  });
-                          await onTapAddOrder(selectedCount, calculatedTotal, variantTypeList.expand((v) => v.variantOptions!).where((v) => v.selected!).toList());
-                          setState(() {
-                                    isLoading = false;
-                                    selectedCount = count;
-                                    calculatedSubTotal = subTotal;
-                                    calculatedTotal = total;
-                                    variantSelected = null;
-                                  });
-                          Navigator.pop(context);
-                        },
-                        text: 'Tambah Pesanan - ${Constant.currencyCode}${formatNumberWithThousandsSeparator(calculatedTotal)}',
-                        borderRadius: 54.0,
-                      ),
+                  ),
+                  Container(
+                    height: 50,
+                    width: double.infinity,
+                    margin: const EdgeInsets.symmetric(vertical: 25),
+                    child: CBlueButton(
+                      isLoading: isLoading,
+                      onPressed: () async {
+                        if (calculatedTotal == 0) {
+                          showToast('Masukan input jumlah menu');
+                          return;
+                        }
+                        setState(() {
+                                  isLoading = true;
+                                });
+                        await onTapAddOrder(selectedCount, calculatedTotal, variantTypeList.expand((v) => v.variantOptions!).where((v) => v.selected!).toList());
+                        setState(() {
+                                  isLoading = false;
+                                  selectedCount = count;
+                                  calculatedSubTotal = subTotal;
+                                  calculatedTotal = total;
+                                  variantSelected = null;
+                                });
+                        Navigator.pop(context);
+                      },
+                      text: 'Tambah Pesanan - ${Constant.currencyCode}${formatNumberWithThousandsSeparator(calculatedTotal)}',
+                      borderRadius: 54.0,
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           );
