@@ -14,7 +14,9 @@ class GetSpecificMenuResponse {
     statusCode = json['statusCode'];
     status = json['status'];
     message = json['message'];
-    data = json['data'] != null ? new DataSpecificMenu.fromJson(json['data']) : null;
+    data = json['data'] != null
+        ? new DataSpecificMenu.fromJson(json['data'])
+        : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -36,6 +38,8 @@ class DataSpecificMenu {
   String? menuDesc;
   int? menuPrice;
   int? menuStock;
+  int? menuSolds;
+  int? quantity;
   int? likes;
   double? rating;
   bool? isDanus;
@@ -51,6 +55,8 @@ class DataSpecificMenu {
       this.menuDesc,
       this.menuPrice,
       this.menuStock,
+      this.menuSolds,
+      this.quantity,
       this.likes,
       this.rating,
       this.isDanus,
@@ -66,6 +72,8 @@ class DataSpecificMenu {
     menuDesc = json['menuDesc'];
     menuPrice = json['menuPrice'];
     menuStock = json['menuStock'];
+    menuSolds = json['menuSolds'];
+    quantity = json['quantity'];
     likes = json['likes'];
     rating = json['rating'];
     isDanus = json['isDanus'];
@@ -88,6 +96,8 @@ class DataSpecificMenu {
     data['menuDesc'] = this.menuDesc;
     data['menuPrice'] = this.menuPrice;
     data['menuStock'] = this.menuStock;
+    data['menuSolds'] = this.menuSolds;
+    data['quantity'] = this.quantity;
     data['likes'] = this.likes;
     data['rating'] = this.rating;
     data['isDanus'] = this.isDanus;

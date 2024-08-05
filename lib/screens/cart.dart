@@ -71,7 +71,6 @@ class _CartScreenState extends State<CartScreen> {
           description: item.detailMenu.menuDesc,
           price: item.detailMenu.menuPrice,
           likes: item.detailMenu.likes.toString(),
-          // sold: dataSpecificMenu?.so ?? 0,
           sold: item.solds,
           rate: item.detailMenu.rating.toString(),
           innerContentSize: 110,
@@ -85,8 +84,12 @@ class _CartScreenState extends State<CartScreen> {
           },
           onPressed: () {
             if (item.detailMenu.variants!.isEmpty) {
-              updateCartItem(item.cartItemId, "add", cartId);
-              Navigator.pop(context);
+              if (item.quantity < item.detailMenu.menuStock!) {
+                updateCartItem(item.cartItemId, "add", cartId);
+                Navigator.pop(context);
+              } else {
+                showToast('Stok tidak mencukupi');
+              }
             } else {
               Navigator.pop(context);
               int selectedCount = 0;
@@ -99,7 +102,8 @@ class _CartScreenState extends State<CartScreen> {
                 productName: item.detailMenu.menuName!,
                 description: item.detailMenu.menuDesc!,
                 price: item.detailMenu.menuPrice!,
-                subTotal: 100,
+                stock: item.detailMenu.menuStock!,
+                quantity: item.quantity,
                 likes: item.detailMenu.likes.toString(),
                 rate: item.detailMenu.rating.toString(),
                 count: selectedCount,

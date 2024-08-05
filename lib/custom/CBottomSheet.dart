@@ -6,6 +6,7 @@ import 'package:cfood/custom/CToast.dart';
 import 'package:cfood/custom/card.dart';
 import 'package:cfood/custom/order_status_timeline_tile.dart';
 import 'package:cfood/model/get_detail_merchant_response.dart';
+import 'package:cfood/model/get_specific_menu_response.dart';
 import 'package:cfood/screens/reviews.dart';
 import 'package:cfood/style.dart';
 import 'package:cfood/utils/common.dart';
@@ -13,6 +14,26 @@ import 'package:cfood/utils/constant.dart';
 import 'package:flutter/material.dart';
 import 'package:toast/toast.dart';
 import 'package:uicons/uicons.dart';
+
+String getMinMax(int minimal, int maximal, int length, bool required) {
+  String isMinMax = "";
+  if (required) {
+    // asumsikan minimal tidak akan 0
+    if (minimal < maximal) {
+      isMinMax = (maximal == length)
+          ? 'Minimal $minimal'
+          : 'Minimal $minimal, maksimal $maximal';
+    } else if (minimal == maximal) {
+      isMinMax = 'Pilih $maximal';
+    }
+  } else {
+    // asumsikan minimal adalah 0
+    if (minimal < maximal) {
+      isMinMax = (maximal == length) ? '' : 'Maksimal $maximal';
+    }
+  }
+  return isMinMax;
+}
 
 Future menuFrameSheet(
   BuildContext? context, {
@@ -339,7 +360,9 @@ Future menuCustomeFrameSheet(
   required String rate,
   required String likes,
   required int count,
-  required int subTotal,
+  int subTotal = 0,
+  int stock = 0,
+  int quantity = 0,
   int sold = 0,
   required VoidCallback onPressed,
   required Function(int, int, List<VariantOption>) onTapAddOrder,
@@ -350,10 +373,15 @@ Future menuCustomeFrameSheet(
   required VariantOption? variantSelected,
   required int total,
 }) {
-  int selectedCount = count;
-  int calculatedSubTotal = subTotal;
-  int calculatedTotal = total;
+  int variantSelectedList = 0;
+  int selectedCount = 0;
+  int optionPrice = 0;
+  int calculatedTotal = 0;
   bool isLoading = false;
+
+  int selectedValidVariant =
+      variantTypeList.where((variant) => variant.valid == true).length;
+
   ToastContext().init(context);
   return showModalBottomSheet(
     context: context,
@@ -378,14 +406,23 @@ Future menuCustomeFrameSheet(
             canPop: true,
             onPopInvoked: (didPop) {
               setState(() {
-                                    isLoading = false;
-                                    selectedCount = count;
-                                    calculatedSubTotal = subTotal;
-                                    calculatedTotal = total;
-                                    variantSelected = null;
-                                  });
+                isLoading = false;
+                selectedCount = 0;
+                optionPrice = 0;
+                calculatedTotal = 0;
+                variantSelected = null;
+                variantSelectedList = 0;
+
+                for (var variantType in variantTypeList) {
+                  variantType.selected = false;
+                  for (var option in variantType.variantOptions!) {
+                    option.selected = false;
+                  }
+                }
+              });
             },
             child: Container(
+              color: Colors.white,
               padding: const EdgeInsets.symmetric(horizontal: 25),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -403,20 +440,22 @@ Future menuCustomeFrameSheet(
                     isCustom: false,
                     onTapAdd: () {
                       setState(() {
-                        selectedCount++;
-                        calculatedSubTotal = price * selectedCount;
-                        calculatedTotal = calculatedSubTotal;
+                        if ((quantity + selectedCount) < stock) {
+                          selectedCount++;
+                          calculatedTotal =
+                              (price + optionPrice) * selectedCount;
+                        } else {
+                          showToast("Stok tidak mencukupi");
+                        }
                       });
-                      onTapAdd(() {});
                     },
                     onTapRemove: () {
                       if (selectedCount > 0) {
                         setState(() {
                           selectedCount--;
-                          calculatedSubTotal = price * selectedCount;
-                          calculatedTotal = calculatedSubTotal;
+                          calculatedTotal =
+                              (price + optionPrice) * selectedCount;
                         });
-                        onTapRemove(() {});
                       }
                     },
                     innerContentSize: innerContentSize,
@@ -426,52 +465,140 @@ Future menuCustomeFrameSheet(
                     child: ListView.builder(
                       itemCount: variantTypeList.length,
                       shrinkWrap: true,
-                      // physics: const NeverScrollableScrollPhysics(),
                       physics: const BouncingScrollPhysics(),
                       itemBuilder: (context, indexType) {
-                        List<VariantOption>? variantItems = variantTypeList[indexType].variantOptions;
+                        List<dynamic> variantItems =
+                            variantTypeList[indexType].variantOptions!;
+
+                        int optionSelected = variantItems
+                            .where((option) => option.selected == true)
+                            .length;
                         return Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                color: Warna.abu,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Text(
-                                variantTypeList[indexType].variantName.toString(),
-                                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
-                              ),
-                            ),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 15, vertical: 8),
+                                width: double.infinity,
+                                decoration: BoxDecoration(
+                                  color: Warna.abu,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                        variantTypeList[indexType]
+                                            .variantName
+                                            .toString(),
+                                        style: const TextStyle(
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w500)),
+                                    Text(
+                                        (variantTypeList[indexType].isRequired!
+                                            ? "Wajib (${getMinMax(variantTypeList[indexType].minimal!, variantTypeList[indexType].maximal!, variantTypeList[indexType].variantOptions!.length, variantTypeList[indexType].isRequired!)})"
+                                            : "Opsional (${getMinMax(variantTypeList[indexType].minimal!, variantTypeList[indexType].maximal!, variantTypeList[indexType].variantOptions!.length, variantTypeList[indexType].isRequired!)})"),
+                                        style: const TextStyle(
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w500))
+                                  ],
+                                )),
                             ListView.builder(
                               itemCount: variantItems?.length,
                               shrinkWrap: true,
                               physics: const NeverScrollableScrollPhysics(),
                               itemBuilder: (context, indexVariant) {
-                                VariantOption variant = variantItems![indexVariant];
+                                VariantOption option =
+                                    variantItems![indexVariant];
+
+                                variantSelectedList = variantTypeList
+                                    .where(
+                                        (selected) => selected.selected == true)
+                                    .length;
+
                                 return CheckboxListTile(
-                                  value: variant.selected,
-                                  // enabled: variantSelected != null ? variantSelected == variant : true,
+                                  value: option.selected,
                                   onChanged: (value) {
                                     setState(() {
-                                      variant.selected = value!;
-                                      log('${variant.variantOptionName} - ${variant.selected}');
-                                      if (value) {
-                                        calculatedTotal = calculatedSubTotal + variant.variantOptionPrice!;
-                                        // calculatedTotal = price + variant.variantOptionPrice! * selectedCount; 
-                                        variantSelected = variant;
+                                      if (selectedCount != 0) {
+                                        log('${option.variantOptionName} - $option.selected');
+                                        if (value!) {
+                                          if (optionSelected <
+                                              variantTypeList[indexType]
+                                                  .maximal!) {
+                                            option.selected = value!;
+                                            optionPrice +=
+                                                option.variantOptionPrice!;
+                                            calculatedTotal =
+                                                (price + optionPrice) *
+                                                    selectedCount;
+                                            optionSelected++;
+                                            log('optionSelected: $optionSelected');
+                                            variantSelected = option;
+                                          }
+                                        } else {
+                                          option.selected = value!;
+                                          optionPrice -=
+                                              option.variantOptionPrice!;
+                                          calculatedTotal =
+                                              (price + optionPrice) *
+                                                  selectedCount;
+                                          optionSelected--;
+                                          log('optionSelected: $optionSelected');
+                                          variantSelected = null;
+                                        }
+
+                                        // cek variant dipilih atau belum
+                                        if (optionSelected >=
+                                                variantTypeList[indexType]
+                                                    .minimal! &&
+                                            optionSelected <=
+                                                variantTypeList[indexType]
+                                                    .maximal!) {
+                                          variantTypeList[indexType].selected =
+                                              true;
+
+                                          log('variantSelected: $variantSelectedList');
+                                        } else {
+                                          variantTypeList[indexType].selected =
+                                              false;
+                                          log('variantSelected: $variantSelectedList');
+                                        }
+
+                                        // cek variant yg dipilih sudah valid atau belum
+                                        if (optionSelected >=
+                                            variantTypeList[indexType]
+                                                .minimal!) {
+                                          if (optionSelected <=
+                                              variantTypeList[indexType]
+                                                  .maximal!) {
+                                            variantTypeList[indexType].valid =
+                                                true;
+                                          } else {
+                                            variantTypeList[indexType].valid =
+                                                false;
+                                          }
+                                        } else {
+                                          variantTypeList[indexType].valid =
+                                              false;
+                                        }
                                       } else {
-                                        // calculatedTotal = calculatedSubTotal - variant.variantOptionPrice!;
-                                        calculatedTotal = calculatedTotal - variant.variantOptionPrice!;
-                                        variantSelected = null;
+                                        showToast("Masukan jumlah menu");
                                       }
                                     });
                                   },
-                                  title: Text(variant.variantOptionName.toString()),
-                                  subtitle: Text(Constant.currencyCode + variant.variantOptionPrice.toString()),
-                                  shape: indexVariant == variantItems.length - 1 ? null : Border(bottom: BorderSide(color: Warna.abu, width: 1.5)),
+                                  title:
+                                      Text(option.variantOptionName.toString()),
+                                  subtitle: Text(Constant.currencyCode +
+                                      formatNumberWithThousandsSeparator(
+                                              option.variantOptionPrice!)
+                                          .toString()),
+                                  shape: indexVariant == variantItems.length - 1
+                                      ? null
+                                      : Border(
+                                          bottom: BorderSide(
+                                              color: Warna.abu, width: 1.5)),
                                 );
                               },
                             ),
@@ -488,23 +615,45 @@ Future menuCustomeFrameSheet(
                       isLoading: isLoading,
                       onPressed: () async {
                         if (calculatedTotal == 0) {
-                          showToast('Masukan input jumlah menu');
+                          showToast('Masukan jumlah menu');
+                          return;
+                        }
+
+                        variantTypeList.forEach((variant) {
+                          if (variant.isRequired != true) {
+                            variant.valid = true;
+                          }
+                        });
+
+                        int selectedValidVariant = variantTypeList
+                            .where((variant) => variant.valid == true)
+                            .length;
+
+                        if (selectedValidVariant != variantTypeList.length) {
+                          showToast('Pilih Varian');
                           return;
                         }
                         setState(() {
-                                  isLoading = true;
-                                });
-                        await onTapAddOrder(selectedCount, calculatedTotal, variantTypeList.expand((v) => v.variantOptions!).where((v) => v.selected!).toList());
+                          isLoading = true;
+                        });
+                        await onTapAddOrder(
+                            selectedCount,
+                            calculatedTotal,
+                            variantTypeList
+                                .expand((v) => v.variantOptions!)
+                                .where((v) => v.selected!)
+                                .toList());
                         setState(() {
-                                  isLoading = false;
-                                  selectedCount = count;
-                                  calculatedSubTotal = subTotal;
-                                  calculatedTotal = total;
-                                  variantSelected = null;
-                                });
+                          isLoading = false;
+                          selectedCount = count;
+                          // calculatedSubTotal = subTotal;
+                          // calculatedTotal = total;
+                          variantSelected = null;
+                        });
                         Navigator.pop(context);
                       },
-                      text: 'Tambah Pesanan - ${Constant.currencyCode}${formatNumberWithThousandsSeparator(calculatedTotal)}',
+                      text:
+                          'Tambah Pesanan - ${Constant.currencyCode}${formatNumberWithThousandsSeparator(calculatedTotal)}',
                       borderRadius: 54.0,
                     ),
                   ),
@@ -517,190 +666,6 @@ Future menuCustomeFrameSheet(
     },
   );
 }
-
-
-// Future menuCustomeFrameSheet(
-//   BuildContext context, {
-//   required String imgUrl,
-//   required String productName,
-//   required String description,
-//   required int price,
-//   required String rate,
-//   required String likes,
-//   required int count,
-//   required int subTotal,
-//   int sold = 0,
-//   required VoidCallback onPressed,
-//   required Function(int, int, List<VariantOption>) onTapAddOrder,
-//   required Function(Function) onTapAdd,
-//   required Function(Function) onTapRemove,
-//   required double innerContentSize,
-//   required List<Variant> variantTypeList,
-//   required VariantOption? variantSelected,
-//   required int total,
-// }) {
-//   int selectedCount = count;
-//   int calculatedSubTotal = subTotal;
-//   int calculatedTotal = total;
-//   bool isLoading = false;
-//   List<VariantOption> selectedVariants = [];
-
-//   ToastContext().init(context);
-//   return showModalBottomSheet(
-//     context: context,
-//     backgroundColor: Colors.white,
-//     enableDrag: true,
-//     showDragHandle: true,
-//     isScrollControlled: true,
-//     shape: const RoundedRectangleBorder(
-//       borderRadius: BorderRadius.only(
-//         topLeft: Radius.circular(20),
-//         topRight: Radius.circular(20),
-//       ),
-//     ),
-//     builder: (context) {
-//       return StatefulBuilder(
-//         builder: (context, setState) {
-//           return PopScope(
-//             canPop: true,
-//             onPopInvoked: (didPop) {
-//               setState(() {
-//                 isLoading = false;
-//                 selectedCount = count;
-//                 calculatedSubTotal = subTotal;
-//                 calculatedTotal = total;
-//                 variantSelected = null;
-//                 selectedVariants.clear();
-//               });
-//             },
-//             child: SingleChildScrollView(
-//               child: Container(
-//                 padding: const EdgeInsets.symmetric(horizontal: 25),
-//                 child: Column(
-//                   mainAxisSize: MainAxisSize.min,
-//                   crossAxisAlignment: CrossAxisAlignment.start,
-//                   children: [
-//                     ProductCardBoxHorizontal(
-//                       imgUrl: imgUrl,
-//                       productName: productName,
-//                       price: price,
-//                       rate: rate,
-//                       likes: likes,
-//                       sold: sold,
-//                       count: selectedCount.toString(),
-//                       description: description,
-//                       isCustom: false,
-//                       onTapAdd: () {
-//                         setState(() {
-//                           selectedCount++;
-//                           calculatedSubTotal = price * selectedCount;
-//                           calculatedTotal = calculatedSubTotal + selectedVariants.fold(0, (sum, variant) => sum + variant.variantOptionPrice!);
-//                         });
-//                         onTapAdd(() {});
-//                       },
-//                       onTapRemove: () {
-//                         if (selectedCount > 0) {
-//                           setState(() {
-//                             selectedCount--;
-//                             calculatedSubTotal = price * selectedCount;
-//                             calculatedTotal = calculatedSubTotal + selectedVariants.fold(0, (sum, variant) => sum + variant.variantOptionPrice!);
-//                           });
-//                           onTapRemove(() {});
-//                         }
-//                       },
-//                       innerContentSize: innerContentSize,
-//                       hideBorder: true,
-//                     ),
-//                     ListView.builder(
-//                       itemCount: variantTypeList.length,
-//                       shrinkWrap: true,
-//                       physics: const NeverScrollableScrollPhysics(),
-//                       itemBuilder: (context, indexType) {
-//                         List<VariantOption>? variantItems = variantTypeList[indexType].variantOptions;
-//                         return Column(
-//                           mainAxisSize: MainAxisSize.min,
-//                           children: [
-//                             Container(
-//                               padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
-//                               width: double.infinity,
-//                               decoration: BoxDecoration(
-//                                 color: Warna.abu,
-//                                 borderRadius: BorderRadius.circular(8),
-//                               ),
-//                               child: Text(
-//                                 variantTypeList[indexType].variantName.toString(),
-//                                 style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
-//                               ),
-//                             ),
-//                             ListView.builder(
-//                               itemCount: variantItems?.length,
-//                               shrinkWrap: true,
-//                               physics: const NeverScrollableScrollPhysics(),
-//                               itemBuilder: (context, indexVariant) {
-//                                 VariantOption variant = variantItems![indexVariant];
-//                                 return CheckboxListTile(
-//                                   value: variant.selected,
-//                                   onChanged: (value) {
-//                                     setState(() {
-//                                       variant.selected = value!;
-//                                       if (value) {
-//                                         selectedVariants.add(variant);
-//                                       } else {
-//                                         selectedVariants.remove(variant);
-//                                       }
-//                                       calculatedTotal = calculatedSubTotal + selectedVariants.fold(0, (sum, variant) => sum + variant.variantOptionPrice!);
-//                                     });
-//                                   },
-//                                   title: Text(variant.variantOptionName.toString()),
-//                                   subtitle: Text(Constant.currencyCode + variant.variantOptionPrice.toString()),
-//                                   shape: indexVariant == variantItems.length - 1 ? null : Border(bottom: BorderSide(color: Warna.abu, width: 1.5)),
-//                                 );
-//                               },
-//                             ),
-//                           ],
-//                         );
-//                       },
-//                     ),
-//                     Container(
-//                       height: 50,
-//                       width: double.infinity,
-//                       margin: const EdgeInsets.symmetric(vertical: 25),
-//                       child: CBlueButton(
-//                         isLoading: isLoading,
-//                         onPressed: () async {
-//                           if (calculatedTotal == 0) {
-//                             showToast('Masukan input jumlah menu');
-//                             return;
-//                           }
-//                           setState(() {
-//                             isLoading = true;
-//                           });
-//                           await onTapAddOrder(selectedCount, calculatedTotal, selectedVariants);
-//                           setState(() {
-//                             isLoading = false;
-//                             selectedCount = count;
-//                             calculatedSubTotal = subTotal;
-//                             calculatedTotal = total;
-//                             variantSelected = null;
-//                             selectedVariants.clear();
-//                           });
-//                           Navigator.pop(context);
-//                         },
-//                         text: 'Tambah Pesanan - ${Constant.currencyCode}${formatNumberWithThousandsSeparator(calculatedTotal)}',
-//                         borderRadius: 54.0,
-//                       ),
-//                     ),
-//                   ],
-//                 ),
-//               ),
-//             ),
-//           );
-//         },
-//       );
-//     },
-//   );
-// }
-
 
 Future statusOrderSheet(
   BuildContext? context, {

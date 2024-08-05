@@ -223,6 +223,7 @@ class Menu {
   int? menuStock;
   int? menuLikes;
   int? menuSolds;
+  int? quantity;
   double? menuRate;
   bool? isDanus;
   bool? isLike;
@@ -241,6 +242,7 @@ class Menu {
     this.menuStock,
     this.menuLikes,
     this.menuSolds,
+    this.quantity,
     this.menuRate,
     this.isDanus,
     this.isLike,
@@ -260,6 +262,7 @@ class Menu {
     menuStock = json['menuStock'];
     menuLikes = json['menuLikes'];
     menuSolds = json['menuSolds'];
+    quantity = json['quantity'];
     menuRate = json['menuRate'];
     isDanus = json['isDanus'];
     isLike = json['isLike'];
@@ -285,6 +288,7 @@ class Menu {
     data['menuStock'] = menuStock;
     data['menuLikes'] = menuLikes;
     data['menuSolds'] = menuSolds;
+    data['quantity'] = quantity;
     data['menuRate'] = menuRate;
     data['isDanus'] = isDanus;
     data['isLike'] = isLike;
@@ -304,6 +308,7 @@ class Variant {
   int? minimal;
   int? maximal;
   bool? selected;
+  bool? valid;
   List<VariantOption>? variantOptions;
 
   Variant({
@@ -313,6 +318,7 @@ class Variant {
     this.minimal,
     this.maximal,
     this.selected,
+    this.valid,
     this.variantOptions,
   });
 
@@ -323,6 +329,7 @@ class Variant {
     minimal = json['minimal'];
     maximal = json['maximal'];
     selected = false;
+    valid = false;
     if (json['variantOptions'] != null) {
       variantOptions = <VariantOption>[];
       json['variantOptions'].forEach((v) {
