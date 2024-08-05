@@ -365,7 +365,7 @@ Future menuCustomeFrameSheet(
   int quantity = 0,
   int sold = 0,
   required VoidCallback onPressed,
-  required Function(int, int, List<VariantOption>) onTapAddOrder,
+  required Function(int, int, List<Map<String, dynamic>>) onTapAddOrder,
   required Function(Function) onTapAdd,
   required Function(Function) onTapRemove,
   required double innerContentSize,
@@ -586,6 +586,27 @@ Future menuCustomeFrameSheet(
                                       } else {
                                         showToast("Masukan jumlah menu");
                                       }
+
+                                      // Assuming variantTypeList is a list of objects with fields variantId and variantOptions
+                                      List<Map<String, dynamic>> debugVariants =
+                                          variantTypeList
+                                              .where((variant) =>
+                                                  variant.selected!)
+                                              .map((variant) {
+                                        return {
+                                          "variantId": variant.id,
+                                          "variantOptionIds": variant
+                                                  .variantOptions
+                                                  ?.where((option) =>
+                                                      option.selected!)
+                                                  .map((option) => option.id)
+                                                  .toList() ??
+                                              []
+                                        };
+                                      }).toList();
+
+// Print the result to the debug console
+                                      print({"variants": debugVariants});
                                     });
                                   },
                                   title:
@@ -636,13 +657,27 @@ Future menuCustomeFrameSheet(
                         setState(() {
                           isLoading = true;
                         });
+                        // Assuming variantTypeList is a list of objects with fields id (variantId) and variantOptions
+                        List<Map<String, dynamic>> formattedVariants =
+                            variantTypeList.where((variant) => variant.selected!).map((variant) {
+                          return {
+                            "variantId": variant.id,
+                            "variantOptionIds": variant.variantOptions!
+                                .where((option) => option.selected!)
+                                .map((option) => option.id)
+                                .toList()
+                          };
+                        }).toList();
+
                         await onTapAddOrder(
-                            selectedCount,
-                            calculatedTotal,
-                            variantTypeList
-                                .expand((v) => v.variantOptions!)
-                                .where((v) => v.selected!)
-                                .toList());
+                          selectedCount,
+                          calculatedTotal,
+                          // variantTypeList
+                          //     .expand((v) => v.variantOptions!)
+                          //     .where((v) => v.selected!)
+                          //     .toList()
+                          formattedVariants
+                        );
                         setState(() {
                           isLoading = false;
                           selectedCount = count;

@@ -10,6 +10,7 @@ import 'package:cfood/custom/popup_dialog.dart';
 import 'package:cfood/custom/reload_indicator.dart';
 import 'package:cfood/model/add_cart_response.dart';
 import 'package:cfood/model/get_cart_user_response.dart';
+import 'package:cfood/model/get_detail_merchant_response.dart';
 import 'package:cfood/model/update_cartitem_response.dart';
 import 'package:cfood/model/get_calculate_cart_response.dart';
 import 'package:cfood/model/get_detail_merchant_response.dart'
@@ -95,6 +96,7 @@ class _CartScreenState extends State<CartScreen> {
               int selectedCount = 0;
               int price = item.detailMenu.menuPrice!;
               int subtotal = price;
+              // List<Variant> variantTypeList;
               menuCustomeFrameSheet(
                 context,
                 imgUrl:
@@ -103,7 +105,7 @@ class _CartScreenState extends State<CartScreen> {
                 description: item.detailMenu.menuDesc!,
                 price: item.detailMenu.menuPrice!,
                 stock: item.detailMenu.menuStock!,
-                quantity: item.quantity,
+                quantity: item.totalQuantity,
                 likes: item.detailMenu.likes.toString(),
                 rate: item.detailMenu.rating.toString(),
                 count: selectedCount,
@@ -135,10 +137,14 @@ class _CartScreenState extends State<CartScreen> {
                   updateCart(
                       menuId: item.detailMenu.id!,
                       quantity: selectedCount,
-                      variants: selectedVariants
-                          .map((v) => {
-                                'variantId': v.id,
-                                'variantOptionIds': [v.id],
+                      variants: item.detailMenu.variants!
+                          .where((variant) => variant.selected!)
+                          .map((variant) => {
+                                'variantId': variant.id,
+                                'variantOptionIds': variant.variantOptions!
+                                    .where((option) => option.selected!)
+                                    .map((option) => option.id)
+                                    .toList(),
                               })
                           .toList(),
                       merchantId: merchantId);

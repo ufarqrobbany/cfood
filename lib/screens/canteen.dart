@@ -412,12 +412,17 @@ class _CanteenScreenState extends State<CanteenScreen>
                   updateCart(
                     menuId: dataSpecificMenu!.id!,
                     quantity: selectedCount,
-                    variants: selectedVariants
-                        .map((v) => {
-                              'variantId': v.id,
-                              'variantOptionIds': [v.id],
+                    variants: dataSpecificMenu!.variants!
+                        .where((variant) => variant.selected!)
+                        .map((variant) => {
+                              'variantId': variant.id,
+                              'variantOptionIds': variant.variantOptions!
+                                  .where((option) => option.selected!)
+                                  .map((option) => option.id)
+                                  .toList(),
                             })
                         .toList(),
+
                     // merchantId: merchantId
                   );
                 },
@@ -1361,10 +1366,18 @@ class _CanteenScreenState extends State<CanteenScreen>
                                         updateCart(
                                           menuId: item.id!,
                                           quantity: selectedCount,
-                                          variants: selectedVariants
-                                              .map((v) => {
-                                                    'variantId': v.id,
-                                                    'variantOptionIds': [v.id],
+                                          variants: item.variants!
+                                              .where((variant) =>
+                                                  variant.selected!)
+                                              .map((variant) => {
+                                                    'variantId': variant.id,
+                                                    'variantOptionIds': variant
+                                                        .variantOptions!
+                                                        .where((option) =>
+                                                            option.selected!)
+                                                        .map((option) =>
+                                                            option.id)
+                                                        .toList(),
                                                   })
                                               .toList(),
                                         );
@@ -1479,12 +1492,18 @@ class _CanteenScreenState extends State<CanteenScreen>
                                           updateCart(
                                             menuId: item.id!,
                                             quantity: selectedCount,
-                                            variants: selectedVariants
-                                                .map((v) => {
-                                                      'variantId': v.id,
-                                                      'variantOptionIds': [
-                                                        v.id
-                                                      ],
+                                            variants: item.variants!
+                                                .where((variant) =>
+                                                    variant.selected!)
+                                                .map((variant) => {
+                                                      'variantId': variant.id,
+                                                      'variantOptionIds': variant
+                                                          .variantOptions!
+                                                          .where((option) =>
+                                                              option.selected!)
+                                                          .map((option) =>
+                                                              option.id)
+                                                          .toList(),
                                                     })
                                                 .toList(),
                                           );
@@ -2078,10 +2097,16 @@ class _CanteenScreenState extends State<CanteenScreen>
                               updateCart(
                                 menuId: item.id!,
                                 quantity: selectedCount,
-                                variants: selectedVariants
-                                    .map((v) => {
-                                          'variantId': v.id,
-                                          'variantOptionIds': [v.id],
+                                variants: item.variants!
+                                    .where((variant) => variant.selected!)
+                                    .map((variant) => {
+                                          'variantId': variant.id,
+                                          'variantOptionIds': variant
+                                              .variantOptions!
+                                              .where(
+                                                  (option) => option.selected!)
+                                              .map((option) => option.id)
+                                              .toList(),
                                         })
                                     .toList(),
                               );
