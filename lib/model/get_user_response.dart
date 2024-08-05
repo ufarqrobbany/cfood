@@ -179,12 +179,12 @@ class MerchantInformation {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['merchantId'] = this.merchantId;
-    data['merchantName'] = this.merchantName;
-    data['merchantPhoto'] = this.merchantPhoto;
-    data['merchantDesc'] = this.merchantDesc;
-    data['merchantType'] = this.merchantType;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['merchantId'] = merchantId;
+    data['merchantName'] = merchantName;
+    data['merchantPhoto'] = merchantPhoto;
+    data['merchantDesc'] = merchantDesc;
+    data['merchantType'] = merchantType;
     return data;
   }
 }

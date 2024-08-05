@@ -17,15 +17,15 @@ class FollowMerchantResponse {
     status = json['status'];
     message = json['message'];
     data = json['data'] != null
-        ? new DataFollowMerchant.fromJson(json['data'])
+        ? DataFollowMerchant.fromJson(json['data'])
         : null;
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['statusCode'] = this.statusCode;
-    data['status'] = this.status;
-    data['message'] = this.message;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['statusCode'] = statusCode;
+    data['status'] = status;
+    data['message'] = message;
     if (this.data != null) {
       data['data'] = this.data!.toJson();
     }
@@ -56,12 +56,12 @@ class DataFollowMerchant {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['userId'] = this.userId;
-    data['userName'] = this.userName;
-    data['merchantId'] = this.merchantId;
-    data['merchantName'] = this.merchantName;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['userId'] = userId;
+    data['userName'] = userName;
+    data['merchantId'] = merchantId;
+    data['merchantName'] = merchantName;
     return data;
   }
 }
@@ -80,15 +80,15 @@ class UnfollowMerchantResponse {
     status = json['status'];
     message = json['message'];
     data = json['data'] != null
-        ? new DataUnfollowMerchant.fromJson(json['data'])
+        ? DataUnfollowMerchant.fromJson(json['data'])
         : null;
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['statusCode'] = this.statusCode;
-    data['status'] = this.status;
-    data['message'] = this.message;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['statusCode'] = statusCode;
+    data['status'] = status;
+    data['message'] = message;
     if (this.data != null) {
       data['data'] = this.data!.toJson();
     }
@@ -108,9 +108,9 @@ class DataUnfollowMerchant {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['userId'] = this.userId;
-    data['merchantId'] = this.merchantId;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['userId'] = userId;
+    data['merchantId'] = merchantId;
     return data;
   }
 }
@@ -132,10 +132,10 @@ class IsFollowMerchantResponse {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['statusCode'] = this.statusCode;
-    data['status'] = this.status;
-    data['message'] = this.message;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['statusCode'] = statusCode;
+    data['status'] = status;
+    data['message'] = message;
     data['data'] = this.data;
     return data;
   }

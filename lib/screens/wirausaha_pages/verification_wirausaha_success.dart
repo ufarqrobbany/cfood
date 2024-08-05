@@ -1,6 +1,5 @@
 import 'package:cfood/custom/CButtons.dart';
 import 'package:cfood/custom/CPageMover.dart';
-import 'package:cfood/screens/kantin_pages/main.dart';
 import 'package:cfood/style.dart';
 import 'package:flutter/material.dart';
 

@@ -46,6 +46,27 @@ class AuthHelper {
     prefs.setMerchantId(id ?? '0');
   }
 
+  setUserType({
+    String type = '',
+  }) {
+    log('$type type saved');
+    prefs.setType(type: type);
+  }
+
+  setToDashboard({
+    String dashboard = 'no',
+  }) {
+    prefs.setToDashboard(dashboard);
+  }
+
+  Future<Map<String, dynamic>> getToDashboard() async {
+    String? dashboard = await SessionManager().getToDashBoard();
+
+    return {
+      'dashboard': dashboard,
+    };
+  }
+
   clearUserData() {
     prefs.setIsloggedIn('no');
     prefs.setToken('');

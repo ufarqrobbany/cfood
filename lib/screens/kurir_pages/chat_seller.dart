@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 
 // ignore: must_be_immutable
 class ChatSellerScreen extends StatefulWidget {
-  ChatSellerScreen({
+  const ChatSellerScreen({
     super.key,
   });
 

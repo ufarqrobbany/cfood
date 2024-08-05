@@ -1,4 +1,3 @@
-import 'dart:convert';
 
 class GetAllMerchantsResponse {
   int? statusCode;
@@ -14,15 +13,15 @@ class GetAllMerchantsResponse {
     status = json['status'];
     message = json['message'];
     data = json['data'] != null
-        ? new DataGetMerchant.fromJson(json['data'])
+        ? DataGetMerchant.fromJson(json['data'])
         : null;
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['statusCode'] = this.statusCode;
-    data['status'] = this.status;
-    data['message'] = this.message;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['statusCode'] = statusCode;
+    data['status'] = status;
+    data['message'] = message;
     if (this.data != null) {
       data['data'] = this.data!.toJson();
     }
@@ -41,7 +40,7 @@ class DataGetMerchant {
     if (json['merchants'] != null) {
       merchants = <MerchantItems>[];
       json['merchants'].forEach((v) {
-        merchants!.add(new MerchantItems.fromJson(v));
+        merchants!.add(MerchantItems.fromJson(v));
       });
     }
     totalPages = json['totalPages'];
@@ -49,12 +48,12 @@ class DataGetMerchant {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.merchants != null) {
-      data['merchants'] = this.merchants!.map((v) => v.toJson()).toList();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    if (merchants != null) {
+      data['merchants'] = merchants!.map((v) => v.toJson()).toList();
     }
-    data['totalPages'] = this.totalPages;
-    data['totalElements'] = this.totalElements;
+    data['totalPages'] = totalPages;
+    data['totalElements'] = totalElements;
     return data;
   }
 }
@@ -97,17 +96,17 @@ class MerchantItems {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['merchantId'] = this.merchantId;
-    data['merchantName'] = this.merchantName;
-    data['merchantPhoto'] = this.merchantPhoto;
-    data['merchantType'] = this.merchantType;
-    data['rating'] = this.rating;
-    data['followers'] = this.followers;
-    data['location'] = this.location;
-    data['userId'] = this.userId;
-    data['open'] = this.open;
-    data['danus'] = this.danus;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['merchantId'] = merchantId;
+    data['merchantName'] = merchantName;
+    data['merchantPhoto'] = merchantPhoto;
+    data['merchantType'] = merchantType;
+    data['rating'] = rating;
+    data['followers'] = followers;
+    data['location'] = location;
+    data['userId'] = userId;
+    data['open'] = open;
+    data['danus'] = danus;
     return data;
   }
 }

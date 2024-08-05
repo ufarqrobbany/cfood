@@ -5,10 +5,10 @@ class SwitchWithBorder extends StatefulWidget {
   final ValueChanged<bool> onChanged;
 
   const SwitchWithBorder({
-    Key? key,
+    super.key,
     required this.initialAccept,
     required this.onChanged,
-  }) : super(key: key);
+  });
 
   @override
   _SwitchWithBorderState createState() => _SwitchWithBorderState();
@@ -33,7 +33,7 @@ class _SwitchWithBorderState extends State<SwitchWithBorder> {
         widget.onChanged(accept);
       },
       child: Container(
-        padding: EdgeInsets.all(4.0), // Padding between toggle circle and border
+        padding: const EdgeInsets.all(4.0), // Padding between toggle circle and border
         decoration: BoxDecoration(
           border: Border.all(
             color: accept ? Colors.green : Colors.red,
@@ -59,7 +59,7 @@ class _SwitchWithBorderState extends State<SwitchWithBorder> {
               child: Container(
                 width: 26.0,
                 height: 26.0,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   color: Colors.white,
                   shape: BoxShape.circle,
                   boxShadow: [

@@ -79,7 +79,7 @@ class _ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateM
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Nama toko / merchant', style: AppTextStyles.subTitle,),
+                  const Text('Nama toko / merchant', style: AppTextStyles.subTitle,),
                   Text('Nama Penjual disii', style: TextStyle(
                     fontSize: 15,
                     color: Warna.abu2,

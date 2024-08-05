@@ -158,7 +158,7 @@ class _UserInformationScreenState extends State<UserInformationScreen> {
       builder: (context) => CupertinoActionSheet(
         actions: [
           CupertinoActionSheetAction(
-            child: Text('Photo Gallery'),
+            child: const Text('Photo Gallery'),
             onPressed: () {
               // close the options modal
               Navigator.of(context).pop();
@@ -167,7 +167,7 @@ class _UserInformationScreenState extends State<UserInformationScreen> {
             },
           ),
           CupertinoActionSheetAction(
-            child: Text('Camera'),
+            child: const Text('Camera'),
             onPressed: () {
               // close the options modal
               Navigator.of(context).pop();
@@ -307,7 +307,7 @@ class _UserInformationScreenState extends State<UserInformationScreen> {
             )
           : null,
       body: dataUser == null
-          ? Container(
+          ? SizedBox(
               height: MediaQuery.of(context).size.height,
               width: MediaQuery.of(context).size.width,
               child: Center(

@@ -17,7 +17,7 @@ class CalculateCartResponse {
         status: json['status'],
         message: json['message'],
         data: json['data'] != null
-            ? new CalculateCartData.fromJson(json['data'])
+            ? CalculateCartData.fromJson(json['data'])
             : null);
   }
 

@@ -134,7 +134,9 @@ class FetchController {
     required String dataKeyName,
     required Map<String, dynamic> data,
     required File file,
-    required String fileKeyName,
+    required String fileKeyName, 
+    bool customToJson = false,
+    var dataFromCustomToJson,
     // required List<MultipartFile> files,
   }) async {
     try {
@@ -147,7 +149,7 @@ class FetchController {
       FormData formData = FormData.fromMap({
         // dataKeyName: json.encode(data),
         dataKeyName: MultipartFile.fromString(
-          json.encode(data),
+          customToJson ? dataFromCustomToJson : json.encode(data),
           contentType: MediaType.parse('application/json'),
         ),
         fileKeyName: await MultipartFile.fromFile(

@@ -10,14 +10,14 @@ class AddCartResponse {
     statusCode = json['statusCode'];
     status = json['status'];
     message = json['message'];
-    data = json['data'] != null ? new DataAddCart.fromJson(json['data']) : null;
+    data = json['data'] != null ? DataAddCart.fromJson(json['data']) : null;
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['statusCode'] = this.statusCode;
-    data['status'] = this.status;
-    data['message'] = this.message;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['statusCode'] = statusCode;
+    data['status'] = status;
+    data['message'] = message;
     if (this.data != null) {
       data['data'] = this.data!.toJson();
     }
@@ -48,12 +48,12 @@ class DataAddCart {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['cartId'] = this.cartId;
-    data['merchantId'] = this.merchantId;
-    data['totalMenus'] = this.totalMenus;
-    data['totalItems'] = this.totalItems;
-    data['totalPrices'] = this.totalPrices;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['cartId'] = cartId;
+    data['merchantId'] = merchantId;
+    data['totalMenus'] = totalMenus;
+    data['totalItems'] = totalItems;
+    data['totalPrices'] = totalPrices;
     return data;
   }
 }

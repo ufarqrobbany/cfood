@@ -10,11 +10,8 @@ import 'package:cfood/custom/popup_dialog.dart';
 import 'package:cfood/custom/reload_indicator.dart';
 import 'package:cfood/model/add_cart_response.dart';
 import 'package:cfood/model/get_cart_user_response.dart';
-import 'package:cfood/model/get_detail_merchant_response.dart';
 import 'package:cfood/model/update_cartitem_response.dart';
 import 'package:cfood/model/get_calculate_cart_response.dart';
-import 'package:cfood/model/get_detail_merchant_response.dart'
-    as detailmerchant;
 import 'package:cfood/model/delete_cart_response.dart';
 import 'package:cfood/repository/fetch_controller.dart';
 import 'package:cfood/model/post_menu_like_response.dart';
@@ -27,7 +24,6 @@ import 'package:community_material_icon/community_material_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:toast/toast.dart';
 import 'package:uicons/uicons.dart';
-import 'package:cfood/model/get_specific_menu_response.dart';
 
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
@@ -447,9 +443,9 @@ class _CartScreenState extends State<CartScreen> {
                                   children: [
                                     GestureDetector(
                                       onTap: () {
-                                        log('Cart selected: ${store?.merchantName}');
+                                        log('Cart selected: ${store.merchantName}');
                                         setState(() {
-                                          if (store!.isOpen) {
+                                          if (store.isOpen) {
                                             selectCartId = store.cartId;
                                             getCalculateCart(selectCartId!);
                                           }
@@ -459,7 +455,7 @@ class _CartScreenState extends State<CartScreen> {
                                       // bookmark
                                       child: store!.isOpen
                                           ? Icon(
-                                              selectCartId == store?.cartId
+                                              selectCartId == store.cartId
                                                   ? Icons
                                                       .radio_button_checked_rounded
                                                   : Icons
@@ -517,11 +513,11 @@ class _CartScreenState extends State<CartScreen> {
                                             MainAxisAlignment.start,
                                         children: [
                                           Icon(
-                                            store?.merchantType == "WIRAUSAHA"
+                                            store.merchantType == "WIRAUSAHA"
                                                 ? CommunityMaterialIcons
                                                     .handshake
                                                 : Icons.store,
-                                            color: store?.merchantType ==
+                                            color: store.merchantType ==
                                                     "WIRAUSAHA"
                                                 ? Warna.kuning
                                                 : Warna.biru,
@@ -532,7 +528,7 @@ class _CartScreenState extends State<CartScreen> {
                                           ),
                                           Flexible(
                                             child: Text(
-                                              store!.merchantName,
+                                              store.merchantName,
                                               style: const TextStyle(
                                                 fontSize: 16,
                                                 fontWeight: FontWeight.w700,
@@ -553,7 +549,7 @@ class _CartScreenState extends State<CartScreen> {
                                                 'Apakah Anda yakin untuk menghapus keranjang ini?\n',
                                             colorYes: Warna.like, onTapYes: () {
                                           navigateBack(context);
-                                          deleteCart(store!.cartId);
+                                          deleteCart(store.cartId);
                                         });
                                       },
                                       child: Icon(

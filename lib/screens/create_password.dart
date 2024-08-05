@@ -179,44 +179,42 @@ class _CreatePasswordScreenState extends State<CreatePasswordScreen> {
       DataAddUser? dataUser = userResponse.data;
       log(dataUser!.id.toString());
 
-      if (dataUser != null) {
-        if (widget.isStudent) {
-          log('add student');
-          await RegisterRepository().addPostStudent(
-            // ignore: use_build_context_synchronously
-            context,
-            userId: dataUser.id!,
-            campusId: widget.campusId!,
-            // campusId: 2,
-            majorId: widget.majorId!,
-            nim: widget.nim!,
-            studyProgramId: widget.studyProgramId!,
-            admissionYear: widget.addmissionYear!,
-          );
-        }
-
-        // log('request otp');
-        // await RegisterRepository().sendPostOtp(
-        //   context,
-        //   userId: dataUser.id!,
-        //   name: dataUser.name,
-        //   to: dataUser.email,
-        //   type: widget.forgotPass ? "RESET_PASSWORD" : "REGISTER",
-        // );
-
-        setState(() {
-          loadButton = false;
-          log('load button is $loadButton');
-        });
-        log('go to verification email');
-        //
-        navigateTo(
-            context,
-            VerificationScreen(
-              userId: dataUser.id!,
-            ));
+      if (widget.isStudent) {
+        log('add student');
+        await RegisterRepository().addPostStudent(
+          // ignore: use_build_context_synchronously
+          context,
+          userId: dataUser.id!,
+          campusId: widget.campusId!,
+          // campusId: 2,
+          majorId: widget.majorId!,
+          nim: widget.nim!,
+          studyProgramId: widget.studyProgramId!,
+          admissionYear: widget.addmissionYear!,
+        );
       }
 
+      // log('request otp');
+      // await RegisterRepository().sendPostOtp(
+      //   context,
+      //   userId: dataUser.id!,
+      //   name: dataUser.name,
+      //   to: dataUser.email,
+      //   type: widget.forgotPass ? "RESET_PASSWORD" : "REGISTER",
+      // );
+
+      setState(() {
+        loadButton = false;
+        log('load button is $loadButton');
+      });
+      log('go to verification email');
+      //
+      navigateTo(
+          context,
+          VerificationScreen(
+            userId: dataUser.id!,
+          ));
+    
       // log('request otp');
       // await RegisterRepository().sendPostOtp(
       //   context,

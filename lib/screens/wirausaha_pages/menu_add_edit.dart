@@ -7,8 +7,11 @@ import 'package:cfood/custom/CPageMover.dart';
 import 'package:cfood/custom/CTextField.dart';
 import 'package:cfood/custom/CToast.dart';
 import 'package:cfood/model/add_menu_response.dart';
-import 'package:cfood/model/data_variants_local.dart';
+// import 'package:cfood/model/data_variants_local.dart';
 import 'package:cfood/model/get_category_response.dart';
+import 'package:cfood/model/get_detail_merchant_response.dart';
+import 'package:cfood/model/get_specific_menu_response.dart';
+import 'package:cfood/model/reponse_handler.dart';
 import 'package:cfood/repository/fetch_controller.dart';
 import 'package:cfood/screens/wirausaha_pages/category_add.dart';
 import 'package:cfood/screens/wirausaha_pages/varianst_add_edit.dart';
@@ -20,12 +23,19 @@ import 'package:image_picker/image_picker.dart';
 import 'package:mobkit_dashed_border/mobkit_dashed_border.dart';
 import 'package:toast/toast.dart';
 import 'package:uicons/uicons.dart';
+import 'package:cfood/model/get_detail_merchant_response.dart'
+    as detailmerchant;
 
 class AddEditMenuScreen extends StatefulWidget {
   final bool isEdit;
   final bool merchantIsDanus;
-  const AddEditMenuScreen(
-      {super.key, this.isEdit = false, this.merchantIsDanus = false});
+  final int menuId;
+  const AddEditMenuScreen({
+    super.key,
+    this.isEdit = false,
+    this.merchantIsDanus = false,
+    this.menuId = 0,
+  });
 
   @override
   State<AddEditMenuScreen> createState() => _AddEditMenuScreenState();
@@ -39,6 +49,7 @@ class _AddEditMenuScreenState extends State<AddEditMenuScreen> {
   TextEditingController stockController = TextEditingController();
   File? _image;
   File? _image_temp;
+  String img_url = '';
   final picker = ImagePicker();
   bool buttonLoad = false;
   bool isDanusan = false;
@@ -49,7 +60,14 @@ class _AddEditMenuScreenState extends State<AddEditMenuScreen> {
   String selectedCategory = '';
   int selectedCategoryId = 0;
   bool showCategoryBox = false;
-  List<VariantDatas> dataListVariant = [];
+  // List<VariantDatas> dataListVariant = [];
+  List<detailmerchant.Variant> dataListVariant = [];
+
+  DataSpecificMenu? dataSpecificMenu;
+  String nameMenuBefore = '';
+  String descMenuBefore = '';
+  String priceMenuBefore = '';
+  String stockMenuBefore = '';
 
   @override
   void initState() {
@@ -58,6 +76,9 @@ class _AddEditMenuScreenState extends State<AddEditMenuScreen> {
     setState(() {
       dataListVariant = MenuConfig.variants;
     });
+    if (widget.isEdit) {
+      getDataMenu(BuildContext);
+    }
   }
 
   Future<void> getCategory() async {
@@ -131,6 +152,10 @@ class _AddEditMenuScreenState extends State<AddEditMenuScreen> {
       return;
     }
 
+    log('variant : ${json.encode(dataListVariant)}');
+    log('variant data type : ${json.encode(dataListVariant).runtimeType}');
+    log('variant : ${json.encode(dataListVariant.map((variant) => variant.toJson()).toList())}');
+
     try {
       await FetchController(
         endpoint: 'menus/',
@@ -150,7 +175,9 @@ class _AddEditMenuScreenState extends State<AddEditMenuScreen> {
           "menuStock": int.parse(stockController.text),
           "isDanus": isDanusan,
           "merchantId": AppConfig.MERCHANT_ID,
-          "variants": dataListVariant,
+          // "variants": dataListVariant,
+          "variants":
+              dataListVariant.map((variant) => variant.toJson()).toList(),
         },
         fileKeyName: 'photo',
         file: _image!,
@@ -168,6 +195,17 @@ class _AddEditMenuScreenState extends State<AddEditMenuScreen> {
       setState(() {
         buttonLoad = false;
       });
+      log({
+        "menuName": nameProductController.text,
+        "categoryMenuId": selectedCategoryId,
+        "menuDesc": descriptionController.text,
+        "menuPrice": int.parse(priceController.text),
+        "menuStock": int.parse(stockController.text),
+        "isDanus": isDanusan,
+        "merchantId": AppConfig.MERCHANT_ID,
+        // "variants": dataListVariant,
+        "variants": dataListVariant.map((variant) => variant.toJson()).toList(),
+      }.toString());
       log('somthing wong in $e');
     }
   }
@@ -176,6 +214,101 @@ class _AddEditMenuScreenState extends State<AddEditMenuScreen> {
     setState(() {
       MenuConfig.variants.removeAt(index);
       dataListVariant.removeAt(index);
+    });
+  }
+
+  Future<void> updateMenu(BuildContext context) async {
+    log('update menu');
+    String emptyField = '';
+    setState(() {
+      buttonLoad = true;
+    });
+
+    if (nameProductController.text == nameMenuBefore &&
+        descriptionController.text == descMenuBefore &&
+        priceController.text == priceMenuBefore &&
+        stockController.text == stockMenuBefore) {
+      setState(() {
+        buttonLoad = false;
+        emptyField = 'Kamu belum melakukan perubahan apapun';
+      });
+      showToast(emptyField);
+      return;
+    }
+
+    try {
+      // await FetchController(
+      //   endpoint: 'menus/',
+      //   fromJson: (json) => AddMenuResponse.fromJson(json),
+      //   headers: {
+      //     "Content-Type": 'multipart/form-data',
+      //     "Accept": "*/*",
+      //     // "Accept-Encoding": 'gzip, deflate, br',
+      //   },
+      // ).postMultipartData(
+      //   dataKeyName: 'menu',
+      //   data: {
+      //     "menuName": nameProductController.text,
+      //     "categoryMenuId": selectedCategoryId,
+      //     "menuDesc": descriptionController.text,
+      //     "menuPrice": int.parse(priceController.text),
+      //     "menuStock": int.parse(stockController.text),
+      //     "isDanus": isDanusan,
+      //     "merchantId": AppConfig.MERCHANT_ID,
+      //     "variants": dataListVariant,
+      //   },
+      //   fileKeyName: 'photo',
+      //   file: _image!,
+      // );
+
+      setState(() {
+        buttonLoad = false;
+      });
+      MenuConfig.variants.clear();
+      dataListVariant.clear();
+      log('go to canteen');
+      navigateBack(context);
+    } on Exception catch (e) {
+      // TODO
+      setState(() {
+        buttonLoad = false;
+      });
+      log('somthing wong in $e');
+    }
+  }
+
+  Future<void> getDataMenu(BuildContext) async {
+    GetSpecificMenuResponse? response = await FetchController(
+        endpoint: 'menus/${widget.menuId}?userId=${AppConfig.USER_ID}',
+        fromJson: (json) => GetSpecificMenuResponse.fromJson(json)).getData();
+
+    log('specific menu > ${response?.data}');
+    if (response != null) {
+      setState(() {
+        dataSpecificMenu = response.data!;
+        img_url = '${AppConfig.URL_IMAGES_PATH}${dataSpecificMenu!.menuPhoto!}';
+        nameProductController.text = dataSpecificMenu!.menuName!;
+        produckCategoryController.text = dataSpecificMenu!.categoryMenuName!;
+        descriptionController.text = dataSpecificMenu!.menuDesc!;
+        priceController.text = dataSpecificMenu!.menuPrice!.toString();
+        stockController.text = dataSpecificMenu!.menuStock!.toString();
+        isDanusan = dataSpecificMenu!.isDanus!;
+        MenuConfig.variants = dataSpecificMenu!.variants!;
+        dataListVariant = MenuConfig.variants;
+
+        nameMenuBefore = dataSpecificMenu!.menuName!;
+        descMenuBefore = dataSpecificMenu!.menuDesc!;
+        priceMenuBefore = dataSpecificMenu!.menuPrice!.toString();
+        stockMenuBefore = dataSpecificMenu!.menuStock!.toString();
+      });
+    }
+  }
+
+  void deleteDataVariant(int index) {
+    setState(() {
+      // dataListVariant.removeAt(index);
+      MenuConfig.variants.removeAt(index);
+      dataListVariant = MenuConfig.variants;
     });
   }
 
@@ -199,7 +332,7 @@ class _AddEditMenuScreenState extends State<AddEditMenuScreen> {
               }),
           leadingWidth: 90,
           title: Text(
-            'Tambah Menu',
+            widget.isEdit ? 'Edit Menu' : 'Tambah Menu',
             style: AppTextStyles.appBarTitle,
           ),
           foregroundColor: Colors.white,
@@ -241,32 +374,37 @@ class _AddEditMenuScreenState extends State<AddEditMenuScreen> {
                               )
                             : null,
                       ),
-                      child: _image != null
-                          ? Image.file(
-                              _image!,
+                      child: widget.isEdit
+                          ? Image.network(
+                              img_url,
                               fit: BoxFit.cover,
                             )
-                          : Center(
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    UIcons.solidRounded.camera,
-                                    color: Warna.biru,
-                                    size: 30,
+                          : _image != null
+                              ? Image.file(
+                                  _image!,
+                                  fit: BoxFit.cover,
+                                )
+                              : Center(
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        UIcons.solidRounded.camera,
+                                        color: Warna.biru,
+                                        size: 30,
+                                      ),
+                                      Text(
+                                        'Tambah foto',
+                                        style: TextStyle(
+                                          color: Warna.biru,
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w400,
+                                        ),
+                                      )
+                                    ],
                                   ),
-                                  Text(
-                                    'Tambah foto',
-                                    style: TextStyle(
-                                      color: Warna.biru,
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                  )
-                                ],
-                              ),
-                            ),
+                                ),
                     ),
                   ),
                 ),
@@ -384,12 +522,14 @@ class _AddEditMenuScreenState extends State<AddEditMenuScreen> {
                         physics: const NeverScrollableScrollPhysics(),
                         padding: const EdgeInsets.symmetric(vertical: 10),
                         itemBuilder: (context, index) {
-                          VariantDatas variant = dataListVariant[index];
+                          // VariantDatas variant = dataListVariant[index];
+                          detailmerchant.Variant variant =
+                              dataListVariant[index];
                           return Padding(
                             padding: const EdgeInsets.symmetric(vertical: 5),
                             child: varianProductBox(
                               varianName: variant.variantName,
-                              listOption: variant.variantOption,
+                              listOption: variant.variantOptions,
                               varianIdx: index,
                             ),
                           );
@@ -444,7 +584,7 @@ class _AddEditMenuScreenState extends State<AddEditMenuScreen> {
                           const SizedBox(
                               width:
                                   8), // Add some spacing between checkbox and text
-                          Text('Produk Danus'),
+                          const Text('Produk Danus'),
                         ],
                       )
                     : Container(),
@@ -473,7 +613,11 @@ class _AddEditMenuScreenState extends State<AddEditMenuScreen> {
           child: CBlueButton(
             isLoading: buttonLoad,
             onPressed: () {
-              dataCheck(context);
+              if (widget.isEdit) {
+                updateMenu(context);
+              } else {
+                dataCheck(context);
+              }
             },
             text: 'Tambah',
           ),
@@ -558,7 +702,9 @@ class _AddEditMenuScreenState extends State<AddEditMenuScreen> {
                   Expanded(
                     child: DynamicColorButton(
                       onPressed: () {
-                        deleteVariant(varianIdx!);
+                        // deleteVariant(varianIdx!);
+                        log(varianIdx!.toString());
+                        deleteDataVariant(varianIdx);
                       },
                       text: 'Hapus',
                       textStyle: const TextStyle(

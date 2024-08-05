@@ -10,9 +10,7 @@ import 'package:cfood/model/check_email_response.dart';
 import 'package:cfood/model/check_verify_email_response.dart';
 import 'package:cfood/model/validate_email_student_reponse.dart';
 import 'package:cfood/repository/register_repository.dart';
-import 'package:cfood/screens/create_password.dart';
 import 'package:cfood/screens/login.dart';
-import 'package:cfood/screens/main.dart';
 import 'package:cfood/screens/signup_student.dart';
 import 'package:cfood/screens/verification.dart';
 import 'package:cfood/style.dart';
@@ -33,7 +31,7 @@ class _SignupScreenState extends State<SignupScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController campusController = TextEditingController();
   bool imStudent = true;
-  String _selectedOptionStudent = 'ya';
+  final String _selectedOptionStudent = 'ya';
   bool _showSuggestions = false;
   String selectedCampus = '';
   List<DataCampusesItem> campusesList = [];
@@ -55,7 +53,7 @@ class _SignupScreenState extends State<SignupScreen> {
     while (campusesList.isEmpty) {
       await fetchData();
       await Future.delayed(
-          Duration(seconds: 1)); // Tunggu sejenak sebelum cek lagi
+          const Duration(seconds: 1)); // Tunggu sejenak sebelum cek lagi
     }
   }
 

@@ -15,14 +15,14 @@ class AddOrganizationResponse {
     statusCode = json['statusCode'];
     status = json['status'];
     message = json['message'];
-    data = json['data'] != null ? new Data.fromJson(json['data']) : null;
+    data = json['data'] != null ? Data.fromJson(json['data']) : null;
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['statusCode'] = this.statusCode;
-    data['status'] = this.status;
-    data['message'] = this.message;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['statusCode'] = statusCode;
+    data['status'] = status;
+    data['message'] = message;
     if (this.data != null) {
       data['data'] = this.data!.toJson();
     }
@@ -46,11 +46,11 @@ class Data {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['organizationName'] = this.organizationName;
-    data['organizationLogo'] = this.organizationLogo;
-    data['campusId'] = this.campusId;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['organizationName'] = organizationName;
+    data['organizationLogo'] = organizationLogo;
+    data['campusId'] = campusId;
     return data;
   }
 }

@@ -4,14 +4,14 @@ import 'package:cfood/custom/CButtons.dart';
 import 'package:cfood/custom/CPageMover.dart';
 import 'package:cfood/custom/CTextField.dart';
 import 'package:cfood/custom/CToast.dart';
-import 'package:cfood/model/data_variants_local.dart';
+// import 'package:cfood/model/data_variants_local.dart';
 import 'package:cfood/style.dart';
 import 'package:cfood/utils/constant.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:toast/toast.dart';
 import 'package:uicons/uicons.dart';
+import 'package:cfood/model/get_detail_merchant_response.dart'
+    as detailmerchant;
 
 class AddEditVariantsScreen extends StatefulWidget {
   final bool isEdit;
@@ -32,7 +32,7 @@ class _AddEditVariantsScreenState extends State<AddEditVariantsScreen> {
   bool variantRequired = false;
   bool addOption = false;
   bool buttonLoad = false;
-  List<VariantOption> listOpsiVarian = [];
+  List<detailmerchant.VariantOption> listOpsiVarian = [];
 
   @override
   void initState() {
@@ -41,10 +41,13 @@ class _AddEditVariantsScreenState extends State<AddEditVariantsScreen> {
     if (widget.isEdit) {
       isEditVariant();
     }
-    setState(() {
-      minController.text = '0';
-      maxController.text = '0';
-    });
+
+    if (widget.isEdit == false) {
+      setState(() {
+        minController.text = '1';
+        maxController.text = '1';
+      });
+    }
   }
 
   void isEditVariant() {
@@ -55,16 +58,16 @@ class _AddEditVariantsScreenState extends State<AddEditVariantsScreen> {
     maxController.text =
         MenuConfig.variants[widget.indexVarian!].maximal!.toString();
     variantRequired = MenuConfig.variants[widget.indexVarian!].isRequired!;
-    listOpsiVarian = MenuConfig.variants[widget.indexVarian!].variantOption!;
+    listOpsiVarian = MenuConfig.variants[widget.indexVarian!].variantOptions!;
   }
 
   void tapEditVariant() {
-    MenuConfig.variants[widget.indexVarian!] = VariantDatas(
+    MenuConfig.variants[widget.indexVarian!] = detailmerchant.Variant(
       variantName: variantNameController.text,
       isRequired: variantRequired,
       minimal: int.parse(minController.text),
       maximal: int.parse(maxController.text),
-      variantOption: listOpsiVarian,
+      variantOptions: listOpsiVarian,
     );
 
     log(MenuConfig.variants[widget.indexVarian!].toString());
@@ -144,82 +147,27 @@ class _AddEditVariantsScreenState extends State<AddEditVariantsScreen> {
       return;
     }
 
+    if (listOpsiVarian.isEmpty) {
+      log('min = $minimal || maks = $maksimal');
+      setState(() {
+        buttonLoad = false;
+      });
+      showToast('Tambahkan minimal opsi 1 opsi varian!!');
+      return;
+    }
+
     log('min = $minimal || maks = $maksimal');
     showToast('Berhasil disimpan');
     saveDataVariant();
-
-    // if (minimal >= maksimal) {
-    //   if (variantRequired) {
-    //     if (minimal > 0) {
-    //       if (maksimal <= listOpsiVarian.length) {
-    //         log('min = $minimal || maks = $maksimal');
-    //         showToast('Berhasil Disimpan');
-    //         saveDataVariant();
-    //         setState(() {
-    //           buttonLoad = false;
-    //         });
-    //         // berhasil simpan
-    //       } else {
-    //         // maksimal melebihi jumlah opsi, tambahin dulu opsi nya
-    //         setState(() {
-    //           buttonLoad = false;
-    //         });
-    //         log('min = $minimal || maks = $maksimal');
-    //         log('maksimal melebihi jumlah opsi\ntambahin dulu opsi nya cuy');
-    //         showToast(
-    //             'maksimal melebihi jumlah opsi\ntambahin dulu opsi nya cuy');
-    //         return;
-    //       }
-    //     } else {
-    //       // pilih wajib tapi minimalnya diisi kurang dari 1, membingungkan
-    //       setState(() {
-    //           buttonLoad = false;
-    //         });
-    //         log('min = $minimal || maks = $maksimal');
-    //         log('Pilih wajib tapi minimalnya diisi kurang dari 1, membingungkan');
-    //       showToast(
-    //           'Pilih wajib tapi minimalnya diisi kurang dari 1, membingungkan');
-    //       return;
-    //     }
-    //   } else {
-    //     if (maksimal <= listOpsiVarian.length) {
-    //       // berhasil simpan
-    //       setState(() {
-    //           buttonLoad = false;
-    //         });
-    //         log('min = $minimal || maks = $maksimal');
-    //       showToast('Berhasil disimpan');
-    //       saveDataVariant();
-    //     } else {
-    //       // maksimal melebihi jumlah opsi, tambahin dulu opsi nya
-    //       showToast('maksimal melebihi jumlah opsi, tambahin dulu opsi nya');
-    //       log('maksimal melebihi jumlah opsi, tambahin dulu opsi nya');
-    //       setState(() {
-    //           buttonLoad = false;
-    //         });
-    //         log('min = $minimal || maks = $maksimal');
-    //       return;
-    //     }
-    //   }
-    // } else {
-    //   log('min = $minimal || maks = $maksimal');
-    //   // mana ada minimal lebih besar dari maksimal
-    //   setState(() {
-    //           buttonLoad = false;
-    //         });
-    //         log('mana ada minimal lebih besar dari maksimal');
-    //   showToast('mana ada minimal lebih besar dari maksimal');
-    //   return;
-    // }
   }
 
   void saveDataVariant() {
-    VariantDatas newVariant = VariantDatas(
+    detailmerchant.Variant newVariant = detailmerchant.Variant(
       variantName: variantNameController.text,
       isRequired: variantRequired,
       minimal: int.parse(minController.text),
       maximal: int.parse(maxController.text),
-      variantOption: listOpsiVarian,
+      variantOptions: listOpsiVarian,
     );
 
     setState(() {
@@ -231,7 +179,7 @@ class _AddEditVariantsScreenState extends State<AddEditVariantsScreen> {
   }
 
   void addVariantOption() {
-    VariantOption opsiVarian = VariantOption(
+    detailmerchant.VariantOption opsiVarian = detailmerchant.VariantOption(
       variantOptionName: varianOptionController.text,
       variantOptionPrice: int.parse(varianOptionPriceController.text),
     );
@@ -248,7 +196,7 @@ class _AddEditVariantsScreenState extends State<AddEditVariantsScreen> {
 
   void editVariantOption(int index) {
     setState(() {
-      listOpsiVarian[index] = VariantOption(
+      listOpsiVarian[index] = detailmerchant.VariantOption(
         variantOptionName: varianOptionController.text,
         variantOptionPrice: int.parse(varianOptionPriceController.text),
       );
@@ -314,17 +262,18 @@ class _AddEditVariantsScreenState extends State<AddEditVariantsScreen> {
                       setState(() {
                         variantRequired = value!;
                       });
-                      if (variantRequired) {
-                        setState(() {
-                          minController.text = '1';
-                          maxController.text = '1';
-                        });
-                      } else {
-                        setState(() {
-                          minController.text = '0';
-                          maxController.text = '0';
-                        });
-                      }
+                      // if (variantRequired) {
+                      //   setState(() {
+                      //     if(minController.text ==)
+                      //     minController.text = '1';
+                      //     maxController.text = '1';
+                      //   });
+                      // } else {
+                      //   setState(() {
+                      //     minController.text = '0';
+                      //     maxController.text = '0';
+                      //   });
+                      // }
                     },
                   ),
                   const SizedBox(

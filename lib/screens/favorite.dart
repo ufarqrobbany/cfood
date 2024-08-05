@@ -4,7 +4,6 @@ import 'package:cfood/custom/card.dart';
 import 'package:cfood/custom/page_item_void.dart';
 import 'package:cfood/model/followed_response.dart';
 import 'package:cfood/model/liked_response.dart';
-import 'package:cfood/model/getl_all_merchant_response.dart';
 // import 'package:cfood/model/get_all_menu_response.dart';
 import 'package:cfood/repository/fetch_controller.dart';
 import 'package:cfood/screens/canteen.dart';
@@ -143,13 +142,13 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
                       likes: ' ${items.followers}',
                       rate: '${items.rating}',
                       type: items.merchantType,
-                      danus: items!.danus!,
+                      danus: items.danus!,
                       onPressed: () => navigateTo(
                           context,
                           CanteenScreen(
-                            merchantId: items?.merchantId,
+                            merchantId: items.merchantId,
                             isOwner: false,
-                            merchantType: items!.merchantType!,
+                            merchantType: items.merchantType!,
                             itsDanusan: items.danus,
                           )),
                     ),

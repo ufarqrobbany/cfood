@@ -6,7 +6,6 @@ import 'package:cfood/custom/CToast.dart';
 import 'package:cfood/custom/card.dart';
 import 'package:cfood/custom/order_status_timeline_tile.dart';
 import 'package:cfood/model/get_detail_merchant_response.dart';
-import 'package:cfood/model/get_specific_menu_response.dart';
 import 'package:cfood/screens/reviews.dart';
 import 'package:cfood/style.dart';
 import 'package:cfood/utils/common.dart';
@@ -162,7 +161,7 @@ Future menuFrameSheet(
                             ),
                             Text(
                               likes!,
-                              style: TextStyle(fontSize: 12),
+                              style: const TextStyle(fontSize: 12),
                             ),
                           ],
                         ),
@@ -188,7 +187,7 @@ Future menuFrameSheet(
                             ),
                             Text(
                               rate!,
-                              style: TextStyle(fontSize: 12),
+                              style: const TextStyle(fontSize: 12),
                             ),
                           ],
                         ),
@@ -505,12 +504,12 @@ Future menuCustomeFrameSheet(
                                   ],
                                 )),
                             ListView.builder(
-                              itemCount: variantItems?.length,
+                              itemCount: variantItems.length,
                               shrinkWrap: true,
                               physics: const NeverScrollableScrollPhysics(),
                               itemBuilder: (context, indexVariant) {
                                 VariantOption option =
-                                    variantItems![indexVariant];
+                                    variantItems[indexVariant];
 
                                 variantSelectedList = variantTypeList
                                     .where(
@@ -527,7 +526,7 @@ Future menuCustomeFrameSheet(
                                           if (optionSelected <
                                               variantTypeList[indexType]
                                                   .maximal!) {
-                                            option.selected = value!;
+                                            option.selected = value;
                                             optionPrice +=
                                                 option.variantOptionPrice!;
                                             calculatedTotal =
@@ -538,7 +537,7 @@ Future menuCustomeFrameSheet(
                                             variantSelected = option;
                                           }
                                         } else {
-                                          option.selected = value!;
+                                          option.selected = value;
                                           optionPrice -=
                                               option.variantOptionPrice!;
                                           calculatedTotal =
@@ -640,11 +639,11 @@ Future menuCustomeFrameSheet(
                           return;
                         }
 
-                        variantTypeList.forEach((variant) {
+                        for (var variant in variantTypeList) {
                           if (variant.isRequired != true) {
                             variant.valid = true;
                           }
-                        });
+                        }
 
                         int selectedValidVariant = variantTypeList
                             .where((variant) => variant.valid == true)
@@ -771,7 +770,7 @@ Future statusOrderSheet(
                                 )
                               : Container(),
 
-                          Container(
+                          SizedBox(
                             // height: 50,
                             width: double.infinity,
                             // padding: const EdgeInsets.symmetric(vertical: 5),
@@ -883,7 +882,7 @@ Future statusOrderSheet(
                             height: 10,
                           ),
 
-                          Container(
+                          SizedBox(
                             height: 50,
                             width: double.infinity,
                             child: CBlueButton(
@@ -976,7 +975,7 @@ Future statusDeliverySheet(
                             ),
                           ),
 
-                          Container(
+                          SizedBox(
                             // height: 50,
                             width: double.infinity,
                             // padding: const EdgeInsets.symmetric(vertical: 5),
@@ -1090,7 +1089,7 @@ Future statusDeliverySheet(
                             height: 10,
                           ),
 
-                          Container(
+                          SizedBox(
                             height: 50,
                             width: double.infinity,
                             child: CBlueButton(

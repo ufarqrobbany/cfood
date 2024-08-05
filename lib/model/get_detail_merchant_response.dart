@@ -1,4 +1,5 @@
-import 'dart:convert';
+
+import 'package:cfood/model/reponse_handler.dart';
 
 class GetDetailMerchantResponse {
   int? statusCode;
@@ -14,15 +15,15 @@ class GetDetailMerchantResponse {
     status = json['status'];
     message = json['message'];
     data = json['data'] != null
-        ? new DataDetailMerchant.fromJson(json['data'])
+        ? DataDetailMerchant.fromJson(json['data'])
         : null;
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['statusCode'] = this.statusCode;
-    data['status'] = this.status;
-    data['message'] = this.message;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['statusCode'] = statusCode;
+    data['status'] = status;
+    data['message'] = message;
     if (this.data != null) {
       data['data'] = this.data!.toJson();
     }
@@ -70,10 +71,10 @@ class DataDetailMerchant {
     rating = json['rating'];
     location = json['location'];
     studentInformation = json['studentInformation'] != null
-        ? new StudentInformation.fromJson(json['studentInformation'])
+        ? StudentInformation.fromJson(json['studentInformation'])
         : null;
     danusInformation = json['danusInformation'] != null
-        ? new DanusInformation.fromJson(json['danusInformation'])
+        ? DanusInformation.fromJson(json['danusInformation'])
         : null;
     if (json['menusMerchant'] != null) {
       menusMerchant = <MenusMerchant>[];
@@ -86,26 +87,26 @@ class DataDetailMerchant {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['merchantId'] = this.merchantId;
-    data['merchantName'] = this.merchantName;
-    data['merchantPhoto'] = this.merchantPhoto;
-    data['merchantDesc'] = this.merchantDesc;
-    data['merchantType'] = this.merchantType;
-    data['followers'] = this.followers;
-    data['rating'] = this.rating;
-    data['location'] = this.location;
-    if (this.studentInformation != null) {
-      data['studentInformation'] = this.studentInformation!.toJson();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['merchantId'] = merchantId;
+    data['merchantName'] = merchantName;
+    data['merchantPhoto'] = merchantPhoto;
+    data['merchantDesc'] = merchantDesc;
+    data['merchantType'] = merchantType;
+    data['followers'] = followers;
+    data['rating'] = rating;
+    data['location'] = location;
+    if (studentInformation != null) {
+      data['studentInformation'] = studentInformation!.toJson();
     }
-    if (this.danusInformation != null) {
-      data['danusInformation'] = this.danusInformation!.toJson();
+    if (danusInformation != null) {
+      data['danusInformation'] = danusInformation!.toJson();
     }
     if (menusMerchant != null) {
       data['menusMerchant'] = menusMerchant!.map((v) => v.toJson()).toList();
     }
-    data['open'] = this.open;
-    data['follow'] = this.follow;
+    data['open'] = open;
+    data['follow'] = follow;
     return data;
   }
 }
@@ -142,15 +143,15 @@ class StudentInformation {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['studentId'] = this.studentId;
-    data['userId'] = this.userId;
-    data['userName'] = this.userName;
-    data['userPhoto'] = this.userPhoto;
-    data['campusId'] = this.campusId;
-    data['campusName'] = this.campusName;
-    data['majorName'] = this.majorName;
-    data['studyProgramName'] = this.studyProgramName;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['studentId'] = studentId;
+    data['userId'] = userId;
+    data['userName'] = userName;
+    data['userPhoto'] = userPhoto;
+    data['campusId'] = campusId;
+    data['campusName'] = campusName;
+    data['majorName'] = majorName;
+    data['studyProgramName'] = studyProgramName;
     return data;
   }
 }
@@ -178,12 +179,12 @@ class DanusInformation {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['organizationId'] = this.organizationId;
-    data['organizationName'] = this.organizationName;
-    data['organizationPhoto'] = this.organizationPhoto;
-    data['activityId'] = this.activityId;
-    data['activityName'] = this.activityName;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['organizationId'] = organizationId;
+    data['organizationName'] = organizationName;
+    data['organizationPhoto'] = organizationPhoto;
+    data['activityId'] = activityId;
+    data['activityName'] = activityName;
     return data;
   }
 }
@@ -338,18 +339,31 @@ class Variant {
     }
   }
 
-  Map<String, dynamic> toJson() {
+    Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['id'] = id;
-    data['variantName'] = variantName;
-    data['isRequired'] = isRequired;
-    data['minimal'] = minimal;
-    data['maximal'] = maximal;
+    if (id != null) data['id'] = id;
+    if (variantName != null) data['variantName'] = variantName;
+    if (isRequired != null) data['isRequired'] = isRequired;
+    if (minimal != null) data['minimal'] = minimal;
+    if (maximal != null) data['maximal'] = maximal;
     if (variantOptions != null) {
-      data['variantOptions'] = variantOptions!.map((v) => v.toJson()).toList();
+      data['variantOption'] = variantOptions!.map((v) => v.toJson()).toList();
     }
-    return data;
+    return removeNullsFromModel(data);
   }
+
+  // Map<String, dynamic> toJson() {
+  //   final Map<String, dynamic> data = <String, dynamic>{};
+  //   data['id'] = id;
+  //   data['variantName'] = variantName;
+  //   data['isRequired'] = isRequired;
+  //   data['minimal'] = minimal;
+  //   data['maximal'] = maximal;
+  //   if (variantOptions != null) {
+  //     data['variantOptions'] = variantOptions!.map((v) => v.toJson()).toList();
+  //   }
+  //   return data;
+  // }
 }
 
 class VariantOption {
@@ -371,11 +385,19 @@ class VariantOption {
     selected = false;
   }
 
-  Map<String, dynamic> toJson() {
+   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['id'] = id;
-    data['variantOptionName'] = variantOptionName;
-    data['variantOptionPrice'] = variantOptionPrice;
-    return data;
+    if (id != null) data['id'] = id;
+    if (variantOptionName != null) data['variantOptionName'] = variantOptionName;
+    if (variantOptionPrice != null) data['variantOptionPrice'] = variantOptionPrice;
+    return removeNullsFromModel(data);
   }
+
+  // Map<String, dynamic> toJson() {
+  //   final Map<String, dynamic> data = <String, dynamic>{};
+  //   data['id'] = id;
+  //   data['variantOptionName'] = variantOptionName;
+  //   data['variantOptionPrice'] = variantOptionPrice;
+  //   return data;
+  // }
 }

@@ -18,16 +18,16 @@ class GetFollowedResponse {
     if (json['data'] != null) {
       data = <DataFollowed>[];
       json['data'].forEach((v) {
-        data!.add(new DataFollowed.fromJson(v));
+        data!.add(DataFollowed.fromJson(v));
       });
     }
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['statusCode'] = this.statusCode;
-    data['status'] = this.status;
-    data['message'] = this.message;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['statusCode'] = statusCode;
+    data['status'] = status;
+    data['message'] = message;
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
@@ -73,17 +73,17 @@ class DataFollowed {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['merchantId'] = this.merchantId;
-    data['merchantName'] = this.merchantName;
-    data['merchantPhoto'] = this.merchantPhoto;
-    data['merchantType'] = this.merchantType;
-    data['rating'] = this.rating;
-    data['followers'] = this.followers;
-    data['location'] = this.location;
-    data['userId'] = this.userId;
-    data['open'] = this.open;
-    data['danus'] = this.danus;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['merchantId'] = merchantId;
+    data['merchantName'] = merchantName;
+    data['merchantPhoto'] = merchantPhoto;
+    data['merchantType'] = merchantType;
+    data['rating'] = rating;
+    data['followers'] = followers;
+    data['location'] = location;
+    data['userId'] = userId;
+    data['open'] = open;
+    data['danus'] = danus;
     return data;
   }
 }

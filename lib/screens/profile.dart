@@ -14,17 +14,14 @@ import 'package:cfood/model/open_close_store_response.dart';
 import 'package:cfood/repository/fetch_controller.dart';
 import 'package:cfood/screens/app_setting_info.dart';
 import 'package:cfood/screens/inbox.dart';
-import 'package:cfood/screens/kantin_pages/main.dart';
 import 'package:cfood/screens/kurir_pages/chat_seller.dart';
 import 'package:cfood/screens/kurir_pages/delivery.dart';
 import 'package:cfood/screens/kurir_pages/order_available.dart';
-import 'package:cfood/screens/kurir_pages/order_status.dart';
 import 'package:cfood/screens/login.dart';
 import 'package:cfood/screens/main.dart';
 import 'package:cfood/screens/user_info.dart';
 import 'package:cfood/screens/wirausaha_pages/main.dart';
 import 'package:cfood/screens/wirausaha_pages/signup_wirausaha.dart';
-import 'package:cfood/screens/wirausaha_pages/update_merchant.dart';
 import 'package:cfood/style.dart';
 import 'package:cfood/utils/auth.dart';
 import 'package:cfood/utils/constant.dart';
@@ -109,6 +106,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       AuthHelper().setMerchantId(id: AppConfig.MERCHANT_ID.toString());
       log('merchant id : ${AppConfig.MERCHANT_ID}');
       AuthHelper().chackUserData();
+      AuthHelper().getToDashboard();
     }
   }
 
@@ -722,7 +720,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 driverItemsMenu(
                   onTap: () {
-                    navigateTo(context, ChatSellerScreen());
+                    navigateTo(context, const ChatSellerScreen());
                   },
                   icons: UIcons.solidRounded.comment,
                   text: 'Chat Pembeli',
@@ -759,10 +757,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 height: 30,
                 child: DynamicColorButton(
                   onPressed: () {
+                    AuthHelper().setToDashboard(dashboard: 'yes');
                     setState(() {
                       AppConfig.ON_DASHBOARD = true;
                     });
-                    navigateToRep(context, const MainScreenMerchant(firstIndexScreen: 3,));
+                    navigateToRep(
+                        context,
+                        const MainScreenMerchant(
+                          firstIndexScreen: 3,
+                        ));
                     // navigateTo(
                     //   context,
                     //   UpdateMerchantScreen(
@@ -812,7 +815,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 driverItemsMenu(
                   onTap: () {
-                    navigateTo(context, ChatSellerScreen());
+                    navigateTo(context, const ChatSellerScreen());
                   },
                   icons: UIcons.solidRounded.comment,
                   text: 'Chat Pembeli',
@@ -850,6 +853,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 child: IconButton(
                   onPressed: () {
                     setState(() {
+                      AuthHelper().setToDashboard(dashboard: 'no');
                       AppConfig.ON_DASHBOARD = false;
                     });
                     navigateToRep(context, const MainScreen());

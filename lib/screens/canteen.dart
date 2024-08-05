@@ -12,8 +12,6 @@ import 'package:cfood/custom/page_item_void.dart';
 import 'package:cfood/custom/popup_dialog.dart';
 import 'package:cfood/custom/reload_indicator.dart';
 import 'package:cfood/model/add_cart_response.dart';
-import 'package:cfood/model/add_merchants_response.dart';
-import 'package:cfood/model/error_response.dart';
 import 'package:cfood/model/follow_merchant_response.dart';
 import 'package:cfood/model/get_detail_merchant_response.dart';
 import 'package:cfood/model/get_quantity_selected_menu_response.dart';
@@ -394,7 +392,8 @@ class _CanteenScreenState extends State<CanteenScreen>
                   log('coount ${dataSpecificMenu!.quantity!} | Stock ${dataSpecificMenu!.menuStock!}');
                   setState(() {
                     // selectedCount++;
-                    dataSpecificMenu!.quantity = dataSpecificMenu!.quantity! + 1;
+                    dataSpecificMenu!.quantity =
+                        dataSpecificMenu!.quantity! + 1;
                   });
                   updateState();
                 },
@@ -403,7 +402,8 @@ class _CanteenScreenState extends State<CanteenScreen>
                   if (selectedCount > 0) {
                     setState(() {
                       // selectedCount--;
-                      dataSpecificMenu!.quantity = dataSpecificMenu!.quantity! - 1;
+                      dataSpecificMenu!.quantity =
+                          dataSpecificMenu!.quantity! - 1;
                     });
                     updateState();
                   }
@@ -602,7 +602,7 @@ class _CanteenScreenState extends State<CanteenScreen>
   Widget build(BuildContext context) {
     ToastContext().init(context);
     return Scaffold(
-      appBar: widget.isOwner!
+      appBar: widget.isOwner
           ? null
           : AppBar(
               leadingWidth: 90,
@@ -739,7 +739,7 @@ class _CanteenScreenState extends State<CanteenScreen>
                                       ),
                                     ),
                                   ),
-                                  widget.isOwner!
+                                  widget.isOwner
                                       ? Container()
                                       : Positioned(
                                           bottom: 0,
@@ -794,7 +794,7 @@ class _CanteenScreenState extends State<CanteenScreen>
                             delegate: SliverChildListDelegate(
                               [
                                 bodyCanteenInfo(),
-                                (widget.isOwner!
+                                (widget.isOwner
                                     ? Padding(
                                         padding: const EdgeInsets.only(top: 15),
                                         child: ListTile(
@@ -838,7 +838,7 @@ class _CanteenScreenState extends State<CanteenScreen>
                                       )
                                     : Container()),
                                 dataMerchant?.danusInformation == null
-                                    ? (widget.isOwner!
+                                    ? (widget.isOwner
                                         ? Padding(
                                             padding:
                                                 const EdgeInsets.only(top: 15),
@@ -941,7 +941,7 @@ class _CanteenScreenState extends State<CanteenScreen>
                                             style: const TextStyle(
                                                 fontWeight: FontWeight.w400),
                                           ),
-                                          trailing: widget.isOwner!
+                                          trailing: widget.isOwner
                                               ? InkWell(
                                                   onTap: () {
                                                     log('finish danush?');
@@ -1113,7 +1113,7 @@ class _CanteenScreenState extends State<CanteenScreen>
           const SizedBox(
             height: 16,
           ),
-          Container(
+          SizedBox(
             width: double.infinity,
             child: ListTile(
               contentPadding: EdgeInsets.zero,
@@ -1248,40 +1248,8 @@ class _CanteenScreenState extends State<CanteenScreen>
               return Container(
                 color: Colors.white,
                 padding: const EdgeInsets.symmetric(horizontal: 25),
-                child: widget.isOwner!
+                child: widget.isOwner
                     ? ProductCardBoxHorizontal(
-                        onPressed: () {
-                          log('product: ${item.menuName}');
-                          // storeMenuCountSheet();
-                          menuFrameSheet(
-                            context,
-                            menuId: item.id!,
-                            merchantId: dataMerchant?.merchantId!,
-                            imgUrl:
-                                "${AppConfig.URL_IMAGES_PATH}${item.menuPhoto}",
-                            productName: item.menuName!,
-                            description: item.menuDesc!,
-                            price: item.menuPrice!,
-                            likes: item.menuLikes!.toString(),
-                            count: item.quantity!.toString(),
-                            sold: item.menuSolds,
-                            rate: item.menuRate.toString(),
-                            innerContentSize: 110,
-                            isLike: item.isLike!,
-                            onTapLike: (updateState) {
-                              tapLikeMenu(context,
-                                  isLike: item.isLike!,
-                                  menuId: item.id!,
-                                  updateState: updateState,
-                                  menuItem: item);
-                            },
-                            onPressed: () {
-                              // edit menu
-                            },
-                            onTapAdd: () {},
-                            onTapRemove: () {},
-                          );
-                        },
                         imgUrl: "${AppConfig.URL_IMAGES_PATH}${item.menuPhoto}",
                         productName: item.menuName!,
                         description: item.menuDesc ?? 'deskripsi menu',
@@ -1292,7 +1260,14 @@ class _CanteenScreenState extends State<CanteenScreen>
                         // isCustom: item.isDanus!,
                         isCustom: item.variants!.isNotEmpty ? true : false,
                         isOwner: widget.isOwner,
-                        onTapEditProduct: () {},
+                        onTapEditProduct: () {
+                          navigateTo(
+                              context,
+                              AddEditMenuScreen(
+                                isEdit: true,
+                                menuId: item.id!,
+                              ));
+                        },
                       )
                     : ProductCardBoxHorizontal(
                         onPressed: () {
@@ -1427,171 +1402,68 @@ class _CanteenScreenState extends State<CanteenScreen>
                           if (item.variants!.isNotEmpty) {
                             log('product: ${item.menuName}');
                             // storeMenuCountSheet();
-
-                            menuFrameSheet(
+                            int selectedCount = item.quantity!;
+                            int price = item.menuPrice!;
+                            int subtotal = price * selectedCount;
+                            menuCustomeFrameSheet(
                               context,
-                              menuId: item.id!,
-                              merchantId: dataMerchant?.merchantId!,
                               imgUrl:
                                   "${AppConfig.URL_IMAGES_PATH}${item.menuPhoto}",
                               productName: item.menuName!,
-                              description: item.menuDesc!,
+                              description: item.menuDesc ?? '',
                               price: item.menuPrice!,
-                              likes: item.menuLikes!.toString(),
-                              // count: item.menuStock!.toString(),
-                              // count: item.selectedCount!.toString(),
-                              count: item.quantity!.toString(),
-                              sold: item.menuSolds ?? 0,
+                              subTotal: item.subTotal!,
+                              likes: item.menuLikes.toString(),
                               rate: item.menuRate.toString(),
+                              // count: item.selectedCount!,
+                              count: item.quantity!,
+                              sold: item.menuSolds ?? 0,
+                              quantity: item.quantity!,
+                              stock: item.menuStock!,
                               innerContentSize: 110,
-                              isLike: item.isLike!,
-                              onTapLike: (updateState) {
-                                tapLikeMenu(context,
-                                    isLike: item.isLike!,
-                                    menuId: item.id!,
-                                    updateState: updateState,
-                                    menuItem: item);
+                              variantSelected: null,
+                              total: subtotal,
+                              variantTypeList: item.variants!,
+                              onPressed: () {},
+                              onTapAdd: (Function updateState) {
+                                setState(() {
+                                  selectedCount++;
+                                  item.selectedCount = selectedCount;
+                                });
+                                updateState();
                               },
-                              onPressed: item.variants!.isNotEmpty
-                                  ? () {
-                                      // int selectedCount = item.selectedCount!;
-                                      int selectedCount = item.quantity!;
-                                      int price = item.menuPrice!;
-                                      int subtotal = price * selectedCount;
-                                      menuCustomeFrameSheet(
-                                        context,
-                                        imgUrl:
-                                            "${AppConfig.URL_IMAGES_PATH}${item.menuPhoto}",
-                                        productName: item.menuName!,
-                                        description: item.menuDesc ?? '',
-                                        price: item.menuPrice!,
-                                        subTotal: item.subTotal!,
-                                        likes: item.menuLikes.toString(),
-                                        rate: item.menuRate.toString(),
-                                        // count: item.selectedCount!,
-                                        count: item.quantity!,
-                                        sold: item.menuSolds ?? 0,
-                                        quantity: item.quantity!,
-                                        stock: item.menuStock!,
-                                        innerContentSize: 110,
-                                        variantSelected: null,
-                                        total: subtotal,
-                                        variantTypeList: item.variants!,
-                                        onPressed: () {},
-                                        onTapAdd: (Function updateState) {
-                                          setState(() {
-                                            selectedCount++;
-                                            item.selectedCount = selectedCount;
-                                          });
-                                          updateState();
-                                        },
-                                        onTapRemove: (Function updateState) {
-                                          if (selectedCount > 0) {
-                                            setState(() {
-                                              selectedCount--;
-                                              item.selectedCount =
-                                                  selectedCount;
-                                            });
-                                            updateState();
-                                          }
-                                        },
-                                        onTapAddOrder: (selectedCount,
-                                            calculatedTotal, selectedVariants) {
-                                          setState(() {
-                                            // Update UI if needed
-                                          });
-                                          updateCart(
-                                            menuId: item.id!,
-                                            quantity: selectedCount,
-                                            variants: item.variants!
-                                                .where((variant) =>
-                                                    variant.selected!)
-                                                .map((variant) => {
-                                                      'variantId': variant.id,
-                                                      'variantOptionIds': variant
-                                                          .variantOptions!
-                                                          .where((option) =>
-                                                              option.selected!)
-                                                          .map((option) =>
-                                                              option.id)
-                                                          .toList(),
-                                                    })
+                              onTapRemove: (Function updateState) {
+                                if (selectedCount > 0) {
+                                  setState(() {
+                                    selectedCount--;
+                                    item.selectedCount = selectedCount;
+                                  });
+                                  updateState();
+                                }
+                              },
+                              onTapAddOrder: (selectedCount, calculatedTotal,
+                                  selectedVariants) {
+                                setState(() {
+                                  // Update UI if needed
+                                });
+                                updateCart(
+                                  menuId: item.id!,
+                                  quantity: selectedCount,
+                                  variants: item.variants!
+                                      .where((variant) => variant.selected!)
+                                      .map((variant) => {
+                                            'variantId': variant.id,
+                                            'variantOptionIds': variant
+                                                .variantOptions!
+                                                .where((option) =>
+                                                    option.selected!)
+                                                .map((option) => option.id)
                                                 .toList(),
-                                          );
-                                        },
-                                      );
-                                    }
-                                  : () {
-                                      setState(() {
-                                        item.selectedCount = item.quantity! + 1;
-                                        // item.selectedCount! + 1;
-
-                                        // item.subTotal =
-                                        //     (item.menuPrice! * item.selectedCount!);
-                                      });
-                                      updateCart(
-                                        menuId: item.id!,
-                                        quantity: 1,
-                                      );
-                                      showToast(
-                                          'Menu di tambahkan kedalam keranjang');
-                                    },
-                              onTapAdd: () {},
-                              onTapRemove: () {},
+                                          })
+                                      .toList(),
+                                );
+                              },
                             );
-                            // int selectedCount = item.selectedCount!;
-                            // int price = item.menuPrice!;
-                            // int subtotal = price * selectedCount;
-                            // menuCustomeFrameSheet(
-                            //   context,
-                            //   imgUrl:
-                            //       "${AppConfig.URL_IMAGES_PATH}${item.menuPhoto}",
-                            //   productName: item.menuName!,
-                            //   description: item.menuDesc ?? '',
-                            //   price: item.menuPrice!,
-                            //   subTotal: item.subTotal!,
-                            //   likes: item.menuLikes.toString(),
-                            //   rate: item.menuRate.toString(),
-                            //   count: item.selectedCount!,
-                            //   sold: item.menuSolds ?? 0,
-                            //   innerContentSize: 110,
-                            //   variantSelected: null,
-                            //   total: subtotal,
-                            //   variantTypeList: item.variants!,
-                            //   onPressed: () {},
-                            //   onTapAdd: (Function updateState) {
-                            //     setState(() {
-                            //       selectedCount++;
-                            //       item.selectedCount = selectedCount;
-                            //     });
-                            //     updateState();
-                            //   },
-                            //   onTapRemove: (Function updateState) {
-                            //     if (selectedCount > 0) {
-                            //       setState(() {
-                            //         selectedCount--;
-                            //         item.selectedCount = selectedCount;
-                            //       });
-                            //       updateState();
-                            //     }
-                            //   },
-                            //   onTapAddOrder: (selectedCount, calculatedTotal,
-                            //       selectedVariants) {
-                            //     setState(() {
-                            //       // Update UI if needed
-                            //     });
-                            //     updateCart(
-                            //       menuId: item.id!,
-                            //       quantity: selectedCount,
-                            //       variants: selectedVariants
-                            //           .map((v) => {
-                            //                 'variantId': v.id,
-                            //                 'variantOptionIds': [v.id],
-                            //               })
-                            //           .toList(),
-                            //     );
-                            //   },
-                            // );
                           } else {
                             if (item.quantity! < item.menuStock!) {
                               setState(() {
@@ -1748,7 +1620,7 @@ class _CanteenScreenState extends State<CanteenScreen>
               ),
               Text(
                 dataMerchant!.rating!.toString(),
-                style: TextStyle(fontSize: 12),
+                style: const TextStyle(fontSize: 12),
               ),
             ],
           ),
@@ -1972,7 +1844,7 @@ class _CanteenScreenState extends State<CanteenScreen>
             return Container(
               color: Colors.white,
               padding: const EdgeInsets.symmetric(horizontal: 25),
-              child: widget.isOwner!
+              child: widget.isOwner
                   ? ProductCardBoxHorizontal(
                       onPressed: () {
                         log('product: ${item.menuName}');
@@ -2013,7 +1885,7 @@ class _CanteenScreenState extends State<CanteenScreen>
                       count: item.menuStock.toString(),
                       // isCustom: item.isDanus!,
                       isCustom: item.variants!.isNotEmpty ? true : false,
-                      isOwner: widget.isOwner!,
+                      isOwner: widget.isOwner,
                       onTapEditProduct: () {},
                     )
                   : ProductCardBoxHorizontal(

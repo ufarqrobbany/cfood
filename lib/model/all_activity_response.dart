@@ -20,16 +20,16 @@ class GetAllActivityResponse {
     if (json['data'] != null) {
       data = <DataGetActivity>[];
       json['data'].forEach((v) {
-        data!.add(new DataGetActivity.fromJson(v));
+        data!.add(DataGetActivity.fromJson(v));
       });
     }
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['statusCode'] = this.statusCode;
-    data['status'] = this.status;
-    data['message'] = this.message;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['statusCode'] = statusCode;
+    data['status'] = status;
+    data['message'] = message;
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
@@ -60,12 +60,12 @@ class DataGetActivity {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['activityName'] = this.activityName;
-    data['organizationId'] = this.organizationId;
-    data['totalWirausaha'] = this.totalWirausaha;
-    data['totalMenu'] = this.totalMenu;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['activityName'] = activityName;
+    data['organizationId'] = organizationId;
+    data['totalWirausaha'] = totalWirausaha;
+    data['totalMenu'] = totalMenu;
     return data;
   }
 }

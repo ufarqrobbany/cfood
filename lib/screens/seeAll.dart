@@ -190,9 +190,9 @@ class _SeeAllItemsScreenState extends State<SeeAllItemsScreen> {
                           onPressed: () => navigateTo(
                               context,
                               CanteenScreen(
-                                merchantId: items?.merchantId,
+                                merchantId: items.merchantId,
                                 isOwner: false,
-                                merchantType: items!.merchantType!,
+                                merchantType: items.merchantType!,
                                 itsDanusan: items.danus,
                               )),
                         ),
@@ -235,9 +235,9 @@ class _SeeAllItemsScreenState extends State<SeeAllItemsScreen> {
                           onPressed: () => navigateTo(
                               context,
                               CanteenScreen(
-                                merchantId: items?.merchantId,
+                                merchantId: items.merchantId,
                                 isOwner: false,
-                                merchantType: items!.merchantType!,
+                                merchantType: items.merchantType!,
                                 itsDanusan: items.danus,
                               )),
                         ),

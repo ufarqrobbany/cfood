@@ -19,9 +19,9 @@ class AddMenuResponse {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = {};
-    data['statusCode'] = this.statusCode;
-    data['status'] = this.status;
-    data['message'] = this.message;
+    data['statusCode'] = statusCode;
+    data['status'] = status;
+    data['message'] = message;
     if (this.data != null) {
       data['data'] = this.data!.toJson();
     }
@@ -71,16 +71,16 @@ class DataAddMenu {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = {};
-    data['id'] = this.id;
-    data['menuName'] = this.menuName;
-    data['menuPhoto'] = this.menuPhoto;
-    data['menuDesc'] = this.menuDesc;
-    data['menuPrice'] = this.menuPrice;
-    data['menuStock'] = this.menuStock;
-    data['isDanus'] = this.isDanus;
-    data['merchantId'] = this.merchantId;
-    if (this.variants != null) {
-      data['variants'] = this.variants!.map((v) => v.toJson()).toList();
+    data['id'] = id;
+    data['menuName'] = menuName;
+    data['menuPhoto'] = menuPhoto;
+    data['menuDesc'] = menuDesc;
+    data['menuPrice'] = menuPrice;
+    data['menuStock'] = menuStock;
+    data['isDanus'] = isDanus;
+    data['merchantId'] = merchantId;
+    if (variants != null) {
+      data['variants'] = variants!.map((v) => v.toJson()).toList();
     }
     return data;
   }
@@ -119,13 +119,13 @@ class Variants {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = {};
-    data['id'] = this.id;
-    data['variantName'] = this.variantName;
-    data['isRequired'] = this.isRequired;
-    data['minimal'] = this.minimal;
-    data['maximal'] = this.maximal;
-    if (this.variantOptions != null) {
-      data['variantOptions'] = this.variantOptions!.map((v) => v.toJson()).toList();
+    data['id'] = id;
+    data['variantName'] = variantName;
+    data['isRequired'] = isRequired;
+    data['minimal'] = minimal;
+    data['maximal'] = maximal;
+    if (variantOptions != null) {
+      data['variantOptions'] = variantOptions!.map((v) => v.toJson()).toList();
     }
     return data;
   }
@@ -150,9 +150,9 @@ class VariantOptions {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = {};
-    data['id'] = this.id;
-    data['variantOptionName'] = this.variantOptionName;
-    data['variantOptionPrice'] = this.variantOptionPrice;
+    data['id'] = id;
+    data['variantOptionName'] = variantOptionName;
+    data['variantOptionPrice'] = variantOptionPrice;
     return data;
   }
 }

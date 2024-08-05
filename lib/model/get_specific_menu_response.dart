@@ -15,15 +15,15 @@ class GetSpecificMenuResponse {
     status = json['status'];
     message = json['message'];
     data = json['data'] != null
-        ? new DataSpecificMenu.fromJson(json['data'])
+        ? DataSpecificMenu.fromJson(json['data'])
         : null;
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['statusCode'] = this.statusCode;
-    data['status'] = this.status;
-    data['message'] = this.message;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['statusCode'] = statusCode;
+    data['status'] = status;
+    data['message'] = message;
     if (this.data != null) {
       data['data'] = this.data!.toJson();
     }
@@ -83,29 +83,29 @@ class DataSpecificMenu {
     if (json['variants'] != null) {
       variants = <detailmerchant.Variant>[];
       json['variants'].forEach((v) {
-        variants!.add(new detailmerchant.Variant.fromJson(v));
+        variants!.add(detailmerchant.Variant.fromJson(v));
       });
     }
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['menuName'] = this.menuName;
-    data['menuPhoto'] = this.menuPhoto;
-    data['menuDesc'] = this.menuDesc;
-    data['menuPrice'] = this.menuPrice;
-    data['menuStock'] = this.menuStock;
-    data['menuSolds'] = this.menuSolds;
-    data['quantity'] = this.quantity;
-    data['likes'] = this.likes;
-    data['rating'] = this.rating;
-    data['isDanus'] = this.isDanus;
-    data['isLike'] = this.isLike;
-    data['categoryMenuName'] = this.categoryMenuName;
-    data['merchantId'] = this.merchantId;
-    if (this.variants != null) {
-      data['variants'] = this.variants!.map((v) => v.toJson()).toList();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['menuName'] = menuName;
+    data['menuPhoto'] = menuPhoto;
+    data['menuDesc'] = menuDesc;
+    data['menuPrice'] = menuPrice;
+    data['menuStock'] = menuStock;
+    data['menuSolds'] = menuSolds;
+    data['quantity'] = quantity;
+    data['likes'] = likes;
+    data['rating'] = rating;
+    data['isDanus'] = isDanus;
+    data['isLike'] = isLike;
+    data['categoryMenuName'] = categoryMenuName;
+    data['merchantId'] = merchantId;
+    if (variants != null) {
+      data['variants'] = variants!.map((v) => v.toJson()).toList();
     }
     return data;
   }

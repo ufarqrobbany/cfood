@@ -17,7 +17,7 @@ class GetCategoryResponse {
     if (json['data'] != null && json['data'] is List) {
       data = <DataCategory>[];
       json['data'].forEach((v) {
-        data!.add(new DataCategory.fromJson(v));
+        data!.add(DataCategory.fromJson(v));
       });
     } else {
       data = [];
@@ -25,10 +25,10 @@ class GetCategoryResponse {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['statusCode'] = this.statusCode;
-    data['status'] = this.status;
-    data['message'] = this.message;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['statusCode'] = statusCode;
+    data['status'] = status;
+    data['message'] = message;
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
@@ -48,9 +48,9 @@ class DataCategory {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['categoryMenuName'] = this.categoryMenuName;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['categoryMenuName'] = categoryMenuName;
     return data;
   }
 }

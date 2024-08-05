@@ -22,7 +22,7 @@ class GetAllOrganizationResponse {
       if (dataJson['organizations'] != null) {
         organizations = <DataGetOrganization>[];
         dataJson['organizations'].forEach((v) {
-          organizations!.add(new DataGetOrganization.fromJson(v));
+          organizations!.add(DataGetOrganization.fromJson(v));
         });
       }
       totalPages = dataJson['totalPages'];
@@ -31,15 +31,15 @@ class GetAllOrganizationResponse {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['statusCode'] = this.statusCode;
-    data['status'] = this.status;
-    data['message'] = this.message;
-    if (this.organizations != null) {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['statusCode'] = statusCode;
+    data['status'] = status;
+    data['message'] = message;
+    if (organizations != null) {
       data['data'] = {
-        'organizations': this.organizations!.map((v) => v.toJson()).toList(),
-        'totalPages': this.totalPages,
-        'totalElements': this.totalElements
+        'organizations': organizations!.map((v) => v.toJson()).toList(),
+        'totalPages': totalPages,
+        'totalElements': totalElements
       };
     }
     return data;
@@ -75,14 +75,14 @@ class DataGetOrganization {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['organizationName'] = this.organizationName;
-    data['organizationLogo'] = this.organizationLogo;
-    data['totalActivity'] = this.totalActivity;
-    data['totalWirausaha'] = this.totalWirausaha;
-    data['totalMenu'] = this.totalMenu;
-    data['campusId'] = this.campusId;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['organizationName'] = organizationName;
+    data['organizationLogo'] = organizationLogo;
+    data['totalActivity'] = totalActivity;
+    data['totalWirausaha'] = totalWirausaha;
+    data['totalMenu'] = totalMenu;
+    data['campusId'] = campusId;
     return data;
   }
 }

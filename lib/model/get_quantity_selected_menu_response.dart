@@ -14,16 +14,16 @@ class GetQuantitySelectedMenuResponse {
     if (json['data'] != null) {
       data = <DataQuantityMenu>[];
       json['data'].forEach((v) {
-        data!.add(new DataQuantityMenu.fromJson(v));
+        data!.add(DataQuantityMenu.fromJson(v));
       });
     }
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['statusCode'] = this.statusCode;
-    data['status'] = this.status;
-    data['message'] = this.message;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['statusCode'] = statusCode;
+    data['status'] = status;
+    data['message'] = message;
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
@@ -43,9 +43,9 @@ class DataQuantityMenu {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['menuId'] = this.menuId;
-    data['quantity'] = this.quantity;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['menuId'] = menuId;
+    data['quantity'] = quantity;
     return data;
   }
 }

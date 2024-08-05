@@ -1,4 +1,3 @@
-import 'dart:convert';
 
 class DeleteCartResponse {
   int? statusCode;
@@ -16,10 +15,10 @@ class DeleteCartResponse {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['statusCode'] = this.statusCode;
-    data['status'] = this.status;
-    data['message'] = this.message;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['statusCode'] = statusCode;
+    data['status'] = status;
+    data['message'] = message;
     data['data'] = this.data;
 
     return data;

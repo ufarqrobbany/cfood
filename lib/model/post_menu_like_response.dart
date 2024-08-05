@@ -1,4 +1,3 @@
-import 'dart:convert';
 
 class PostMenuLikeResponse {
   int? statusCode;
@@ -12,14 +11,14 @@ class PostMenuLikeResponse {
     statusCode = json['statusCode'];
     status = json['status'];
     message = json['message'];
-    data = json['data'] != null ? new DataLikeMenu.fromJson(json['data']) : null;
+    data = json['data'] != null ? DataLikeMenu.fromJson(json['data']) : null;
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['statusCode'] = this.statusCode;
-    data['status'] = this.status;
-    data['message'] = this.message;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['statusCode'] = statusCode;
+    data['status'] = status;
+    data['message'] = message;
     if (this.data != null) {
       data['data'] = this.data!.toJson();
     }
@@ -50,12 +49,12 @@ class DataLikeMenu {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['userId'] = this.userId;
-    data['userName'] = this.userName;
-    data['merchantId'] = this.merchantId;
-    data['merchantName'] = this.merchantName;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['userId'] = userId;
+    data['userName'] = userName;
+    data['merchantId'] = merchantId;
+    data['merchantName'] = merchantName;
     return data;
   }
 }

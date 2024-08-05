@@ -1,4 +1,3 @@
-import 'dart:convert';
 
 class GetAllOrganizationsResponse {
   int? statusCode;
@@ -14,15 +13,15 @@ class GetAllOrganizationsResponse {
     status = json['status'];
     message = json['message'];
     data = json['data'] != null
-        ? new DataGetOrganization.fromJson(json['data'])
+        ? DataGetOrganization.fromJson(json['data'])
         : null;
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['statusCode'] = this.statusCode;
-    data['status'] = this.status;
-    data['message'] = this.message;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['statusCode'] = statusCode;
+    data['status'] = status;
+    data['message'] = message;
     if (this.data != null) {
       data['data'] = this.data!.toJson();
     }
@@ -42,7 +41,7 @@ class DataGetOrganization {
     if (json['organizations'] != null) {
       organizations = <OrganizationItems>[];
       json['organizations'].forEach((v) {
-        organizations!.add(new OrganizationItems.fromJson(v));
+        organizations!.add(OrganizationItems.fromJson(v));
       });
     }
     totalPages = json['totalPages'];
@@ -50,13 +49,13 @@ class DataGetOrganization {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.organizations != null) {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    if (organizations != null) {
       data['organizations'] =
-          this.organizations!.map((v) => v.toJson()).toList();
+          organizations!.map((v) => v.toJson()).toList();
     }
-    data['totalPages'] = this.totalPages;
-    data['totalElements'] = this.totalElements;
+    data['totalPages'] = totalPages;
+    data['totalElements'] = totalElements;
     return data;
   }
 }

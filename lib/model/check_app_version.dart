@@ -11,14 +11,14 @@ class CheckVersionAppResponse {
     statusCode = json['statusCode'];
     status = json['status'];
     message = json['message'];
-    data = json['data'] != null ? new DataVersion.fromJson(json['data']) : null;
+    data = json['data'] != null ? DataVersion.fromJson(json['data']) : null;
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['statusCode'] = this.statusCode;
-    data['status'] = this.status;
-    data['message'] = this.message;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['statusCode'] = statusCode;
+    data['status'] = status;
+    data['message'] = message;
     if (this.data != null) {
       data['data'] = this.data!.toJson();
     }
@@ -38,9 +38,9 @@ class DataVersion {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['isLatest'] = this.isLatest;
-    data['latestVersion'] = this.latestVersion;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['isLatest'] = isLatest;
+    data['latestVersion'] = latestVersion;
     return data;
   }
 }

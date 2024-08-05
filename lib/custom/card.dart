@@ -1,4 +1,3 @@
-import 'dart:developer';
 
 import 'package:cfood/custom/shimmer.dart';
 import 'package:cfood/style.dart';
@@ -267,7 +266,7 @@ class ProductCardBox extends StatelessWidget {
                                   ),
                                   Text(
                                     ' ${rate!}',
-                                    style: TextStyle(fontSize: 12),
+                                    style: const TextStyle(fontSize: 12),
                                   ),
                                 ],
                               ),
@@ -293,7 +292,7 @@ class ProductCardBox extends StatelessWidget {
                                   ),
                                   Text(
                                     ' ${likes!}',
-                                    style: TextStyle(fontSize: 12),
+                                    style: const TextStyle(fontSize: 12),
                                   ),
                                 ],
                               ),
@@ -1111,7 +1110,7 @@ class OrganizationCardBox extends StatelessWidget {
                                 ),
                                 Text(
                                   ' ${totalWirausaha ?? 0} Wirausaha',
-                                  style: TextStyle(fontSize: 11),
+                                  style: const TextStyle(fontSize: 11),
                                 ),
                               ],
                             ),
@@ -1138,7 +1137,7 @@ class OrganizationCardBox extends StatelessWidget {
                                 ),
                                 Text(
                                   ' ${totalMenu ?? 0} Menu',
-                                  style: TextStyle(fontSize: 11),
+                                  style: const TextStyle(fontSize: 11),
                                 ),
                               ],
                             ),

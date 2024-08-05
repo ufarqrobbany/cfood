@@ -15,20 +15,20 @@ class VariantDatas {
     if (json['variantOption'] != null) {
       variantOption = <VariantOption>[];
       json['variantOption'].forEach((v) {
-        variantOption!.add(new VariantOption.fromJson(v));
+        variantOption!.add(VariantOption.fromJson(v));
       });
     }
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['variantName'] = this.variantName;
-    data['isRequired'] = this.isRequired;
-    data['minimal'] = this.minimal;
-    data['maximal'] = this.maximal;
-    if (this.variantOption != null) {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['variantName'] = variantName;
+    data['isRequired'] = isRequired;
+    data['minimal'] = minimal;
+    data['maximal'] = maximal;
+    if (variantOption != null) {
       data['variantOption'] =
-          this.variantOption!.map((v) => v.toJson()).toList();
+          variantOption!.map((v) => v.toJson()).toList();
     }
     return data;
   }
@@ -46,9 +46,9 @@ class VariantOption {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['variantOptionName'] = this.variantOptionName;
-    data['variantOptionPrice'] = this.variantOptionPrice;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['variantOptionName'] = variantOptionName;
+    data['variantOptionPrice'] = variantOptionPrice;
     return data;
   }
 }

@@ -4,7 +4,6 @@ import 'package:cfood/custom/card.dart';
 import 'package:cfood/screens/chat.dart';
 import 'package:cfood/style.dart';
 import 'package:flutter/material.dart';
-import 'package:share_plus/share_plus.dart';
 
 // ignore: must_be_immutable
 class InboxScreen extends StatefulWidget {

@@ -1,4 +1,3 @@
-import 'dart:convert';
 
 class GetDetailOrganizationResponse {
   int? statusCode;
@@ -14,15 +13,15 @@ class GetDetailOrganizationResponse {
     status = json['status'];
     message = json['message'];
     data = json['data'] != null
-        ? new DataDetailOrganization.fromJson(json['data'])
+        ? DataDetailOrganization.fromJson(json['data'])
         : null;
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['statusCode'] = this.statusCode;
-    data['status'] = this.status;
-    data['message'] = this.message;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['statusCode'] = statusCode;
+    data['status'] = status;
+    data['message'] = message;
     if (this.data != null) {
       data['data'] = this.data!.toJson();
     }
@@ -61,22 +60,22 @@ class DataDetailOrganization {
     if (json['activities'] != null) {
       activities = [];
       json['activities'].forEach((v) {
-        activities!.add(new Activity.fromJson(v));
+        activities!.add(Activity.fromJson(v));
       });
     }
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['organizationId'] = this.organizationId;
-    data['organizationName'] = this.organizationName;
-    data['organizationLogo'] = this.organizationLogo;
-    data['totalActivity'] = this.totalActivity;
-    data['totalWirausaha'] = this.totalWirausaha;
-    data['totalMenu'] = this.totalMenu;
-    data['campusId'] = this.campusId;
-    if (this.activities != null) {
-      data['activities'] = this.activities!.map((v) => v.toJson()).toList();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['organizationId'] = organizationId;
+    data['organizationName'] = organizationName;
+    data['organizationLogo'] = organizationLogo;
+    data['totalActivity'] = totalActivity;
+    data['totalWirausaha'] = totalWirausaha;
+    data['totalMenu'] = totalMenu;
+    data['campusId'] = campusId;
+    if (activities != null) {
+      data['activities'] = activities!.map((v) => v.toJson()).toList();
     }
     return data;
   }
@@ -93,16 +92,16 @@ class Activity {
     if (json['merchants'] != null) {
       merchants = [];
       json['merchants'].forEach((v) {
-        merchants!.add(new Merchant.fromJson(v));
+        merchants!.add(Merchant.fromJson(v));
       });
     }
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['activityName'] = this.activityName;
-    if (this.merchants != null) {
-      data['merchants'] = this.merchants!.map((v) => v.toJson()).toList();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['activityName'] = activityName;
+    if (merchants != null) {
+      data['merchants'] = merchants!.map((v) => v.toJson()).toList();
     }
     return data;
   }
@@ -146,17 +145,17 @@ class Merchant {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['merchantId'] = this.merchantId;
-    data['merchantName'] = this.merchantName;
-    data['merchantPhoto'] = this.merchantPhoto;
-    data['merchantType'] = this.merchantType;
-    data['rating'] = this.rating;
-    data['followers'] = this.followers;
-    data['location'] = this.location;
-    data['userId'] = this.userId;
-    data['open'] = this.open;
-    data['danus'] = this.danus;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['merchantId'] = merchantId;
+    data['merchantName'] = merchantName;
+    data['merchantPhoto'] = merchantPhoto;
+    data['merchantType'] = merchantType;
+    data['rating'] = rating;
+    data['followers'] = followers;
+    data['location'] = location;
+    data['userId'] = userId;
+    data['open'] = open;
+    data['danus'] = danus;
     return data;
   }
 }

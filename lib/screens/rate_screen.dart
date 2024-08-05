@@ -141,7 +141,7 @@ class _RateScreenState extends State<RateScreen> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text(
+        const Text(
           'Pesanan Sudah Sampai',
           style: AppTextStyles.subTitle,
         ),
@@ -161,7 +161,7 @@ class _RateScreenState extends State<RateScreen> {
             const SizedBox(
               width: 10,
             ),
-            Text(
+            const Text(
               'Nama Toko',
               style: AppTextStyles.canteenName,
               overflow: TextOverflow.ellipsis,

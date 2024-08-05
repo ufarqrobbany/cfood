@@ -71,7 +71,9 @@ class SessionManager {
 
   Future<String?> getType() async {
     final SharedPreferences pref = await SharedPreferences.getInstance();
-    String? type = pref.getString('type',);
+    String? type = pref.getString(
+      'type',
+    );
     return type ?? 'reguler';
   }
 
@@ -87,7 +89,7 @@ class SessionManager {
     return isLoggedIn;
   }
 
-    // LOGGED IN
+  // LOGGED IN
   Future<void> setIsDriver(String isDriver) async {
     final SharedPreferences pref = await SharedPreferences.getInstance();
     pref.setString('is_driver', isDriver);
@@ -99,7 +101,7 @@ class SessionManager {
     return isDriver ?? 'no';
   }
 
-      // Merchant id
+  // Merchant id
   Future<void> setMerchantId(String merchantId) async {
     final SharedPreferences pref = await SharedPreferences.getInstance();
     pref.setString('merchant_id', merchantId);
@@ -112,7 +114,7 @@ class SessionManager {
     return merchantId;
   }
 
-    Future<void> setAppVersion(String appVersion) async {
+  Future<void> setAppVersion(String appVersion) async {
     final SharedPreferences pref = await SharedPreferences.getInstance();
     pref.setString('app_version', appVersion);
   }
@@ -122,5 +124,17 @@ class SessionManager {
     String? appVersion = pref.getString('app_version');
     log('pref app version : $appVersion');
     return appVersion;
+  }
+
+  Future<void> setToDashboard(String toDashboard) async {
+    final SharedPreferences pref = await SharedPreferences.getInstance();
+    pref.setString('to_dashboard', toDashboard);
+  }
+
+  Future<String?> getToDashBoard() async {
+    final SharedPreferences pref = await SharedPreferences.getInstance();
+    String? toDashboard = pref.getString('to_dashboard');
+    log('pref to dahsboard : ${toDashboard ?? 'no'}');
+    return toDashboard ?? 'no';
   }
 }

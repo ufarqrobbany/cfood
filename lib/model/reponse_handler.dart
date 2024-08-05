@@ -26,3 +26,8 @@ class ResponseHendler {
     return data;
   }
 }
+
+Map<String, dynamic> removeNullsFromModel(Map<String, dynamic> json) {
+  json.removeWhere((key, value) => value == null);
+  return json;
+}
