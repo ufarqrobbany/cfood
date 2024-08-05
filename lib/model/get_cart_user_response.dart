@@ -59,6 +59,7 @@ class CartItem {
   final int stock;
   final int solds;
   final int quantity;
+  final int totalQuantity;
   final int totalPriceItem;
   final detailmenu.DataSpecificMenu detailMenu;
   final List<CartVariant> cartVariants;
@@ -68,6 +69,7 @@ class CartItem {
     required this.stock,
     required this.solds,
     required this.quantity,
+    required this.totalQuantity,
     required this.totalPriceItem,
     required this.detailMenu,
     required this.cartVariants,
@@ -79,6 +81,7 @@ class CartItem {
       stock: json['stock'],
       solds: json['solds'],
       quantity: json['quantity'],
+      totalQuantity: json['totalQuantity'],
       totalPriceItem: json['totalPriceItem'],
       detailMenu: detailmenu.DataSpecificMenu.fromJson(json['detailMenu']),
       cartVariants: List<CartVariant>.from(
