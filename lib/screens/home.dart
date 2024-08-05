@@ -4,6 +4,7 @@ import 'package:cfood/custom/CButtons.dart';
 import 'package:cfood/custom/CPageMover.dart';
 import 'package:cfood/custom/card.dart';
 import 'package:cfood/custom/reload_indicator.dart';
+import 'package:cfood/custom/shimmer.dart';
 import 'package:cfood/model/getl_all_merchant_response.dart';
 import 'package:cfood/model/get_all_menu_response.dart';
 import 'package:cfood/model/get_all_organization_response.dart';
@@ -631,6 +632,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   );
                 },
               ),
+
+        // shimmerListBuilder(context, item)
 
         const SizedBox(
           height: 100,

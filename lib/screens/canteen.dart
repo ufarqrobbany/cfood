@@ -391,15 +391,19 @@ class _CanteenScreenState extends State<CanteenScreen>
                 variantTypeList: dataSpecificMenu!.variants!,
                 onPressed: () {},
                 onTapAdd: (Function updateState) {
+                  log('coount ${dataSpecificMenu!.quantity!} | Stock ${dataSpecificMenu!.menuStock!}');
                   setState(() {
-                    selectedCount++;
+                    // selectedCount++;
+                    dataSpecificMenu!.quantity = dataSpecificMenu!.quantity! + 1;
                   });
                   updateState();
                 },
                 onTapRemove: (Function updateState) {
+                  log('coount ${dataSpecificMenu!.quantity!} | Stock ${dataSpecificMenu!.menuStock!}');
                   if (selectedCount > 0) {
                     setState(() {
-                      selectedCount--;
+                      // selectedCount--;
+                      dataSpecificMenu!.quantity = dataSpecificMenu!.quantity! - 1;
                     });
                     updateState();
                   }
@@ -1254,6 +1258,7 @@ class _CanteenScreenState extends State<CanteenScreen>
                             description: item.menuDesc!,
                             price: item.menuPrice!,
                             likes: item.menuLikes!.toString(),
+                            count: item.quantity!.toString(),
                             sold: item.menuSolds,
                             rate: item.menuRate.toString(),
                             innerContentSize: 110,
@@ -1281,12 +1286,12 @@ class _CanteenScreenState extends State<CanteenScreen>
                         count: item.menuStock.toString(),
                         // isCustom: item.isDanus!,
                         isCustom: item.variants!.isNotEmpty ? true : false,
-                        isOwner: widget.isOwner!,
+                        isOwner: widget.isOwner,
                         onTapEditProduct: () {},
                       )
                     : ProductCardBoxHorizontal(
                         onPressed: () {
-                          log('product: ${item.menuName}');
+                          log('product: ${item.menuName} from manulist');
                           // storeMenuCountSheet();
 
                           menuFrameSheet(
@@ -1300,7 +1305,7 @@ class _CanteenScreenState extends State<CanteenScreen>
                             price: item.menuPrice!,
                             likes: item.menuLikes!.toString(),
                             // count: item.menuStock!.toString(),
-                            count: item.selectedCount!.toString(),
+                            count: item.quantity!.toString(),
                             sold: item.menuSolds ?? 0,
                             rate: item.menuRate.toString(),
                             innerContentSize: 110,
@@ -1318,6 +1323,7 @@ class _CanteenScreenState extends State<CanteenScreen>
                                     int selectedCount = 0;
                                     int price = item.menuPrice!;
                                     int subtotal = price;
+                                    log('custom menu ${item.menuName}');
                                     menuCustomeFrameSheet(
                                       context,
                                       imgUrl:
@@ -1326,7 +1332,7 @@ class _CanteenScreenState extends State<CanteenScreen>
                                       description: item.menuDesc ?? '',
                                       price: item.menuPrice!,
                                       stock: item.menuStock!,
-                                      quantity: 100, // perbaiki
+                                      quantity: item.quantity!, // perbaiki
                                       likes: item.menuLikes.toString(),
                                       rate: item.menuRate.toString(),
                                       // count: item.selectedCount!,
@@ -1338,9 +1344,11 @@ class _CanteenScreenState extends State<CanteenScreen>
                                       variantTypeList: item.variants!,
                                       onPressed: () {},
                                       onTapAdd: (Function updateState) {
+                                        log('coount ${item.quantity!} | Stock ${item.menuStock!}');
                                         setState(() {
                                           selectedCount++;
                                           item.selectedCount = selectedCount;
+                                          // item.quantity = item.quantity! + 1;
                                         });
                                         updateState();
                                       },
@@ -1349,6 +1357,7 @@ class _CanteenScreenState extends State<CanteenScreen>
                                           setState(() {
                                             selectedCount--;
                                             item.selectedCount = selectedCount;
+                                            // item.quantity = item.quantity! - 1;
                                           });
                                           updateState();
                                         }
@@ -1449,6 +1458,8 @@ class _CanteenScreenState extends State<CanteenScreen>
                                         // count: item.selectedCount!,
                                         count: item.quantity!,
                                         sold: item.menuSolds ?? 0,
+                                        quantity: item.quantity!,
+                                        stock: item.menuStock!,
                                         innerContentSize: 110,
                                         variantSelected: null,
                                         total: subtotal,
@@ -2051,6 +2062,8 @@ class _CanteenScreenState extends State<CanteenScreen>
                             // count: item.selectedCount!,
                             count: item.quantity!,
                             sold: item.menuSolds ?? 0,
+                            quantity: item.quantity!,
+                            stock: item.menuStock!,
                             innerContentSize: 110,
                             variantSelected: null,
                             total: subtotal,

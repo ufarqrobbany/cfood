@@ -378,7 +378,9 @@ class _CartScreenState extends State<CartScreen> {
           ),
         ],
       ),
-      backgroundColor: Warna.pageBackgroundColor,
+      backgroundColor: cartResponse == null || cartData!.isEmpty
+          ? Colors.white
+          : Warna.pageBackgroundColor,
       body: cartBodyList(),
       floatingActionButton:
           (calculateCartResponse == null || selectCartId == -1)
@@ -395,9 +397,13 @@ class _CartScreenState extends State<CartScreen> {
 
   Widget cartBodyList() {
     return cartResponse == null
-        ? Container()
+        ? pageOnLoading(context)
         : cartData!.isEmpty
-            ? itemsEmptyBody(context, bgcolors: Colors.white)
+            ? itemsEmptyBody(context,
+                bgcolors: Colors.white,
+                icons: UIcons.solidRounded.shopping_cart,
+                iconsColor: Warna.kuning,
+                text: 'Keranjang Kamu masih kosong\nayo tambah yang buanyak!')
             : ReloadIndicatorType1(
                 onRefresh: refreshPage,
                 child: SingleChildScrollView(

@@ -28,6 +28,7 @@ Widget itemsEmptyBody(BuildContext context,
         ),
         Text(
           text ?? 'Item yang kamu cari kosong',
+          textAlign: TextAlign.center,
           style: TextStyle(
               fontSize: 20, fontWeight: FontWeight.normal, color: Warna.abu6),
         ),
