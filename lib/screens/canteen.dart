@@ -13,6 +13,7 @@ import 'package:cfood/custom/popup_dialog.dart';
 import 'package:cfood/custom/reload_indicator.dart';
 import 'package:cfood/model/add_cart_response.dart';
 import 'package:cfood/model/follow_merchant_response.dart';
+import 'package:cfood/model/get_calculate_cart_response.dart';
 import 'package:cfood/model/get_detail_merchant_response.dart';
 import 'package:cfood/model/get_quantity_selected_menu_response.dart';
 import 'package:cfood/model/get_specific_menu_response.dart';
@@ -79,6 +80,7 @@ class _CanteenScreenState extends State<CanteenScreen>
   DataAddCart? dataAddCartInfo;
   List<DataQuantityMenu>? menuQuanList;
   List<Menu> menuItems = [];
+  CalculateCartData? calculateCartData;
 
   @override
   void initState() {
@@ -153,6 +155,8 @@ class _CanteenScreenState extends State<CanteenScreen>
       allMenuItems = menuMaps['Semua']!;
       filteredMenuItems = allMenuItems;
     });
+
+    getCalculateCartMerchant(context);
 
     if (menuMaps != []) {
       getQuantitySelctedMenu();
@@ -595,6 +599,22 @@ class _CanteenScreenState extends State<CanteenScreen>
           menu.selectedCount = matchedMenu.quantity;
         });
       }
+    }
+  }
+
+  Future<void> getCalculateCartMerchant(BuildContext context) async {
+    log('get data calculate cart by merchant ${dataMerchant!.merchantId}');
+    CalculateCartResponse? dataResponse = await FetchController(
+      endpoint:
+          '/carts/calculate/new?merchantId=${dataMerchant!.merchantId!}&userId=${AppConfig.USER_ID}',
+      fromJson: (json) => CalculateCartResponse.fromJson(json),
+    ).getData();
+
+    if (dataResponse != null) {
+      setState(() {
+        calculateCartData = dataResponse.data!;
+      });
+      log('calculate cart data : $calculateCartData');
     }
   }
 
@@ -1745,12 +1765,14 @@ class _CanteenScreenState extends State<CanteenScreen>
   }
 
   Widget storeMenuCountInfo() {
-    return dataAddCartInfo == null
+    return 
+    calculateCartData == null
         ? Container()
-        : AnimatedContainer(
+        : 
+        AnimatedContainer(
             duration: const Duration(milliseconds: 500),
             curve: Curves.easeIn,
-            height: dataAddCartInfo != null ? 116 : 0,
+            height: calculateCartData != null ? 116 : 0,
             width: double.infinity,
             padding: const EdgeInsets.all(25),
             decoration: BoxDecoration(
@@ -1799,7 +1821,9 @@ class _CanteenScreenState extends State<CanteenScreen>
                                   fontWeight: FontWeight.w800),
                             ),
                             subtitle: Text(
-                              '${dataAddCartInfo?.totalMenus!} Menu | ${dataAddCartInfo?.totalItems!} Item',
+                              dataAddCartInfo == null
+                                  ? '${calculateCartData?.totalMenus} Menu | ${calculateCartData?.totalItems}'
+                                  : '${dataAddCartInfo?.totalMenus!} Menu | ${dataAddCartInfo?.totalItems!} Item',
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 13,
@@ -1810,7 +1834,9 @@ class _CanteenScreenState extends State<CanteenScreen>
                               width: 85,
                               child: FittedBox(
                                 child: Text(
-                                  'Rp${formatNumberWithThousandsSeparator(dataAddCartInfo!.totalPrices!)}',
+                                  dataAddCartInfo == null
+                                      ? 'Rp${formatNumberWithThousandsSeparator(calculateCartData!.totalPrices)}'
+                                      : 'Rp${formatNumberWithThousandsSeparator(dataAddCartInfo!.totalPrices!)}',
                                   style: const TextStyle(
                                     color: Colors.white,
                                     fontSize: 16,
