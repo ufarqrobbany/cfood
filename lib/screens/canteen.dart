@@ -1791,19 +1791,23 @@ class _CanteenScreenState extends State<CanteenScreen>
                               size: 25,
                               color: Colors.white,
                             ),
-                            title: const Text(
-                              'Pesan Sekarang',
-                              style: TextStyle(
+                            title: const FittedBox(
+                              child: Text(
+                                'Pesan Sekarang',
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w800),
+                              ),
+                            ),
+                            subtitle: FittedBox(
+                              child: Text(
+                                '${dataAddCartInfo?.totalMenus!} Menu | ${dataAddCartInfo?.totalItems!} Item',
+                                style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 13,
-                                  fontWeight: FontWeight.w800),
-                            ),
-                            subtitle: Text(
-                              '${dataAddCartInfo?.totalMenus!} Menu | ${dataAddCartInfo?.totalItems!} Item',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
                             ),
                             trailing: SizedBox(
