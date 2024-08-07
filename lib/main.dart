@@ -33,15 +33,17 @@ import 'package:cfood/style.dart';
 // import 'package:cfood/utils/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 // import 'package:'
 
-void main() {
+void main() async {
   // FlutterError.onError = (FlutterErrorDetails details) {
   //   // Log or handle the error details
   //   log('${details.exception}');
   //   log('${details.context}');
   // };
+  await initializeDateFormatting('id_ID', null);
   runApp(const MyApp());
 }
 

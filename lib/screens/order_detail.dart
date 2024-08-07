@@ -1,23 +1,46 @@
 import 'package:cfood/custom/CButtons.dart';
 import 'package:cfood/custom/CPageMover.dart';
 import 'package:cfood/custom/order_status_timeline_tile.dart';
+import 'package:cfood/model/confirm_cart_response.dart';
+import 'package:cfood/repository/fetch_controller.dart';
 import 'package:cfood/screens/chat.dart';
 import 'package:cfood/screens/order_confirm.dart';
 import 'package:cfood/screens/rate_screen.dart';
 import 'package:cfood/style.dart';
+import 'package:cfood/utils/common.dart';
 import 'package:cfood/utils/constant.dart';
+import 'package:community_material_icon/community_material_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:uicons/uicons.dart';
 
 class OrderDetailScreen extends StatefulWidget {
   final String? status;
-  const OrderDetailScreen({super.key, this.status});
+  final int? merchantId;
+  final int? cartId;
+
+  final String noteOrder;
+  final String orderNumber;
+  final String orderTime;
+  final String paymentMethod;
+  const OrderDetailScreen({
+    super.key,
+    this.status,
+    this.merchantId,
+    this.cartId,
+    this.noteOrder = '',
+    this.orderNumber = '',
+    this.orderTime = '',
+    this.paymentMethod = '',
+  });
 
   @override
   State<OrderDetailScreen> createState() => _OrderDetailScreenState();
 }
 
 class _OrderDetailScreenState extends State<OrderDetailScreen> {
+  ConfirmCartResponse? confirmCartResponse;
+  DataConfirmCart? dataConfirmCart;
+  String currentStatus = '';
   final List<Map<String, dynamic>> orderStatusProses = [
     {
       'status': 'Dikonfirmasi',
@@ -82,6 +105,41 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
   @override
   void initState() {
     super.initState();
+    setState(() {
+      currentStatus = widget.status!;
+    });
+    fetchData();
+  }
+
+  Future<void> fetchData() async {
+    if (widget.cartId != null) {
+      fetchConfirmCartByCartId();
+    } else {
+      fetchConfirmCartByMerchantId();
+    }
+  }
+
+  Future<void> fetchConfirmCartByCartId() async {
+    confirmCartResponse = await FetchController(
+      endpoint: 'carts/confirm?cartId=${widget.cartId}',
+      fromJson: (json) => ConfirmCartResponse.fromJson(json),
+    ).getData();
+
+    setState(() {
+      dataConfirmCart = confirmCartResponse?.data;
+    });
+  }
+
+  Future<void> fetchConfirmCartByMerchantId() async {
+    confirmCartResponse = await FetchController(
+      endpoint:
+          'carts/confirm-merchant?userId=${AppConfig.USER_ID}&merchantId=${widget.merchantId}',
+      fromJson: (json) => ConfirmCartResponse.fromJson(json),
+    ).getData();
+
+    setState(() {
+      dataConfirmCart = confirmCartResponse?.data;
+    });
   }
 
   Future<void> refreshPage() async {
@@ -138,186 +196,240 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 25),
-          child: Column(
-            mainAxisSize: MainAxisSize.max,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              widget.status == 'Belum Bayar'
-                  ? const Center(
-                      child: Text(
-                        'Menunggu Pembayaran',
-                        style: AppTextStyles.subTitle,
+        child: dataConfirmCart == null
+            ? Container()
+            : Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 25),
+                child: Column(
+                  mainAxisSize: MainAxisSize.max,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    currentStatus == 'pesanan dibuat'
+                        ? const Center(
+                            child: Text(
+                              'Menunggu Konfirmasi',
+                              style: AppTextStyles.subTitle,
+                            ),
+                          )
+                        : currentStatus == 'pesanan dikonfirmasi'
+                            ? const Center(
+                                child: Text(
+                                  'Pesanan Dikonfirmasi',
+                                  style: AppTextStyles.subTitle,
+                                ),
+                              )
+                            : currentStatus == 'pesanan sudah sampai'
+                                ? const Center(
+                                    child: Text(
+                                      'Pesanan Sudah Sampai',
+                                      style: AppTextStyles.subTitle,
+                                    ),
+                                  )
+                                : Container(),
+                    currentStatus == 'Belum Bayar'
+                        ? Container(
+                            height: 50,
+                            width: double.infinity,
+                            margin: const EdgeInsets.symmetric(vertical: 20),
+                            child: DynamicColorButton(
+                              onPressed: () {},
+                              text: 'Batalkan Pesanan',
+                              backgroundColor: Warna.like,
+                              borderRadius: 54,
+                            ),
+                          )
+                        : currentStatus == 'selesai'
+                            ? Container(
+                                height: 50,
+                                width: double.infinity,
+                                margin:
+                                    const EdgeInsets.symmetric(vertical: 10),
+                                child: DynamicColorButton(
+                                  onPressed: () {},
+                                  text: 'Konfirmasi Telah Diterima',
+                                  backgroundColor: Warna.kuning,
+                                  borderRadius: 54,
+                                ),
+                              )
+                            : currentStatus == 'pesanan dibuat'
+                                ? Container(
+                                    height: 50,
+                                    width: double.infinity,
+                                    margin: const EdgeInsets.symmetric(
+                                        vertical: 20),
+                                    child: DynamicColorButton(
+                                      onPressed: () {},
+                                      text: 'Batalkan Pesanan',
+                                      backgroundColor: Warna.like,
+                                      borderRadius: 54,
+                                    ),
+                                  )
+                                : currentStatus == 'pesanan dikonfirmasi'
+                                    ? Container(
+                                        height: 50,
+                                        width: double.infinity,
+                                        margin: const EdgeInsets.symmetric(
+                                            vertical: 20),
+                                        child: Text(
+                                          'Buat kesepakatan dengan penjual dan tunggu pesananmu diantarakan',
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            color: Warna.abu4,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ))
+                                    : currentStatus == 'pesanan sudah sampai'
+                                        ? Container(
+                                            height: 50,
+                                            width: double.infinity,
+                                            margin: const EdgeInsets.symmetric(
+                                                vertical: 20),
+                                            child: DynamicColorButton(
+                                              onPressed: () {},
+                                              text: 'Konfirmasi Sudah Diterima',
+                                              backgroundColor: Warna.hijau,
+                                              borderRadius: 54,
+                                            ),
+                                          )
+                                        : Container(),
+                    // Container(
+                    //   height: 130,
+                    //   margin: const EdgeInsets.symmetric(vertical: 10),
+                    //   child: StatusOrderTimeLineTileWidget(
+                    //     processIndex: 0,
+                    //     status: '',
+                    //     statusListMapData: orderStatusProses,
+                    //   ),
+                    // ),
+
+                    Divider(
+                      height: 10,
+                      thickness: 1.5,
+                      color: Warna.abu,
+                    ),
+
+                    ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      dense: false,
+                      leading: ClipRRect(
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(100)),
+                        child:
+                            dataConfirmCart?.userInformation.userPhoto == null
+                                ? const Center(
+                                    child: Icon(Icons.image),
+                                  )
+                                : Image.network(
+                                    "${AppConfig.URL_IMAGES_PATH}${dataConfirmCart!.userInformation.userPhoto}",
+                                    fit: BoxFit.cover,
+                                    width: 40,
+                                    height: 40,
+                                  ),
                       ),
-                    )
-                  : Container(),
-              widget.status == 'Belum Bayar'
-                  ? Container(
+                      title: Text(
+                        dataConfirmCart!.userInformation.userName,
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      subtitle: Text(
+                        dataConfirmCart!.userInformation.studentInformation
+                            .studyProgramInformation.studyProgramName,
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Warna.abu4,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                    Divider(
+                      height: 10,
+                      thickness: 1.5,
+                      color: Warna.abu,
+                    ),
+                    // orderItemBox(),
+                    orderItemBox(),
+
+                    orderCalculateCostBox(),
+
+                    boxOrderInfoDetail(),
+
+                    // Container(
+                    //   height: 50,
+                    //   width: double.infinity,
+                    //   margin: const EdgeInsets.symmetric(vertical: 10),
+                    //   child: DynamicColorButton(
+                    //     onPressed: () {
+                    //       navigateTo(context, const OrderConfirmScreen());
+                    //     },
+                    //     text: 'Bayar',
+                    //     backgroundColor: Warna.kuning,
+                    //     borderRadius: 54,
+                    //   ),
+                    // ),
+                    // currentStatus == 'pesanan dibuat' ?
+                    Container(
                       height: 50,
                       width: double.infinity,
-                      margin: const EdgeInsets.symmetric(vertical: 20),
+                      margin: const EdgeInsets.symmetric(vertical: 10),
                       child: DynamicColorButton(
-                        onPressed: () {},
-                        text: 'Batalkan Pesanan',
-                        backgroundColor: Warna.like,
+                        onPressed: () {
+                          navigateTo(
+                            context,
+                            ChatScreen(
+                              isMerchant: true,
+                              merchantId: 1,
+                              userId: 1,
+                            ),
+                          );
+                        },
+                        icon: Icon(
+                          UIcons.solidRounded.comment,
+                          color: Colors.white,
+                        ),
+                        text: 'Chat Penjual',
+                        backgroundColor: Warna.kuning,
                         borderRadius: 54,
                       ),
-                    )
-                  : widget.status == 'selesai' ? Container(
-                height: 50,
-                width: double.infinity,
-                margin: const EdgeInsets.symmetric(vertical: 10),
-                child: DynamicColorButton(
-                  onPressed: () {},
-                  text: 'Konfirmasi Telah Diterima',
-                  backgroundColor: Warna.kuning,
-                  borderRadius: 54,
-                ),
-              ) :Container(),
-              Container(
-                height: 130,
-                margin: const EdgeInsets.symmetric(vertical: 10),
-                child: StatusOrderTimeLineTileWidget(
-                  processIndex: 0,
-                  status: '',
-                  statusListMapData: orderStatusProses,
-                ),
-              ),
-              ListTile(
-                shape: Border(
-                  bottom: BorderSide(color: Warna.abu, width: 1.5),
-                  top: BorderSide(color: Warna.abu, width: 1.5),
-                ),
-                dense: false,
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 0,
-                  vertical: 15,
-                ),
-                leading: Container(
-                  height: 50,
-                  width: 50,
-                  decoration: BoxDecoration(
-                    color: Warna.abu,
-                    borderRadius: BorderRadius.circular(50),
-                  ),
-                  child: Image.network(
-                    '/.jpg',
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        height: 50,
-                        width: 50,
-                        decoration: BoxDecoration(
-                          color: Warna.abu,
-                          borderRadius: BorderRadius.circular(50),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-                title: Text(
-                  driverInfo['name'].toString(),
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                subtitle: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(
-                      Icons.star,
                     ),
+
+                    currentStatus == 'pesanan sudah sampai'
+                        ? Container(
+                            height: 50,
+                            width: double.infinity,
+                            margin: const EdgeInsets.symmetric(vertical: 10),
+                            child: DynamicColorButton(
+                              onPressed: () {
+                                navigateTo(context, const RateScreen());
+                              },
+                              text: 'Beri Penilaian',
+                              backgroundColor: Warna.kuning,
+                              borderRadius: 54,
+                            ),
+                          )
+                        : Container(),
+
+                    // Container(
+                    //   height: 50,
+                    //   width: double.infinity,
+                    //   margin: const EdgeInsets.symmetric(vertical: 10),
+                    //   child: DynamicColorButton(
+                    //     onPressed: () {},
+                    //     text: 'Ubah Metode Pembayaran',
+                    //     backgroundColor: Warna.biru,
+                    //     borderRadius: 54,
+                    //   ),
+                    // ),
                     const SizedBox(
-                      width: 5,
+                      height: 15,
                     ),
-                    Text(
-                      driverInfo['rate'].toString(),
-                    )
+
+                    // SizedBox(height: 100,),
                   ],
                 ),
-                trailing: notifIconButton(
-                  notifCount: driverInfo['notification'].toString(),
-                  onPressed: () {},
-                  icons: UIcons.regularRounded.comment,
-                  iconColor: Warna.regulerFontColor,
-                ),
               ),
-              orderItemBox(
-                storeListIndex: 0,
-                storeItem: orderStatusInfoData,
-                menuItems: orderStatusInfoData['menu'],
-              ),
-
-              orderCalculateCostBox(),
-
-              boxOrderInfoDetail(),
-
-              Container(
-                height: 50,
-                width: double.infinity,
-                margin: const EdgeInsets.symmetric(vertical: 10),
-                child: DynamicColorButton(
-                  onPressed: () {
-                    navigateTo(context, const OrderConfirmScreen());
-                  },
-                  text: 'Bayar',
-                  backgroundColor: Warna.kuning,
-                  borderRadius: 54,
-                ),
-              ),
-
-              Container(
-                height: 50,
-                width: double.infinity,
-                margin: const EdgeInsets.symmetric(vertical: 10),
-                child: DynamicColorButton(
-                  onPressed: () {
-                    navigateTo(context, ChatScreen(isMerchant: true, merchantId: 1, userId: 1,),);
-                  },
-                  icon: Icon(
-                    UIcons.solidRounded.comment,
-                    color: Colors.white,
-                  ),
-                  text: 'Chat Penjual',
-                  backgroundColor: Warna.kuning,
-                  borderRadius: 54,
-                ),
-              ),
-
-              Container(
-                height: 50,
-                width: double.infinity,
-                margin: const EdgeInsets.symmetric(vertical: 10),
-                child: DynamicColorButton(
-                  onPressed: () {
-                    navigateTo(context, const RateScreen());
-                  },
-                  text: 'Beri Penilaian',
-                  backgroundColor: Warna.kuning,
-                  borderRadius: 54,
-                ),
-              ),
-
-              Container(
-                height: 50,
-                width: double.infinity,
-                margin: const EdgeInsets.symmetric(vertical: 10),
-                child: DynamicColorButton(
-                  onPressed: () {},
-                  text: 'Ubah Metode Pembayaran',
-                  backgroundColor: Warna.biru,
-                  borderRadius: 54,
-                ),
-              ),
-              const SizedBox(
-                height: 15,
-              ),
-
-              // SizedBox(height: 100,),
-            ],
-          ),
-        ),
       ),
     );
   }
@@ -328,13 +440,6 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     Map<String, dynamic>? storeItem,
     List<Map<String, dynamic>>? menuItems,
   }) {
-    int subTotalPrice = calculateSubtotalCost(storeItem!);
-    int itemCount = calculateTotalMenuItems(storeItem);
-    int totalCost = calculateTotalCost(
-      subtotal: subTotalPrice,
-      shipping: 5000,
-      service: 1000,
-    );
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 20),
       decoration: BoxDecoration(
@@ -355,15 +460,24 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Icon(
-                Icons.store,
-                color: Warna.biru,
+                dataConfirmCart!
+                            .cartInformation.merchantInformation.merchantType ==
+                        "WIRAUSAHA"
+                    ? CommunityMaterialIcons.handshake
+                    : Icons.store,
+                color: dataConfirmCart!
+                            .cartInformation.merchantInformation.merchantType ==
+                        "WIRAUSAHA"
+                    ? Warna.kuning
+                    : Warna.biru,
                 size: 20,
               ),
               const SizedBox(
                 width: 5,
               ),
               Text(
-                storeItem['store'].toString(),
+                dataConfirmCart!
+                    .cartInformation.merchantInformation.merchantName,
                 // 'nama toko',
                 style: const TextStyle(
                   fontSize: 16,
@@ -371,63 +485,51 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                 ),
               ),
               const Spacer(),
-              Container(
-                height: 20,
-                width: 20,
-                decoration:
-                    BoxDecoration(borderRadius: BorderRadius.circular(30)),
-                child: Center(
-                  child: Icon(
-                    Icons.arrow_forward_ios,
-                    color: Warna.regulerFontColor,
-                    size: 15,
-                  ),
-                ),
-              )
             ],
           ),
           ListView.builder(
-            itemCount: menuItems?.length,
+            itemCount:
+                dataConfirmCart!.cartInformation.cartItemInformations.length,
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemBuilder: (context, menuIdx) {
-              return InkWell(
-                onTap: () {
-                  navigateTo(
-                      context,
-                      OrderDetailScreen(
-                        status: storeItem['status'],
-                      ));
-                },
-                child: Container(
-                  // height: 100,
-                  // padding: const EdgeInsets.symmetric(vertical: 20),
-                  decoration: BoxDecoration(
-                    border: Border(
-                      bottom: menuIdx == menuItems!.length - 1
-                          ? const BorderSide(
-                              color: Colors.transparent, width: 1.5)
-                          : BorderSide(color: Warna.abu5, width: 1.5),
-                    ),
+              var item = dataConfirmCart!
+                  .cartInformation.cartItemInformations[menuIdx];
+              return Container(
+                // height: 100,
+                // padding: const EdgeInsets.symmetric(vertical: 20),
+                decoration: BoxDecoration(
+                  border: Border(
+                    bottom: menuIdx ==
+                            dataConfirmCart!.cartInformation
+                                    .cartItemInformations.length -
+                                1
+                        ? const BorderSide(
+                            color: Colors.transparent, width: 1.5)
+                        : BorderSide(color: Warna.abu, width: 1.5),
                   ),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 15),
-                    child: ListTile(
-                      contentPadding: EdgeInsets.zero,
-                      dense: false,
-                      leading: Container(
-                        width: 60,
-                        height: 60,
-                        decoration: BoxDecoration(
-                          color: Warna.abu,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: menuItems[menuIdx]['image'] == null
-                            ? const Center(
-                                child: Icon(Icons.image),
-                              )
-                            : Image.network(
-                                menuItems[menuIdx]['image'],
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 15),
+                  child: ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    dense: false,
+                    leading: Container(
+                      width: 60,
+                      height: 60,
+                      decoration: BoxDecoration(
+                        color: Warna.abu,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: item.menuInformation.menuPhoto == null
+                          ? const Center(
+                              child: Icon(Icons.image),
+                            )
+                          : ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: Image.network(
+                                "${AppConfig.URL_IMAGES_PATH}${item.menuInformation.menuPhoto}",
+                                fit: BoxFit.cover,
                                 errorBuilder: (context, error, stackTrace) {
                                   return Container(
                                     width: 60,
@@ -438,49 +540,56 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                                     ),
                                   );
                                 },
-                              ),
-                      ),
-                      title: Row(
-                        mainAxisSize: MainAxisSize.max,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            menuItems[menuIdx]['name'],
+                              )),
+                    ),
+                    title: Row(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Flexible(
+                          child: Text(
+                            item.menuInformation.menuName,
                             style: const TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.w600),
-                          ),
-                          Text(
-                            '${menuItems[menuIdx]['count']}x',
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w400,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
                             ),
-                          )
-                        ],
-                      ),
-                      subtitle: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            menuItems[menuIdx]['variants']
-                                .toString()
-                                .replaceAll('[', '')
-                                .replaceAll(']', ''),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
                           ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            mainAxisSize: MainAxisSize.max,
-                            children: [
-                              Text(
-                                Constant.currencyCode +
-                                    menuItems[menuIdx]['price'].toString(),
-                                style: AppTextStyles.productPrice,
-                              )
-                            ],
-                          )
-                        ],
-                      ),
+                        ),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        Text(
+                          '${item.quantity}x',
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        )
+                      ],
+                    ),
+                    subtitle: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(item.cartVariantInformations.isEmpty
+                            ? ''
+                            : getVariantDescription(
+                                item.cartVariantInformations)),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          mainAxisSize: MainAxisSize.max,
+                          children: [
+                            Text(
+                              Constant.currencyCode +
+                                  formatNumberWithThousandsSeparator(
+                                      item.totalPriceItem),
+                              style: AppTextStyles.productPrice,
+                            )
+                          ],
+                        )
+                      ],
                     ),
                   ),
                 ),
@@ -491,17 +600,25 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
           Row(
             mainAxisSize: MainAxisSize.max,
             children: [
-              const Text(
+              Text(
                 'Subtotal ',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
+                  color: Warna.regulerFontColor,
                 ),
               ),
-              Text("(${menuItems?.length} Menu | $itemCount Item)"),
+              Text(
+                  "(${dataConfirmCart!.cartInformation.totalMenu} Menu | ${dataConfirmCart!.cartInformation.totalItem} Item)",
+                  style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.normal,
+                      color: Warna.regulerFontColor)),
               const Spacer(),
               Text(
-                Constant.currencyCode + subTotalPrice.toString(),
+                Constant.currencyCode +
+                    formatNumberWithThousandsSeparator(
+                        dataConfirmCart!.cartInformation.subTotalPrice),
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w800,
@@ -516,12 +633,6 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
   }
 
   Widget orderCalculateCostBox() {
-    int subTotalPrice = calculateSubtotalCost(orderStatusInfoData);
-    int totalCost = calculateTotalCost(
-      subtotal: subTotalPrice,
-      shipping: 5000,
-      service: 1000,
-    );
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 20),
       decoration: BoxDecoration(
@@ -537,27 +648,30 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Biaya Pengiriman',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: Warna.regulerFontColor,
-                ),
-              ),
-              Text(
-                "${Constant.currencyCode}5000",
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                  color: Warna.biru,
-                ),
-              )
-            ],
-          ),
+          dataConfirmCart!.cartInformation.merchantInformation.merchantType ==
+                  "KANTIN"
+              ? Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Biaya Pengiriman',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: Warna.regulerFontColor,
+                      ),
+                    ),
+                    Text(
+                      "${Constant.currencyCode}${formatNumberWithThousandsSeparator(5000)}",
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        color: Warna.biru,
+                      ),
+                    )
+                  ],
+                )
+              : Container(),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -565,15 +679,15 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                 'Biaya Layanan',
                 style: TextStyle(
                   fontSize: 14,
-                  fontWeight: FontWeight.w500,
+                  fontWeight: FontWeight.normal,
                   color: Warna.regulerFontColor,
                 ),
               ),
               Text(
-                "${Constant.currencyCode}1000",
+                "${Constant.currencyCode}${formatNumberWithThousandsSeparator(dataConfirmCart!.serviceCost)}",
                 style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
+                  fontWeight: FontWeight.normal,
                   color: Warna.biru,
                 ),
               )
@@ -585,16 +699,19 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
           Row(
             mainAxisSize: MainAxisSize.max,
             children: [
-              const Text(
+              Text(
                 'Total ',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
+                  color: Warna.regulerFontColor,
                 ),
               ),
               const Spacer(),
               Text(
-                Constant.currencyCode + totalCost.toString(),
+                Constant.currencyCode +
+                    formatNumberWithThousandsSeparator(
+                        dataConfirmCart!.totalPrice),
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w800,
@@ -625,9 +742,9 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                   color: Warna.regulerFontColor,
                 ),
               ),
-              const Text(
-                'Tidak ada',
-                style: TextStyle(
+              Text(
+                widget.noteOrder != '' ? widget.noteOrder : 'Tidak ada',
+                style: const TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
                 ),
@@ -649,9 +766,9 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Text(
-                    '768768976897678709',
-                    style: TextStyle(
+                  Text(
+                    widget.orderNumber != '' ? widget.orderNumber : '768768976897678709',
+                    style: const TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
                     ),
@@ -682,9 +799,9 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                   color: Warna.regulerFontColor,
                 ),
               ),
-              const Text(
-                '31 Juli 2024, 15.08',
-                style: TextStyle(
+              Text(
+                widget.orderTime != '' ? widget.orderTime : 'date mounth year, time',
+                style: const TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
                 ),
@@ -702,9 +819,9 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                   color: Warna.regulerFontColor,
                 ),
               ),
-              const Text(
-                'Gopay',
-                style: TextStyle(
+              Text(
+                widget.paymentMethod != '' ? widget.paymentMethod : 'cash',
+                style: const TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
                 ),

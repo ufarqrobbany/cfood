@@ -48,7 +48,7 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
             itemBuilder: (context, index) {
               return InkWell(
                 onTap: () {
-                  navigateBack(context, result: 1);
+                  navigateBack(context, result: 'cash');
                 },
                 child: Container(
                   // height: 65,

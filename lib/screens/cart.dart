@@ -10,6 +10,7 @@ import 'package:cfood/custom/popup_dialog.dart';
 import 'package:cfood/custom/reload_indicator.dart';
 import 'package:cfood/model/add_cart_response.dart';
 import 'package:cfood/model/get_cart_user_response.dart';
+import 'package:cfood/model/reponse_handler.dart';
 import 'package:cfood/model/update_cartitem_response.dart';
 import 'package:cfood/model/get_calculate_cart_response.dart';
 import 'package:cfood/model/delete_cart_response.dart';
@@ -346,6 +347,24 @@ class _CartScreenState extends State<CartScreen> {
     });
   }
 
+  Future<void> getCartQuantityCheck() async {
+    ResponseHendlerDataBool response = await FetchController(
+      endpoint: 'carts/check-quantity?cartId=$selectCartId',
+      fromJson: (json) => ResponseHendlerDataBool.fromJson(json),
+    ).getData();
+
+    log(response.data.toString());
+    if (response.data == true) {
+      navigateTo(
+          context,
+          OrderConfirmScreen(
+            cartId: selectCartId,
+          ));
+    } else {
+      showToast('stok pada menu yg dipilih tidak mencukupi!!');
+    }
+  }
+
   Future<void> refreshPage() async {
     await Future.delayed(const Duration(seconds: 3));
 
@@ -658,9 +677,8 @@ class _CartScreenState extends State<CartScreen> {
                     child: ListTile(
                       onTap: () {
                         // tambahkan logic pengecekan quantity
-                        navigateTo(context, OrderConfirmScreen(
-                          cartId: selectCartId,
-                        ));
+
+                        getCartQuantityCheck();
                       },
                       // contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 0),
                       contentPadding: EdgeInsets.zero,

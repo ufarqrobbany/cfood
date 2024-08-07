@@ -14,6 +14,7 @@ import 'package:cfood/utils/common.dart';
 import 'package:cfood/utils/constant.dart';
 import 'package:community_material_icon/community_material_icon.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 String getVariantDescription(List<dynamic> variants) {
   if (variants.isEmpty) {
@@ -47,7 +48,7 @@ class _OrderConfirmScreenState extends State<OrderConfirmScreen> {
 
   ConfirmCartResponse? confirmCartResponse;
   DataConfirmCart? dataConfirmCart;
-  int selectedPaymentMethod = 0;
+  String selectedPaymentMethod = '';
 
   @override
   void initState() {
@@ -122,6 +123,23 @@ class _OrderConfirmScreenState extends State<OrderConfirmScreen> {
     int totalCost = subtotal! + shipping! + service!;
 
     return totalCost;
+  }
+
+  String getCurrentDateTime() {
+    // Mendapatkan waktu sekarang
+    DateTime now = DateTime.now();
+
+    // Format tanggal
+    String day = DateFormat('d').format(now);
+    String month = DateFormat('MMMM', 'id_ID').format(now);
+    String year = DateFormat('y').format(now);
+
+    // Format waktu
+    String hour = DateFormat('H').format(now);
+    String minute = (now.minute / 10).toStringAsFixed(1);
+
+    // Menggabungkan hasil format
+    return '$day $month $year, $hour.$minute';
   }
 
   @override
@@ -218,17 +236,43 @@ class _OrderConfirmScreenState extends State<OrderConfirmScreen> {
                                 });
                               });
                             },
-                            text: selectedPaymentMethod != 0 ? 'Ubah Metode Pembayaran' : 'Pilih Metode Pembayaran'),
+                            text: selectedPaymentMethod != ''
+                                ? 'Ubah Metode Pembayaran'
+                                : 'Pilih Metode Pembayaran'),
                       ),
-                      const SizedBox(height: 20,),
-                      selectedPaymentMethod == 0 ? Container() :
-                      SizedBox(
-                        height: 50,
-                        width: double.infinity,
-                        child: CBlueButton(onPressed: (){
-                          log('create order');
-                        }, isLoading: buttonLoad , borderRadius: 60, text: 'Buat Pesanan', backgroundColor: Warna.kuning,),
+                      const SizedBox(
+                        height: 20,
                       ),
+                      selectedPaymentMethod == ''
+                          ? Container()
+                          : SizedBox(
+                              height: 50,
+                              width: double.infinity,
+                              child: CBlueButton(
+                                onPressed: () {
+                                  log('create order');
+                                  var currentTime = getCurrentDateTime();
+                                  log(currentTime);
+                                  navigateTo(
+                                    context,
+                                    OrderDetailScreen(
+                                      cartId: widget.cartId,
+                                      merchantId: widget.merchantId,
+                                      noteOrder: noteController.text,
+                                      orderNumber: '65987879867576',
+                                      orderTime: currentTime.toString(),
+                                      paymentMethod: selectedPaymentMethod,
+                                      status:
+                                          'pesanan dibuat', // pesanan dibuat, pesanan dikonfirmasi, pesanan sudah sampai
+                                    ),
+                                  );
+                                },
+                                isLoading: buttonLoad,
+                                borderRadius: 60,
+                                text: 'Buat Pesanan',
+                                backgroundColor: Warna.kuning,
+                              ),
+                            ),
                       const SizedBox(
                         height: 40,
                       ),

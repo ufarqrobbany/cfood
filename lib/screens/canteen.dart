@@ -605,6 +605,25 @@ class _CanteenScreenState extends State<CanteenScreen>
     }
   }
 
+  Future<void> getCateenMenuQuantityCheck() async {
+    ResponseHendlerDataBool response = await FetchController(
+      endpoint:
+          'carts/check-quantity-merchant?userId=${AppConfig.USER_ID}&merchantId=${dataMerchant!.merchantId}',
+      fromJson: (json) => ResponseHendlerDataBool.fromJson(json),
+    ).getData();
+
+    log(response.data.toString());
+    if (response.data == true) {
+      navigateTo(
+          context,
+          OrderConfirmScreen(
+            merchantId: dataMerchant!.merchantId,
+          ));
+    } else {
+      showToast('Stok pada menu yang dipilih tidak mencukupi');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     ToastContext().init(context);
@@ -1727,11 +1746,12 @@ class _CanteenScreenState extends State<CanteenScreen>
                                   const EdgeInsets.symmetric(horizontal: 20),
                               child: ListTile(
                                 onTap: () {
-                                  navigateTo(
-                                      context,
-                                      OrderConfirmScreen(
-                                        merchantId: dataMerchant!.merchantId,
-                                      ));
+                                  getCateenMenuQuantityCheck();
+                                  // navigateTo(
+                                  //     context,
+                                  //     OrderConfirmScreen(
+                                  //       merchantId: dataMerchant!.merchantId,
+                                  //     ));
                                 },
                                 // contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 0),
                                 contentPadding: EdgeInsets.zero,
