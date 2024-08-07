@@ -610,7 +610,8 @@ class _CartScreenState extends State<CartScreen> {
                                         menuItem.quantity,
                                     count: menuItem.quantity.toString(),
                                     onTapAdd: () {
-                                      if (menuItem.quantity < menuItem.stock) {
+                                      if (menuItem.totalQuantity <
+                                          menuItem.stock) {
                                         updateCartItem(menuItem.cartItemId,
                                             "add", store.cartId);
                                       } else {

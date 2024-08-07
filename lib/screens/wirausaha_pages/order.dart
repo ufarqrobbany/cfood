@@ -8,6 +8,7 @@ import 'package:cfood/model/open_close_store_response.dart';
 import 'package:cfood/repository/fetch_controller.dart';
 import 'package:cfood/screens/inbox.dart';
 import 'package:cfood/style.dart';
+import 'package:cfood/utils/common.dart';
 import 'package:cfood/utils/constant.dart';
 import 'package:flutter/material.dart';
 import 'package:toast/toast.dart';
@@ -35,36 +36,33 @@ class _OrderWirausahaScreenState extends State<OrderWirausahaScreen> {
     print('reload...');
   }
 
-    Future<void> merchantStatusOpen(bool value) async {
+  Future<void> merchantStatusOpen(bool value) async {
     OpenCloseStoreResponse response = await FetchController(
       // endpoint: 'merchants/${AppConfig.MERCHANT_ID}/status?isOpen=$value',
       endpoint: 'merchants/${AppConfig.MERCHANT_ID}/status?isOpen=$isOpen',
       fromJson: (json) => OpenCloseStoreResponse.fromJson(json),
     ).putData({});
 
-    if(response.data != null) {
+    if (response.data != null) {
       setState(() {
-      isOpen = !response.data!.open!;
-      AppConfig.MERCHANT_OPEN = isOpen;
-    });
-    log('is open : $isOpen');
+        isOpen = !response.data!.open!;
+        AppConfig.MERCHANT_OPEN = isOpen;
+      });
+      log('is open : $isOpen');
     }
-
-    
   }
 
-    Future<void> fetchSummaryMerchant() async {
+  Future<void> fetchSummaryMerchant() async {
     merchantDataResponse = await FetchController(
       endpoint: 'merchants/${AppConfig.MERCHANT_ID}',
       fromJson: (json) => AddMerchantResponse.fromJson(json),
     ).getData();
 
     setState(() {
-
       AppConfig.MERCHANT_NAME = merchantDataResponse!.data!.merchantName!;
       AppConfig.MERCHANT_DESC = merchantDataResponse!.data!.merchantDesc!;
-      AppConfig.MERCHANT_PHOTO =
-          AppConfig.URL_IMAGES_PATH + merchantDataResponse!.data!.merchantPhoto!;
+      AppConfig.MERCHANT_PHOTO = AppConfig.URL_IMAGES_PATH +
+          merchantDataResponse!.data!.merchantPhoto!;
 
       isOpen = merchantDataResponse!.data!.open!;
     });
@@ -77,6 +75,8 @@ class _OrderWirausahaScreenState extends State<OrderWirausahaScreen> {
       }.toString(),
     );
   }
+
+  bool isConfirm = false;
 
   @override
   Widget build(BuildContext context) {
@@ -154,7 +154,10 @@ class _OrderWirausahaScreenState extends State<OrderWirausahaScreen> {
                         Container(
                           // padding: const EdgeInsets.only(bottom: 45),
                           color: Warna.pageBackgroundColor,
-                          child: Image.network(AppConfig.MERCHANT_PHOTO, fit: BoxFit.cover,),
+                          child: Image.network(
+                            AppConfig.MERCHANT_PHOTO,
+                            fit: BoxFit.cover,
+                          ),
                           // child: Image.asset(
                           //   'assets/header_image.jpg',
                           //   fit: BoxFit.cover,
@@ -275,7 +278,7 @@ class _OrderWirausahaScreenState extends State<OrderWirausahaScreen> {
     //                    storeItem?[storeListIndex]['status'] == 'Pesanan Sedang Disiapkan' ||
     //                    storeItem?[storeListIndex]['status'] == 'Pesanan Sedang Diantar';
 
-    return Column(
+    return isConfirm == true ? Container() : Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         const Row(
@@ -283,7 +286,7 @@ class _OrderWirausahaScreenState extends State<OrderWirausahaScreen> {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Text(
-              '23 Juli 2024, 13.00',
+              '01 Agustus 2024, 13.25',
               style: AppTextStyles.textRegular,
             ),
           ],
@@ -396,7 +399,8 @@ class _OrderWirausahaScreenState extends State<OrderWirausahaScreen> {
                                 children: [
                                   Text(
                                     Constant.currencyCode +
-                                        menuItems[menuIdx]['price'].toString(),
+                                        formatNumberWithThousandsSeparator(
+                                            menuItems[menuIdx]['price']),
                                     style: AppTextStyles.productPrice,
                                   )
                                 ],
@@ -443,7 +447,7 @@ class _OrderWirausahaScreenState extends State<OrderWirausahaScreen> {
                             ),
                           ),
                           title: const Text(
-                            'Pembeli\n[Username Pembeli]',
+                            'Nobby Dharma Khaulid',
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w500,
@@ -451,38 +455,7 @@ class _OrderWirausahaScreenState extends State<OrderWirausahaScreen> {
                           ),
                           // subtitle: starIconBuilder(starCount: 5),
                         ),
-                        ListTile(
-                          contentPadding: EdgeInsets.zero,
-                          dense: false,
-                          leading: Container(
-                            height: 40,
-                            width: 40,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(40),
-                              color: Warna.abu,
-                            ),
-                            child: Image.network(
-                              '/.jpg',
-                              errorBuilder: (context, error, stackTrace) =>
-                                  Container(
-                                height: 40,
-                                width: 40,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(40),
-                                  color: Warna.abu,
-                                ),
-                              ),
-                            ),
-                          ),
-                          title: const Text(
-                            'Pembeli\n[Username Pembeli]',
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          subtitle: starIconBuilder(starCount: 5, starSize: 15),
-                        ),
+                        
                       ],
                     ),
                   ),
@@ -531,7 +504,11 @@ class _OrderWirausahaScreenState extends State<OrderWirausahaScreen> {
             SizedBox(
               height: 45,
               child: DynamicColorButton(
-                onPressed: () {},
+                onPressed: () {
+                  setState(() {
+                    isConfirm = true;
+                  });
+                },
                 text: 'Konfirmasi',
                 backgroundColor: Warna.hijau,
                 borderRadius: 50,
@@ -566,111 +543,20 @@ class _OrderWirausahaScreenState extends State<OrderWirausahaScreen> {
   List<Map<String, dynamic>> orderListItems = [
     {
       'id': '0',
-      'store': 'nama toko',
-      'type': 'Kantin',
+      'store': 'Babarecii Store',
+      'type': 'Wirausaha',
       'selected': true,
       'status': 'Belum Bayar',
       'menu': [
         {
           'id': '1',
-          'name': 'nama menu',
-          'image': '/.jpg',
-          'price': 10000,
-          'count': 1,
-          'variants': ['coklat', 'susu', 'tiramusi'],
-        },
-        {
-          'id': '1',
-          'name': 'nama menu',
-          'image': '/.jpg',
-          'price': 10000,
-          'count': 2,
-          'variants': ['coklat', 'tiramusi'],
-        },
-      ],
-    },
-    {
-      'id': '1',
-      'store': 'nama toko',
-      'type': 'Wirausaha',
-      'selected': true,
-      'status': 'Pesanan Sedang Disiapkan',
-      'menu': [
-        {
-          'id': '1',
-          'name': 'nama menu',
-          'image': '/.jpg',
-          'price': 10000,
-          'count': 1,
-          'variants': ['coklat', 'susu', 'tiramusi'],
-        },
-      ],
-    },
-    {
-      'id': '0',
-      'store': 'nama toko',
-      'type': 'Kantin',
-      'selected': true,
-      'status': 'Pesanan Sedang Diantar',
-      'menu': [
-        {
-          'id': '1',
-          'name': 'nama menu',
-          'image': '/.jpg',
-          'price': 10000,
-          'count': 3,
-          'variants': ['coklat', 'susu', 'tiramusi'],
-        },
-      ],
-    },
-    {
-      'id': '0',
-      'store': 'nama toko',
-      'type': 'Wirausaha',
-      'selected': true,
-      'status': 'Pesanan Selesai',
-      'menu': [
-        {
-          'id': '1',
-          'name': 'nama menu',
-          'image': '/.jpg',
-          'price': 10000,
-          'count': 1,
-          'variants': ['coklat', 'susu', 'tiramusi'],
-        },
-        {
-          'id': '1',
-          'name': 'nama menu',
-          'image': '/.jpg',
-          'price': 10000,
-          'count': 2,
-          'variants': ['coklat', 'tiramusi'],
-        },
-      ],
-    },
-    {
-      'id': '0',
-      'store': 'nama toko',
-      'type': 'Wirausaha',
-      'selected': true,
-      'status': 'Pesanan Dibatalkan',
-      'menu': [
-        {
-          'id': '1',
-          'name': 'nama menu',
-          'image': '/.jpg',
-          'price': 10000,
-          'count': 1,
-          'variants': ['coklat', 'susu', 'tiramusi'],
-        },
-        {
-          'id': '1',
-          'name': 'nama menu',
-          'image': '/.jpg',
-          'price': 10000,
-          'count': 2,
-          'variants': ['coklat', 'tiramusi'],
-        },
+          'name': 'Onde-onde si Mantan',
+          'image':
+              'http://cfood.id/api/images/41f5f883-9263-417d-9eb0-c1ca52753cf8.jpg',
+          'price': 2000,
+          'count': 5,
+          'variants': [],
+        }
       ],
     },
   ];
