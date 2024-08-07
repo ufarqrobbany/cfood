@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cfood/custom/CButtons.dart';
 import 'package:cfood/custom/CPageMover.dart';
 import 'package:cfood/custom/CTextField.dart';
@@ -45,6 +47,7 @@ class _OrderConfirmScreenState extends State<OrderConfirmScreen> {
 
   ConfirmCartResponse? confirmCartResponse;
   DataConfirmCart? dataConfirmCart;
+  int selectedPaymentMethod = 0;
 
   @override
   void initState() {
@@ -207,12 +210,27 @@ class _OrderConfirmScreenState extends State<OrderConfirmScreen> {
                             isLoading: buttonLoad,
                             borderRadius: 60,
                             onPressed: () {
-                              navigateTo(context, const PaymentMethodScreen());
+                              navigateTo(context, const PaymentMethodScreen())
+                                  .then((value) {
+                                setState(() {
+                                  selectedPaymentMethod = value;
+                                  log('payement method : $selectedPaymentMethod');
+                                });
+                              });
                             },
-                            text: 'Pilih Metode Pembayaran'),
+                            text: selectedPaymentMethod != 0 ? 'Ubah Metode Pembayaran' : 'Pilih Metode Pembayaran'),
+                      ),
+                      const SizedBox(height: 20,),
+                      selectedPaymentMethod == 0 ? Container() :
+                      SizedBox(
+                        height: 50,
+                        width: double.infinity,
+                        child: CBlueButton(onPressed: (){
+                          log('create order');
+                        }, isLoading: buttonLoad , borderRadius: 60, text: 'Buat Pesanan', backgroundColor: Warna.kuning,),
                       ),
                       const SizedBox(
-                        height: 60,
+                        height: 40,
                       ),
                     ],
                   ),
