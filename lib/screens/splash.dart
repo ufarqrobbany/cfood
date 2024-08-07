@@ -121,8 +121,8 @@ class _SplashScreenState extends State<SplashScreen> {
             .setAppVersion(version: versionResponse.data!.latestVersion);
         Constant.appVersion = versionResponse.data!.latestVersion!;
         showMyCustomDialog(context,
-            text: 'Versi aplikasi C-Food terbaru telah tersedia ayo update!!',
-            justYEs: true, onTapYes: () {
+            text: 'Versi terbaru aplikasi C-Food sudah tersedia. Ayo segera update!',
+            justYEs: true, yesText: "Update Sekarang", onTapYes: () {
           openUrl(Uri.parse('https://campusfood.id'));
         });
       }

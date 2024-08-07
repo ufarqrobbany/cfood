@@ -17,6 +17,7 @@ import 'package:cfood/repository/fetch_controller.dart';
 import 'package:cfood/model/post_menu_like_response.dart';
 import 'package:cfood/model/post_menu_unlike_response.dart';
 import 'package:cfood/screens/canteen.dart';
+import 'package:cfood/screens/order_confirm.dart';
 import 'package:cfood/style.dart';
 import 'package:cfood/utils/common.dart';
 import 'package:cfood/utils/constant.dart';
@@ -655,6 +656,12 @@ class _CartScreenState extends State<CartScreen> {
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: ListTile(
+                      onTap: () {
+                        // tambahkan logic pengecekan quantity
+                        navigateTo(context, OrderConfirmScreen(
+                          cartId: selectCartId,
+                        ));
+                      },
                       // contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 0),
                       contentPadding: EdgeInsets.zero,
                       dense: true,

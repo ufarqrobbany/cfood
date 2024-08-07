@@ -21,6 +21,7 @@ import 'package:cfood/model/post_menu_like_response.dart';
 import 'package:cfood/model/post_menu_unlike_response.dart';
 import 'package:cfood/model/reponse_handler.dart';
 import 'package:cfood/repository/fetch_controller.dart';
+import 'package:cfood/screens/order_confirm.dart';
 import 'package:cfood/screens/organization.dart';
 import 'package:cfood/screens/reviews.dart';
 import 'package:cfood/screens/wirausaha_pages/menu_add_edit.dart';
@@ -31,6 +32,7 @@ import 'package:cfood/utils/common.dart';
 import 'package:cfood/utils/constant.dart';
 import 'package:community_material_icon/community_material_icon.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:toast/toast.dart';
 import 'package:uicons/uicons.dart';
@@ -341,25 +343,8 @@ class _CanteenScreenState extends State<CanteenScreen>
           },
           onPressed: () {
             if (dataSpecificMenu!.variants!.isEmpty) {
-              // updateCartItem(item.cartItemId, "add",
-              // //  cartId
-              //  );
-              updateCart(
-                menuId: dataSpecificMenu!.id!,
-                quantity: 1,
-                // variants: selectedVariants
-                //     .map((v) => {
-                //           'variantId': v.id,
-                //           'variantOptionIds': [v.id],
-                //         })
-                //     .toList(),
-              );
-              Navigator.pop(context);
-
               if (dataSpecificMenu!.quantity! < dataSpecificMenu!.menuStock!) {
-                updateCart(
-                    quantity: dataSpecificMenu!.quantity!,
-                    menuId: dataSpecificMenu!.id!);
+                updateCart(quantity: 1, menuId: dataSpecificMenu!.id!);
                 Navigator.pop(context);
               } else {
                 showToast('Stok tidak mencukupi');
@@ -568,8 +553,10 @@ class _CanteenScreenState extends State<CanteenScreen>
     }.toString());
 
     if (info != null) {
+      fetchDetailDataMerchant();
       getQuantitySelctedMenu();
       setState(() {
+        getCalculateCartMerchant(context);
         dataAddCartInfo = info.data!;
       });
     }
@@ -1067,6 +1054,13 @@ class _CanteenScreenState extends State<CanteenScreen>
                         merchantIsDanus: dataMerchant!.danusInformation != null
                             ? true
                             : false,
+                        danusOrganization: dataMerchant!.danusInformation !=
+                                null
+                            ? dataMerchant!.danusInformation!.organizationName!
+                            : '',
+                        danusActivity: dataMerchant!.danusInformation != null
+                            ? dataMerchant!.danusInformation!.activityName!
+                            : '',
                       ));
                 },
                 icon: Icon(
@@ -1286,6 +1280,20 @@ class _CanteenScreenState extends State<CanteenScreen>
                               AddEditMenuScreen(
                                 isEdit: true,
                                 menuId: item.id!,
+                                merchantIsDanus:
+                                    dataMerchant!.danusInformation != null
+                                        ? true
+                                        : false,
+                                danusOrganization:
+                                    dataMerchant!.danusInformation != null
+                                        ? dataMerchant!
+                                            .danusInformation!.organizationName!
+                                        : '',
+                                danusActivity:
+                                    dataMerchant!.danusInformation != null
+                                        ? dataMerchant!
+                                            .danusInformation!.organizationName!
+                                        : '',
                               ));
                         },
                       )
@@ -1389,19 +1397,24 @@ class _CanteenScreenState extends State<CanteenScreen>
                                     );
                                   }
                                 : () {
-                                    setState(() {
-                                      item.selectedCount =
-                                          // item.selectedCount! + 1;
-                                          item.quantity! + 1;
-                                      // item.subTotal =
-                                      //     (item.menuPrice! * item.selectedCount!);
-                                    });
-                                    updateCart(
-                                      menuId: item.id!,
-                                      quantity: 1,
-                                    );
-                                    showToast(
-                                        'Menu ditambahkan ke dalam keranjang');
+                                    if (item.quantity! < item.menuStock!) {
+                                      // setState(() {
+                                      //   item.selectedCount =
+                                      //       // item.selectedCount! + 1;
+                                      //       item.quantity! + 1;
+                                      //   // item.subTotal =
+                                      //   //     (item.menuPrice! * item.selectedCount!);
+                                      // });
+                                      updateCart(
+                                        menuId: item.id!,
+                                        quantity: 1,
+                                      );
+                                      Navigator.pop(context);
+                                      showToast(
+                                          'Menu ditambahkan ke dalam keranjang');
+                                    } else {
+                                      showToast('Stok tidak mencukupi');
+                                    }
                                   },
                             onTapAdd: () {},
                             onTapRemove: () {},
@@ -1486,9 +1499,9 @@ class _CanteenScreenState extends State<CanteenScreen>
                             );
                           } else {
                             if (item.quantity! < item.menuStock!) {
-                              setState(() {
-                                item.quantity = item.quantity! + 1;
-                              });
+                              // setState(() {
+                              //   item.quantity = item.quantity! + 1;
+                              // });
                               updateCart(
                                 menuId: item.id!,
                                 quantity: 1,
@@ -1672,185 +1685,96 @@ class _CanteenScreenState extends State<CanteenScreen>
     );
   }
 
-  Future storeMenuCountSheet() {
-    return showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      barrierColor: Colors.transparent,
-      elevation: 0,
-      // isDismissible: orderCount != 0 ? false : true,
-      constraints: const BoxConstraints(
-        minHeight: 114,
-        maxHeight: 114,
-      ),
-      isScrollControlled: false,
-      builder: (context) {
-        return Container(
-          height: 66,
-          width: double.infinity,
-          margin: const EdgeInsets.all(25),
-          decoration: BoxDecoration(borderRadius: BorderRadius.circular(60)),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(60),
-            child: Row(
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                Expanded(
-                  flex: 2,
-                  child: Container(
-                    color: Warna.kuning,
-                    child: Center(
-                      child: Icon(
-                        UIcons.solidRounded.comment,
-                        size: 25,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
-                Expanded(
-                  flex: 8,
-                  child: Container(
-                    color: Warna.biru,
-                    child: Center(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: ListTile(
-                          contentPadding: EdgeInsets.zero,
-                          dense: true,
-                          leading: Icon(
-                            UIcons.solidRounded.shopping_cart,
-                            size: 25,
-                            color: Colors.white,
-                          ),
-                          title: const Text(
-                            'Pesan Sekarang',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 13,
-                                fontWeight: FontWeight.w800),
-                          ),
-                          subtitle: const Text(
-                            '2 Menu | 7 Item',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          trailing: const SizedBox(
-                            width: 85,
-                            child: FittedBox(
-                              child: Text(
-                                'Rp100.000',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w800,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
   Widget storeMenuCountInfo() {
     return calculateCartData == null
         ? Container()
-        : AnimatedContainer(
-            duration: const Duration(milliseconds: 500),
-            curve: Curves.easeIn,
-            height: calculateCartData != null ? 116 : 0,
-            width: double.infinity,
-            padding: const EdgeInsets.all(25),
-            decoration: BoxDecoration(
-              color: Colors.transparent,
-              borderRadius: BorderRadius.circular(60),
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(60),
-              child: Row(
-                mainAxisSize: MainAxisSize.max,
-                children: [
-                  Expanded(
-                    flex: 2,
-                    child: Container(
-                      color: Warna.kuning,
-                      child: Center(
-                        child: Icon(
-                          UIcons.solidRounded.comment,
-                          size: 25,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    flex: 8,
-                    child: Container(
-                      color: Warna.biru,
-                      child: Center(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          child: ListTile(
-                            // contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 0),
-                            contentPadding: EdgeInsets.zero,
-                            dense: true,
-                            leading: Icon(
-                              UIcons.solidRounded.shopping_cart,
+        : dataMerchant!.open!
+            ? AnimatedContainer(
+                duration: const Duration(milliseconds: 500),
+                curve: Curves.easeIn,
+                height: calculateCartData != null ? 116 : 0,
+                width: double.infinity,
+                padding: const EdgeInsets.all(25),
+                decoration: BoxDecoration(
+                  color: Colors.transparent,
+                  borderRadius: BorderRadius.circular(60),
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(60),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      Expanded(
+                        flex: 2,
+                        child: Container(
+                          color: Warna.kuning,
+                          child: Center(
+                            child: Icon(
+                              UIcons.solidRounded.comment,
                               size: 25,
                               color: Colors.white,
                             ),
-                            title: const FittedBox(
-                              child: Text(
-                                'Pesan Sekarang',
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w800),
-                              ),
-                            ),
-                            // subtitle: FittedBox(
-                            //   child: Text(
-                            //     '${dataAddCartInfo?.totalMenus!} Menu | ${dataAddCartInfo?.totalItems!} Item',
-                            //     style: const TextStyle(
-                            //       color: Colors.white,
-                            //       fontSize: 13,
-                            //       fontWeight: FontWeight.w800),
-                            // ),
-                            subtitle: FittedBox(
-                              child: Text(
-                                dataAddCartInfo == null
-                                    ? '${calculateCartData?.totalMenus} Menu | ${calculateCartData?.totalItems}'
-                                    : '${dataAddCartInfo?.totalMenus!} Menu | ${dataAddCartInfo?.totalItems!} Item',
-                                style: const TextStyle(
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        flex: 8,
+                        child: Container(
+                          color: Warna.biru,
+                          child: Center(
+                            child: Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 20),
+                              child: ListTile(
+                                onTap: () {
+                                  navigateTo(
+                                      context,
+                                      OrderConfirmScreen(
+                                        merchantId: dataMerchant!.merchantId,
+                                      ));
+                                },
+                                // contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 0),
+                                contentPadding: EdgeInsets.zero,
+                                dense: true,
+                                leading: Icon(
+                                  UIcons.solidRounded.shopping_cart,
+                                  size: 25,
                                   color: Colors.white,
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w600,
                                 ),
-                              ),
-                            ),
-                            trailing: SizedBox(
-                              width: 85,
-                              child: FittedBox(
-                                child: Text(
-                                  dataAddCartInfo == null
-                                      ? 'Rp${formatNumberWithThousandsSeparator(calculateCartData!.totalPrices)}'
-                                      : 'Rp${formatNumberWithThousandsSeparator(dataAddCartInfo!.totalPrices!)}',
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w800,
+                                title: const FittedBox(
+                                  child: Text(
+                                    'Pesan Sekarang',
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w800),
+                                  ),
+                                ),
+                                subtitle: FittedBox(
+                                  child: Text(
+                                    dataAddCartInfo == null
+                                        ? '${calculateCartData?.totalMenus} Menu | ${calculateCartData?.totalItems} Item'
+                                        : '${calculateCartData?.totalMenus!} Menu | ${calculateCartData?.totalItems!} Item',
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                                trailing: SizedBox(
+                                  width: 80,
+                                  child: FittedBox(
+                                    child: Text(
+                                      dataAddCartInfo == null
+                                          ? 'Rp${formatNumberWithThousandsSeparator(calculateCartData!.totalPrices)}'
+                                          : 'Rp${formatNumberWithThousandsSeparator(calculateCartData!.totalPrices!)}',
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w800,
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ),
@@ -1858,12 +1782,11 @@ class _CanteenScreenState extends State<CanteenScreen>
                           ),
                         ),
                       ),
-                    ),
+                    ],
                   ),
-                ],
-              ),
-            ),
-          );
+                ),
+              )
+            : Container();
   }
 
   Widget searchMenuBody() {
@@ -1951,10 +1874,92 @@ class _CanteenScreenState extends State<CanteenScreen>
                                 menuItem: item);
                           },
                           onPressed: () {
-                            updateCart(
-                              menuId: item.id!,
-                              quantity: 1,
-                            );
+                            // perbaiki
+                            if (item.variants!.isNotEmpty) {
+                              // int selectedCount = item.selectedCount!;
+                              int selectedCount = item.quantity!;
+                              int price = item.menuPrice!;
+                              int subtotal = price * selectedCount;
+                              Navigator.pop(context);
+                              menuCustomeFrameSheet(
+                                context,
+                                imgUrl:
+                                    "${AppConfig.URL_IMAGES_PATH}${item.menuPhoto}",
+                                productName: item.menuName!,
+                                description: item.menuDesc ?? '',
+                                price: item.menuPrice!,
+                                subTotal: item.subTotal!,
+                                likes: item.menuLikes.toString(),
+                                rate: item.menuRate.toString(),
+                                // count: item.selectedCount!,
+                                count: item.quantity!,
+                                sold: item.menuSolds ?? 0,
+                                quantity: item.quantity!,
+                                stock: item.menuStock!,
+                                innerContentSize: 110,
+                                variantSelected: null,
+                                total: subtotal,
+                                variantTypeList: item.variants!,
+                                onPressed: () {},
+                                onTapAdd: (Function updateState) {
+                                  setState(() {
+                                    selectedCount++;
+                                  });
+                                  updateState();
+                                },
+                                onTapRemove: (Function updateState) {
+                                  if (selectedCount > 0) {
+                                    setState(() {
+                                      selectedCount--;
+                                    });
+                                    updateState();
+                                  }
+                                },
+                                onTapAddOrder: (selectedCount, calculatedTotal,
+                                    selectedVariants) {
+                                  setState(() {
+                                    // Update UI if needed
+                                  });
+                                  updateCart(
+                                    menuId: item.id!,
+                                    quantity: selectedCount,
+                                    variants: item.variants!
+                                        .where((variant) => variant.selected!)
+                                        .map((variant) => {
+                                              'variantId': variant.id,
+                                              'variantOptionIds': variant
+                                                  .variantOptions!
+                                                  .where((option) =>
+                                                      option.selected!)
+                                                  .map((option) => option.id)
+                                                  .toList(),
+                                            })
+                                        .toList(),
+                                  );
+                                },
+                              );
+                            } else {
+                              if (item.quantity! < item.menuStock!) {
+                                Navigator.pop(context);
+                                // setState(() {
+                                //   item.quantity = item.quantity! + 1;
+                                //   // item.subTotal =
+                                //   //     (item.menuPrice! * item.quantity!);
+                                // });
+                                updateCart(
+                                  menuId: item.id!,
+                                  quantity: 1,
+                                );
+                              } else {
+                                // Show a message that stock limit has been reached
+                                showToast('Stock tidak mencukupi');
+                              }
+                            }
+
+                            // updateCart(
+                            //   menuId: item.id!,
+                            //   quantity: 1,
+                            // );
                           },
                           onTapAdd: () {},
                           onTapRemove: () {},
@@ -1963,8 +1968,7 @@ class _CanteenScreenState extends State<CanteenScreen>
                       imgUrl: "${AppConfig.URL_IMAGES_PATH}${item.menuPhoto}",
                       productName: item.menuName!,
                       description: item.menuDesc ?? 'deskripsi menu',
-                      price:
-                          item.subTotal != 0 ? item.subTotal : item.menuPrice,
+                      price: item.menuPrice,
                       likes: item.menuLikes.toString(),
                       rate: item.menuRate.toString(),
                       // count: item.selectedCount!.toString(),
@@ -2035,14 +2039,9 @@ class _CanteenScreenState extends State<CanteenScreen>
                           );
                         } else {
                           if (item.quantity! < item.menuStock!) {
-                            setState(() {
-                              item.quantity = item.quantity! + 1;
-                              item.subTotal =
-                                  (item.menuPrice! * item.quantity!);
-                            });
                             updateCart(
                               menuId: item.id!,
-                              quantity: item.quantity!,
+                              quantity: 1,
                             );
                           } else {
                             // Show a message that stock limit has been reached
@@ -2052,13 +2051,13 @@ class _CanteenScreenState extends State<CanteenScreen>
                       },
                       onTapRemove: () {
                         if (item.quantity! > 0) {
-                          setState(() {
-                            item.quantity = item.quantity! - 1;
-                            item.subTotal = (item.subTotal! - item.menuPrice!);
-                          });
+                          // setState(() {
+                          //   item.quantity = item.quantity! - 1;
+                          //   // item.subTotal = (item.subTotal! - item.menuPrice!);
+                          // });
                           updateCart(
                             menuId: item.id!,
-                            quantity: -item.quantity!,
+                            quantity: -1,
                           );
                         }
                       },

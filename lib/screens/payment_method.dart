@@ -29,7 +29,7 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
         leading: backButtonCustom(context: context),
         leadingWidth: 90,
         title: Text(
-          'Pembayaran',
+          'Pilih Pembayaran',
           style: AppTextStyles.appBarTitle,
         ),
         foregroundColor: Colors.white,
@@ -40,7 +40,7 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
       body: ReloadIndicatorType1(
           onRefresh: refreshPage,
           child: ListView.builder(
-            itemCount: 5,
+            itemCount: 1,
             shrinkWrap: true,
             physics: const BouncingScrollPhysics(),
             padding: const EdgeInsets.symmetric(vertical: 15),
@@ -48,43 +48,43 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
               return Container(
                 // height: 65,
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 25),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 30, vertical: 25),
                 margin:
                     const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
                 decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(8),
-                    boxShadow: [
-                      BoxShadow(
-                          blurRadius: 20,
-                          spreadRadius: 0,
-                          color: Warna.shadow.withOpacity(0.12),
-                          offset: const Offset(0, 0)),
-                    ],),
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8),
+                  boxShadow: [
+                    BoxShadow(
+                        blurRadius: 20,
+                        spreadRadius: 0,
+                        color: Warna.shadow.withOpacity(0.12),
+                        offset: const Offset(0, 0)),
+                  ],
+                ),
 
-                    child: Row(
-                      mainAxisSize: MainAxisSize.max,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Container(
-                          height: 30,
-                          width: 50,
-                          color: Warna.abu,
-                        ),
-
-                        const SizedBox(
-                          width: 25,
-                        ),
-
-                        const Text(
-                          'nama metode',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        )
-                      ],
+                child: Row(
+                  mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Icon(
+                      Icons.wallet,
+                      color: Warna.biru,
+                      size: 30,
                     ),
+                    const SizedBox(
+                      width: 25,
+                    ),
+                    const Text(
+                      'Cash',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    )
+                  ],
+                ),
               );
             },
           )),

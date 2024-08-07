@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:ffi';
 import 'dart:io';
 
 import 'package:cfood/custom/CButtons.dart';
@@ -16,6 +17,7 @@ import 'package:cfood/repository/fetch_controller.dart';
 import 'package:cfood/screens/wirausaha_pages/category_add.dart';
 import 'package:cfood/screens/wirausaha_pages/varianst_add_edit.dart';
 import 'package:cfood/style.dart';
+import 'package:cfood/utils/common.dart';
 import 'package:cfood/utils/constant.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -26,16 +28,39 @@ import 'package:uicons/uicons.dart';
 import 'package:cfood/model/get_detail_merchant_response.dart'
     as detailmerchant;
 
+String getMinMax(int minimal, int maximal, int length, bool required) {
+  String isMinMax = "";
+  if (required) {
+    // asumsikan minimal tidak akan 0
+    if (minimal < maximal) {
+      isMinMax = (maximal == length)
+          ? 'Minimal $minimal'
+          : 'Minimal $minimal, maksimal $maximal';
+    } else if (minimal == maximal) {
+      isMinMax = 'Pilih $maximal';
+    }
+  } else {
+    // asumsikan minimal adalah 0
+    if (minimal < maximal) {
+      isMinMax = (maximal == length) ? '' : 'Maksimal $maximal';
+    }
+  }
+  return "($isMinMax)";
+}
+
 class AddEditMenuScreen extends StatefulWidget {
   final bool isEdit;
   final bool merchantIsDanus;
   final int menuId;
-  const AddEditMenuScreen({
-    super.key,
-    this.isEdit = false,
-    this.merchantIsDanus = false,
-    this.menuId = 0,
-  });
+  final String danusOrganization;
+  final String danusActivity;
+  const AddEditMenuScreen(
+      {super.key,
+      this.isEdit = false,
+      this.merchantIsDanus = false,
+      this.menuId = 0,
+      this.danusOrganization = '',
+      this.danusActivity = ''});
 
   @override
   State<AddEditMenuScreen> createState() => _AddEditMenuScreenState();
@@ -528,10 +553,12 @@ class _AddEditMenuScreenState extends State<AddEditMenuScreen> {
                           return Padding(
                             padding: const EdgeInsets.symmetric(vertical: 5),
                             child: varianProductBox(
-                              varianName: variant.variantName,
-                              listOption: variant.variantOptions,
-                              varianIdx: index,
-                            ),
+                                varianName: variant.variantName,
+                                listOption: variant.variantOptions,
+                                varianIdx: index,
+                                isRequired: variant.isRequired,
+                                minimal: variant.minimal,
+                                maximal: variant.maximal),
                           );
                         },
                       ),
@@ -581,10 +608,12 @@ class _AddEditMenuScreenState extends State<AddEditMenuScreen> {
                               });
                             },
                           ),
-                          const SizedBox(
-                              width:
-                                  8), // Add some spacing between checkbox and text
-                          const Text('Produk Danus'),
+                          const SizedBox(width: 8),
+                          widget.merchantIsDanus
+                              ? // Add some spacing between checkbox and text
+                              Text(
+                                  'Produk Danus ${widget.danusOrganization} - ${widget.danusActivity}')
+                              : const Text('Produk Danus'),
                         ],
                       )
                     : Container(),
@@ -627,7 +656,12 @@ class _AddEditMenuScreenState extends State<AddEditMenuScreen> {
   }
 
   Widget varianProductBox(
-      {String? varianName, List<VariantOption>? listOption, int? varianIdx}) {
+      {String? varianName,
+      List<VariantOption>? listOption,
+      int? varianIdx,
+      bool? isRequired,
+      int? minimal,
+      int? maximal}) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(8),
       child: Container(
@@ -650,6 +684,25 @@ class _AddEditMenuScreenState extends State<AddEditMenuScreen> {
                 ),
               ),
             ),
+            // perbaiki
+            Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: Warna.abu,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                        (isRequired!
+                            ? "Wajib ${getMinMax(minimal!, maximal!, listOption!.length, isRequired)}"
+                            : "Opsional ${getMinMax(minimal!, maximal!, listOption!.length, isRequired)}"),
+                        style: const TextStyle(
+                            fontSize: 13, fontWeight: FontWeight.w500))
+                  ],
+                )),
             ListView.builder(
               itemCount: listOption!.length,
               shrinkWrap: true,
@@ -660,7 +713,7 @@ class _AddEditMenuScreenState extends State<AddEditMenuScreen> {
                 return Padding(
                   padding: const EdgeInsets.symmetric(vertical: 2.5),
                   child: Text(
-                    '${item.variantOptionName} - ${Constant.currencyCode} ${item.variantOptionPrice}',
+                    '${item.variantOptionName} - ${Constant.currencyCode}${formatNumberWithThousandsSeparator(item.variantOptionPrice!)}',
                     style: const TextStyle(
                       fontSize: 17,
                       fontWeight: FontWeight.w500,

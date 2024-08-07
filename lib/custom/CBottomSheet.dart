@@ -31,7 +31,7 @@ String getMinMax(int minimal, int maximal, int length, bool required) {
       isMinMax = (maximal == length) ? '' : 'Maksimal $maximal';
     }
   }
-  return isMinMax;
+  return "($isMinMax)";
 }
 
 Future menuFrameSheet(
@@ -496,8 +496,8 @@ Future menuCustomeFrameSheet(
                                             fontWeight: FontWeight.w500)),
                                     Text(
                                         (variantTypeList[indexType].isRequired!
-                                            ? "Wajib (${getMinMax(variantTypeList[indexType].minimal!, variantTypeList[indexType].maximal!, variantTypeList[indexType].variantOptions!.length, variantTypeList[indexType].isRequired!)})"
-                                            : "Opsional (${getMinMax(variantTypeList[indexType].minimal!, variantTypeList[indexType].maximal!, variantTypeList[indexType].variantOptions!.length, variantTypeList[indexType].isRequired!)})"),
+                                            ? "Wajib ${getMinMax(variantTypeList[indexType].minimal!, variantTypeList[indexType].maximal!, variantTypeList[indexType].variantOptions!.length, variantTypeList[indexType].isRequired!)}"
+                                            : "Opsional ${getMinMax(variantTypeList[indexType].minimal!, variantTypeList[indexType].maximal!, variantTypeList[indexType].variantOptions!.length, variantTypeList[indexType].isRequired!)}"),
                                         style: const TextStyle(
                                             fontSize: 13,
                                             fontWeight: FontWeight.w500))
@@ -658,7 +658,9 @@ Future menuCustomeFrameSheet(
                         });
                         // Assuming variantTypeList is a list of objects with fields id (variantId) and variantOptions
                         List<Map<String, dynamic>> formattedVariants =
-                            variantTypeList.where((variant) => variant.selected!).map((variant) {
+                            variantTypeList
+                                .where((variant) => variant.selected!)
+                                .map((variant) {
                           return {
                             "variantId": variant.id,
                             "variantOptionIds": variant.variantOptions!
@@ -669,14 +671,13 @@ Future menuCustomeFrameSheet(
                         }).toList();
 
                         await onTapAddOrder(
-                          selectedCount,
-                          calculatedTotal,
-                          // variantTypeList
-                          //     .expand((v) => v.variantOptions!)
-                          //     .where((v) => v.selected!)
-                          //     .toList()
-                          formattedVariants
-                        );
+                            selectedCount,
+                            calculatedTotal,
+                            // variantTypeList
+                            //     .expand((v) => v.variantOptions!)
+                            //     .where((v) => v.selected!)
+                            //     .toList()
+                            formattedVariants);
                         setState(() {
                           isLoading = false;
                           selectedCount = count;

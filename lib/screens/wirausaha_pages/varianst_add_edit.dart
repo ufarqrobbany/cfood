@@ -6,6 +6,7 @@ import 'package:cfood/custom/CTextField.dart';
 import 'package:cfood/custom/CToast.dart';
 // import 'package:cfood/model/data_variants_local.dart';
 import 'package:cfood/style.dart';
+import 'package:cfood/utils/common.dart';
 import 'package:cfood/utils/constant.dart';
 import 'package:flutter/material.dart';
 import 'package:toast/toast.dart';
@@ -44,7 +45,7 @@ class _AddEditVariantsScreenState extends State<AddEditVariantsScreen> {
 
     if (widget.isEdit == false) {
       setState(() {
-        minController.text = '1';
+        minController.text = '0';
         maxController.text = '1';
       });
     }
@@ -122,7 +123,7 @@ class _AddEditVariantsScreenState extends State<AddEditVariantsScreen> {
       setState(() {
         buttonLoad = false;
       });
-      showToast('mana ada minimal lebih besar dari maksimal');
+      showToast('Mana ada minimal lebih besar dari maksimal');
       return;
     }
 
@@ -143,7 +144,7 @@ class _AddEditVariantsScreenState extends State<AddEditVariantsScreen> {
       setState(() {
         buttonLoad = false;
       });
-      showToast('maksimal melebihi jumlah opsi, tambahin dulu opsi nya');
+      showToast('Maksimal melebihi jumlah opsi, tambahin dulu opsi nya');
       return;
     }
 
@@ -152,7 +153,7 @@ class _AddEditVariantsScreenState extends State<AddEditVariantsScreen> {
       setState(() {
         buttonLoad = false;
       });
-      showToast('Tambahkan minimal opsi 1 opsi varian!!');
+      showToast('Tambahkan minimal 1 opsi varian!!');
       return;
     }
 
@@ -262,18 +263,17 @@ class _AddEditVariantsScreenState extends State<AddEditVariantsScreen> {
                       setState(() {
                         variantRequired = value!;
                       });
-                      // if (variantRequired) {
-                      //   setState(() {
-                      //     if(minController.text ==)
-                      //     minController.text = '1';
-                      //     maxController.text = '1';
-                      //   });
-                      // } else {
-                      //   setState(() {
-                      //     minController.text = '0';
-                      //     maxController.text = '0';
-                      //   });
-                      // }
+                      if (variantRequired) {
+                        setState(() {
+                          minController.text = '1';
+                          maxController.text = '1';
+                        });
+                      } else {
+                        setState(() {
+                          minController.text = '0';
+                          maxController.text = '1';
+                        });
+                      }
                     },
                   ),
                   const SizedBox(
@@ -324,9 +324,8 @@ class _AddEditVariantsScreenState extends State<AddEditVariantsScreen> {
                           padding: const EdgeInsets.symmetric(vertical: 7),
                           child: opsiVarianItem(
                             name: listOpsiVarian[idx].variantOptionName,
-                            price: listOpsiVarian[idx]
-                                .variantOptionPrice
-                                .toString(),
+                            price: Constant.currencyCode + formatNumberWithThousandsSeparator(listOpsiVarian[idx]
+                                .variantOptionPrice!),
                             onTapEdit: () {
                               variantOptionSheet(
                                 context,
@@ -448,7 +447,7 @@ class _AddEditVariantsScreenState extends State<AddEditVariantsScreen> {
     String? editPrice,
   }) {
     varianOptionController.text = editName ?? '';
-    varianOptionPriceController.text = editPrice ?? '';
+    varianOptionPriceController.text = editPrice ?? '0';
 
     return showModalBottomSheet(
       context: context,
