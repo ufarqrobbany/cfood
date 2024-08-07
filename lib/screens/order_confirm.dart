@@ -176,9 +176,14 @@ class _OrderConfirmScreenState extends State<OrderConfirmScreen> {
                               const BorderRadius.all(Radius.circular(100)),
                           child:
                               dataConfirmCart?.userInformation.userPhoto == null
-                                  ? const Center(
-                                      child: Icon(Icons.image),
-                                    )
+                                  ?  Container(
+                                    height: 40,
+                                    width: 40,
+                                    decoration: BoxDecoration(
+                                      color: Warna.abu,
+                                      borderRadius: BorderRadius.circular(50),
+                                    ),
+                                    child: Icon(Icons.person))
                                   : Image.network(
                                       "${AppConfig.URL_IMAGES_PATH}${dataConfirmCart!.userInformation.userPhoto}",
                                       fit: BoxFit.cover,
@@ -193,8 +198,8 @@ class _OrderConfirmScreenState extends State<OrderConfirmScreen> {
                             fontWeight: FontWeight.w500,
                           ),
                         ),
-                        subtitle: Text(
-                          dataConfirmCart!.userInformation.studentInformation
+                        subtitle: dataConfirmCart!.userInformation.studentInformation == null ? null : Text(
+                          dataConfirmCart!.userInformation.studentInformation!
                               .studyProgramInformation.studyProgramName,
                           style: TextStyle(
                             fontSize: 13,

@@ -312,37 +312,42 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                     ListTile(
                       contentPadding: EdgeInsets.zero,
                       dense: false,
-                      leading: ClipRRect(
-                        borderRadius:
-                            const BorderRadius.all(Radius.circular(100)),
-                        child:
-                            dataConfirmCart?.userInformation.userPhoto == null
-                                ? const Center(
-                                    child: Icon(Icons.image),
-                                  )
-                                : Image.network(
-                                    "${AppConfig.URL_IMAGES_PATH}${dataConfirmCart!.userInformation.userPhoto}",
-                                    fit: BoxFit.cover,
-                                    width: 40,
+                       leading: ClipRRect(
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(100)),
+                          child:
+                              dataConfirmCart?.userInformation.userPhoto == null
+                                  ?  Container(
                                     height: 40,
-                                  ),
-                      ),
-                      title: Text(
-                        dataConfirmCart!.userInformation.userName,
-                        style: const TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w500,
+                                    width: 40,
+                                    decoration: BoxDecoration(
+                                      color: Warna.abu,
+                                      borderRadius: BorderRadius.circular(50),
+                                    ),
+                                    child: Icon(Icons.person))
+                                  : Image.network(
+                                      "${AppConfig.URL_IMAGES_PATH}${dataConfirmCart!.userInformation.userPhoto}",
+                                      fit: BoxFit.cover,
+                                      width: 40,
+                                      height: 40,
+                                    ),
                         ),
-                      ),
-                      subtitle: Text(
-                        dataConfirmCart!.userInformation.studentInformation
-                            .studyProgramInformation.studyProgramName,
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: Warna.abu4,
-                          fontWeight: FontWeight.w500,
+                        title: Text(
+                          dataConfirmCart!.userInformation.userName,
+                          style: const TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
-                      ),
+                        subtitle: dataConfirmCart!.userInformation.studentInformation == null ? null : Text(
+                          dataConfirmCart!.userInformation.studentInformation!
+                              .studyProgramInformation.studyProgramName,
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Warna.abu4,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
                     ),
                     Divider(
                       height: 10,

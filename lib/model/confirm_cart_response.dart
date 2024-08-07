@@ -66,9 +66,9 @@ class DataConfirmCart {
 class UserInformation {
   int userId;
   String userName;
-  String userPhoto;
-  CampusInformation campusInformation;
-  StudentInformation studentInformation;
+  String? userPhoto;
+  CampusInformation? campusInformation;
+  StudentInformation? studentInformation;
 
   UserInformation({
     required this.userId,
@@ -83,9 +83,8 @@ class UserInformation {
       userId: json['userId'],
       userName: json['userName'],
       userPhoto: json['userPhoto'],
-      campusInformation: CampusInformation.fromJson(json['campusInformation']),
-      studentInformation:
-          StudentInformation.fromJson(json['studentInformation']),
+      campusInformation: json['campusInformation'] != null ? CampusInformation.fromJson(json['campusInformation']) : null,
+      studentInformation: json['studentInformation'] != null ? StudentInformation.fromJson(json['studentInformation']) : null,
     );
   }
 
@@ -94,8 +93,8 @@ class UserInformation {
       'userId': userId,
       'userName': userName,
       'userPhoto': userPhoto,
-      'campusInformation': campusInformation.toJson(),
-      'studentInformation': studentInformation.toJson(),
+      'campusInformation': campusInformation!.toJson(),
+      'studentInformation': studentInformation!.toJson(),
     };
   }
 }
