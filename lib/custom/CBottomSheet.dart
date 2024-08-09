@@ -52,6 +52,7 @@ Future menuFrameSheet(
   final VoidCallback? onPressed,
   final VoidCallback? onTapAdd,
   final VoidCallback? onTapRemove,
+  final VoidCallback? onPressedShare,
   final double? innerContentSize,
 }) {
   // bool itsFavorite = false;
@@ -300,7 +301,7 @@ Future menuFrameSheet(
                       ),
                       const Spacer(),
                       TextButton.icon(
-                        onPressed: () {},
+                        onPressed: onPressedShare ?? () {},
                         icon: Icon(
                           Icons.share,
                           color: Warna.abu4,

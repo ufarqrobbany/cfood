@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:typed_data';
+import 'dart:io';
 
 import 'package:cfood/custom/CBottomSheet.dart';
 import 'package:cfood/custom/CButtons.dart';
@@ -11,6 +13,8 @@ import 'package:cfood/custom/card.dart';
 import 'package:cfood/custom/page_item_void.dart';
 import 'package:cfood/custom/popup_dialog.dart';
 import 'package:cfood/custom/reload_indicator.dart';
+import 'package:cfood/custom/sharee.dart';
+import 'package:cfood/custom/shimmer.dart';
 import 'package:cfood/model/add_cart_response.dart';
 import 'package:cfood/model/follow_merchant_response.dart';
 import 'package:cfood/model/get_calculate_cart_response.dart';
@@ -21,6 +25,7 @@ import 'package:cfood/model/post_menu_like_response.dart';
 import 'package:cfood/model/post_menu_unlike_response.dart';
 import 'package:cfood/model/reponse_handler.dart';
 import 'package:cfood/repository/fetch_controller.dart';
+import 'package:cfood/screens/main.dart';
 import 'package:cfood/screens/order_confirm.dart';
 import 'package:cfood/screens/organization.dart';
 import 'package:cfood/screens/reviews.dart';
@@ -31,11 +36,19 @@ import 'package:cfood/style.dart';
 import 'package:cfood/utils/common.dart';
 import 'package:cfood/utils/constant.dart';
 import 'package:community_material_icon/community_material_icon.dart';
+import 'package:convert/convert.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import 'package:http/http.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:social_share/social_share.dart';
 import 'package:toast/toast.dart';
 import 'package:uicons/uicons.dart';
+import 'package:encrypt/encrypt.dart' as encrypt;
+import 'package:crypto/crypto.dart' as crypto;
 
 class CanteenScreen extends StatefulWidget {
   final int? merchantId;
@@ -341,6 +354,21 @@ class _CanteenScreenState extends State<CanteenScreen>
                 updateState: updateState,
                 menuItem: dataSpecificMenu);
           },
+          onPressedShare: () {
+            onTapOpenShareOption(
+              context,
+              pathSegment: 'menu',
+              menuId: dataSpecificMenu!.id.toString(),
+              merchantId: dataMerchant!.merchantId.toString(),
+              merchantType: dataMerchant!.merchantType,
+              imageUrl: dataSpecificMenu!.menuPhoto,
+              menuName: dataSpecificMenu!.menuName!,
+              menuPrice: formatNumberWithThousandsSeparator(
+                  dataSpecificMenu!.menuPrice!),
+              dsc: dataSpecificMenu!.menuDesc!,
+              merchantName: dataMerchant!.merchantName!,
+            );
+          },
           onPressed: () {
             if (dataSpecificMenu!.variants!.isEmpty) {
               if (dataSpecificMenu!.quantity! < dataSpecificMenu!.menuStock!) {
@@ -635,14 +663,21 @@ class _CanteenScreenState extends State<CanteenScreen>
               leading: backButtonCustom(
                 context: context,
                 customTap: () {
-                  if (goSeacrhMenu) {
-                    setState(
-                      () {
-                        goSeacrhMenu = !goSeacrhMenu;
-                      },
-                    );
+                  if (AppConfig.FROM_LINK) {
+                    navigateToRep(context, const MainScreen());
+                    setState(() {
+                      AppConfig.FROM_LINK = false;
+                    });
                   } else {
-                    navigateBack(context);
+                    if (goSeacrhMenu) {
+                      setState(
+                        () {
+                          goSeacrhMenu = !goSeacrhMenu;
+                        },
+                      );
+                    } else {
+                      navigateBack(context);
+                    }
                   }
                 },
               ),
@@ -685,7 +720,17 @@ class _CanteenScreenState extends State<CanteenScreen>
                           ),
                           actionButtonCustom(
                             icons: UIcons.solidRounded.share,
-                            onPressed: () {},
+                            onPressed: () {
+                              onTapOpenShareOption(
+                                context,
+                                pathSegment: 'merchant',
+                                merchantId: dataMerchant!.merchantId.toString(),
+                                merchantType: dataMerchant!.merchantType,
+                                imageUrl: dataMerchant!.merchantPhoto,
+                                merchantName: dataMerchant!.merchantName!,
+                                dsc: dataMerchant!.merchantDesc!,
+                              );
+                            },
                           ),
                           const SizedBox(
                             width: 25,
@@ -705,21 +750,32 @@ class _CanteenScreenState extends State<CanteenScreen>
               child: SizedBox(
                 width: double.infinity,
                 height: double.infinity,
-                child: dataMerchant == null && dataSpecificMenu == null
-                    ? pageOnLoading(context)
-                    : CustomScrollView(
-                        physics: const BouncingScrollPhysics(
-                          parent: AlwaysScrollableScrollPhysics(),
-                        ),
-                        slivers: [
-                          // SliverAppBar(
-                          //   pinned: true,
+                child:
+                    // dataMerchant == null && dataSpecificMenu == null
+                    //     ? pageOnLoading(context)
+                    //     :
+                    CustomScrollView(
+                  physics: const BouncingScrollPhysics(
+                    parent: AlwaysScrollableScrollPhysics(),
+                  ),
+                  slivers: [
+                    // SliverAppBar(
+                    //   pinned: true,
 
-                          // ),
+                    // ),
 
-                          SliverList(
-                              delegate: SliverChildListDelegate([
-                            Container(
+                    SliverList(
+                        delegate: SliverChildListDelegate([
+                      dataMerchant == null
+                          ? Padding(
+                              padding: const EdgeInsets.only(bottom: 25),
+                              child: shimmerBox(
+                                enabled: true,
+                                height: 225,
+                                width: double.infinity,
+                              ),
+                            )
+                          : Container(
                               height: 225,
                               width: double.infinity,
                               color: Warna.pageBackgroundColor,
@@ -814,123 +870,132 @@ class _CanteenScreenState extends State<CanteenScreen>
                                 ],
                               ),
                             ),
-                          ])),
+                    ])),
 
-                          SliverList(
-                            delegate: SliverChildListDelegate(
-                              [
-                                bodyCanteenInfo(),
-                                (widget.isOwner
-                                    ? Padding(
-                                        padding: const EdgeInsets.only(top: 15),
-                                        child: ListTile(
-                                          // contentPadding: EdgeInsets.zero,
-                                          contentPadding:
-                                              const EdgeInsets.symmetric(
-                                                  horizontal: 25, vertical: 10),
-                                          tileColor:
-                                              Warna.hijau.withOpacity(0.10),
+                    SliverList(
+                      delegate: SliverChildListDelegate(
+                        [
+                          bodyCanteenInfo(),
+                          dataMerchant == null
+                              ? Container(
+                                  height: 0,
+                                )
+                              : (widget.isOwner
+                                  ? Padding(
+                                      padding: const EdgeInsets.only(top: 15),
+                                      child: ListTile(
+                                        // contentPadding: EdgeInsets.zero,
+                                        contentPadding:
+                                            const EdgeInsets.symmetric(
+                                                horizontal: 25, vertical: 10),
+                                        tileColor:
+                                            Warna.hijau.withOpacity(0.10),
 
-                                          title: const Text(
-                                            // dataMerchant!
-                                            //     .danusInformation!.organizationName!
-                                            //     .toString(),
-                                            "Edit Informasi Wirausaha",
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.w700),
-                                          ),
+                                        title: const Text(
+                                          // dataMerchant!
+                                          //     .danusInformation!.organizationName!
+                                          //     .toString(),
+                                          "Edit Informasi Wirausaha",
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w700),
+                                        ),
 
-                                          trailing: IconButton(
-                                            onPressed: () {
-                                              navigateTo(
-                                                  context,
-                                                  UpdateMerchantScreen(
-                                                    merchantId: dataMerchant
-                                                        ?.merchantId,
-                                                  ));
-                                            },
-                                            icon: const Icon(Icons.edit,
-                                                color: Colors.white),
-                                            iconSize: 18,
-                                            style: IconButton.styleFrom(
-                                              backgroundColor: Warna.hijau,
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(50),
-                                              ),
+                                        trailing: IconButton(
+                                          onPressed: () {
+                                            navigateTo(
+                                                context,
+                                                UpdateMerchantScreen(
+                                                  merchantId:
+                                                      dataMerchant?.merchantId,
+                                                ));
+                                          },
+                                          icon: const Icon(Icons.edit,
+                                              color: Colors.white),
+                                          iconSize: 18,
+                                          style: IconButton.styleFrom(
+                                            backgroundColor: Warna.hijau,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(50),
                                             ),
                                           ),
                                         ),
-                                      )
-                                    : Container()),
-                                dataMerchant?.danusInformation == null
-                                    ? (widget.isOwner
-                                        ? Padding(
-                                            padding:
-                                                const EdgeInsets.only(top: 15),
-                                            child: ListTile(
-                                              // contentPadding: EdgeInsets.zero,
-                                              contentPadding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 25,
-                                                      vertical: 10),
-                                              tileColor: Warna.kuning
-                                                  .withOpacity(0.10),
+                                      ),
+                                    )
+                                  : Container()),
+                          dataMerchant?.danusInformation == null
+                              ? (widget.isOwner
+                                  ? Padding(
+                                      padding: const EdgeInsets.only(top: 15),
+                                      child: ListTile(
+                                        // contentPadding: EdgeInsets.zero,
+                                        contentPadding:
+                                            const EdgeInsets.symmetric(
+                                                horizontal: 25, vertical: 10),
+                                        tileColor:
+                                            Warna.kuning.withOpacity(0.10),
 
-                                              title: const Text(
-                                                // dataMerchant!
-                                                //     .danusInformation!.organizationName!
-                                                //     .toString(),
-                                                "Lagi Danusan?",
-                                                style: TextStyle(
-                                                    fontWeight:
-                                                        FontWeight.w700),
+                                        title: const Text(
+                                          // dataMerchant!
+                                          //     .danusInformation!.organizationName!
+                                          //     .toString(),
+                                          "Lagi Danusan?",
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w700),
+                                        ),
+                                        subtitle: const Text(
+                                          'Prioritaskan menu kamu agar mudah ditemukan pembeli',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w400),
+                                        ),
+                                        trailing: IconButton(
+                                          onPressed: () {
+                                            navigateTo(
+                                              context,
+                                              SignUpDanusScreen(
+                                                campusId: dataMerchant!
+                                                    .studentInformation!
+                                                    .campusId!,
                                               ),
-                                              subtitle: const Text(
-                                                'Prioritaskan menu kamu agar mudah ditemukan pembeli',
-                                                style: TextStyle(
-                                                    fontWeight:
-                                                        FontWeight.w400),
-                                              ),
-                                              trailing: IconButton(
-                                                onPressed: () {
-                                                  navigateTo(
-                                                    context,
-                                                    SignUpDanusScreen(
-                                                      campusId: dataMerchant!
-                                                          .studentInformation!
-                                                          .campusId!,
-                                                    ),
-                                                  );
-                                                },
-                                                icon: const Icon(Icons
-                                                    .arrow_forward_ios_rounded),
-                                                iconSize: 18,
-                                                style: IconButton.styleFrom(
-                                                  backgroundColor: Warna.kuning,
-                                                  shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            50),
-                                                  ),
-                                                ),
-                                              ),
+                                            );
+                                          },
+                                          icon: const Icon(
+                                              Icons.arrow_forward_ios_rounded),
+                                          iconSize: 18,
+                                          style: IconButton.styleFrom(
+                                            backgroundColor: Warna.kuning,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(50),
                                             ),
-                                          )
-                                        : Container())
-                                    : Padding(
-                                        padding: const EdgeInsets.only(top: 15),
-                                        child: ListTile(
-                                          // contentPadding: EdgeInsets.zero,
-                                          contentPadding:
-                                              const EdgeInsets.symmetric(
-                                                  horizontal: 25, vertical: 10),
-                                          tileColor:
-                                              Warna.kuning.withOpacity(0.10),
-                                          leading: ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(50),
-                                            child: Container(
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                  : Container())
+                              : Padding(
+                                  padding: const EdgeInsets.only(top: 15),
+                                  child: ListTile(
+                                    // contentPadding: EdgeInsets.zero,
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        horizontal: 25, vertical: 10),
+                                    tileColor: Warna.kuning.withOpacity(0.10),
+                                    leading: ClipRRect(
+                                      borderRadius: BorderRadius.circular(50),
+                                      child: Container(
+                                        height: 50,
+                                        width: 50,
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(50),
+                                          color: Warna.abu2,
+                                        ),
+                                        child: Image.network(
+                                          '${AppConfig.URL_IMAGES_PATH}${dataMerchant?.danusInformation?.organizationPhoto}',
+                                          fit: BoxFit.cover,
+                                          errorBuilder:
+                                              (context, error, stackTrace) {
+                                            return Container(
                                               height: 50,
                                               width: 50,
                                               decoration: BoxDecoration(
@@ -938,161 +1003,153 @@ class _CanteenScreenState extends State<CanteenScreen>
                                                     BorderRadius.circular(50),
                                                 color: Warna.abu2,
                                               ),
-                                              child: Image.network(
-                                                '${AppConfig.URL_IMAGES_PATH}${dataMerchant?.danusInformation?.organizationPhoto}',
-                                                fit: BoxFit.cover,
-                                                errorBuilder: (context, error,
-                                                    stackTrace) {
-                                                  return Container(
-                                                    height: 50,
-                                                    width: 50,
-                                                    decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              50),
-                                                      color: Warna.abu2,
-                                                    ),
-                                                  );
-                                                },
-                                              ),
-                                            ),
-                                          ),
-                                          title: const Text(
-                                            "Sedang Danusan",
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.w700),
-                                          ),
-                                          subtitle: Text(
-                                            'Kegiatan ${dataMerchant?.danusInformation?.activityName}\n${dataMerchant?.danusInformation?.organizationName}',
-                                            style: const TextStyle(
-                                                fontWeight: FontWeight.w400),
-                                          ),
-                                          trailing: widget.isOwner
-                                              ? InkWell(
-                                                  onTap: () {
-                                                    log('finish danush?');
-                                                    showMyCustomDialog(
-                                                      context,
-                                                      text:
-                                                          'Apakah anda yakin ingin menyelesaikan kegiatan danus?\nProduk danus tidak akan dihapus.',
-                                                      colorYes: Warna.like,
-                                                      onTapYes: () {
-                                                        finishDanus(context);
-                                                        navigateBack(context);
-                                                      },
-                                                    );
-                                                  },
-                                                  child: Container(
-                                                    // height: 30,
-                                                    padding: const EdgeInsets
-                                                        .symmetric(
-                                                        horizontal: 15,
-                                                        vertical: 8),
-                                                    decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              40),
-                                                      color: Warna.like,
-                                                    ),
-                                                    child: const Row(
-                                                      mainAxisSize:
-                                                          MainAxisSize.min,
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .center,
-                                                      children: [
-                                                        Text(
-                                                          'Selesai  ',
-                                                          style: TextStyle(
-                                                            color: Colors.white,
-                                                            fontSize: 14,
-                                                            fontWeight:
-                                                                FontWeight.w600,
-                                                          ),
-                                                        ),
-                                                        Icon(
-                                                          Icons
-                                                              .arrow_forward_ios_rounded,
-                                                          size: 15,
-                                                          color: Colors.white,
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                )
-                                              : IconButton(
-                                                  onPressed: () => navigateTo(
-                                                    context,
-                                                    OrganizationScreen(
-                                                        id: dataMerchant!
-                                                            .danusInformation!
-                                                            .organizationId!),
-                                                  ),
-                                                  icon: const Icon(Icons
-                                                      .arrow_forward_ios_rounded),
-                                                  iconSize: 18,
-                                                  style: IconButton.styleFrom(
-                                                      backgroundColor:
-                                                          Warna.kuning,
-                                                      shape:
-                                                          RoundedRectangleBorder(
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          50))),
-                                                ),
+                                            );
+                                          },
                                         ),
                                       ),
-                                const SizedBox(
-                                  height: 25,
+                                    ),
+                                    title: const Text(
+                                      "Sedang Danusan",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.w700),
+                                    ),
+                                    subtitle: Text(
+                                      'Kegiatan ${dataMerchant?.danusInformation?.activityName}\n${dataMerchant?.danusInformation?.organizationName}',
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.w400),
+                                    ),
+                                    trailing: widget.isOwner
+                                        ? InkWell(
+                                            onTap: () {
+                                              log('finish danush?');
+                                              showMyCustomDialog(
+                                                context,
+                                                text:
+                                                    'Apakah anda yakin ingin menyelesaikan kegiatan danus?\nProduk danus tidak akan dihapus.',
+                                                colorYes: Warna.like,
+                                                onTapYes: () {
+                                                  finishDanus(context);
+                                                  navigateBack(context);
+                                                },
+                                              );
+                                            },
+                                            child: Container(
+                                              // height: 30,
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 15,
+                                                      vertical: 8),
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(40),
+                                                color: Warna.like,
+                                              ),
+                                              child: const Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  Text(
+                                                    'Selesai  ',
+                                                    style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                    ),
+                                                  ),
+                                                  Icon(
+                                                    Icons
+                                                        .arrow_forward_ios_rounded,
+                                                    size: 15,
+                                                    color: Colors.white,
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          )
+                                        : IconButton(
+                                            onPressed: () => navigateTo(
+                                              context,
+                                              OrganizationScreen(
+                                                  id: dataMerchant!
+                                                      .danusInformation!
+                                                      .organizationId!),
+                                            ),
+                                            icon: const Icon(Icons
+                                                .arrow_forward_ios_rounded),
+                                            iconSize: 18,
+                                            style: IconButton.styleFrom(
+                                                backgroundColor: Warna.kuning,
+                                                shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            50))),
+                                          ),
+                                  ),
                                 ),
-                              ],
-                            ),
+                          const SizedBox(
+                            height: 25,
                           ),
-
-                          SliverList(
-                            delegate: SliverChildListDelegate(
-                              [
-                                bodyProductList(),
-                              ],
-                            ),
-                          )
                         ],
                       ),
+                    ),
+
+                    SliverList(
+                      delegate: SliverChildListDelegate(
+                        [
+                          dataMerchant == null && dataSpecificMenu == null
+                              ? SizedBox(
+                                  height: 300,
+                                  child: pageOnLoading(context,
+                                      bgColor: Warna.pageBackgroundColor))
+                              : bodyProductList(),
+                        ],
+                      ),
+                    )
+                  ],
+                ),
               ),
             ),
-      floatingActionButton: widget.isOwner == true
-          ? Padding(
-              padding: const EdgeInsets.only(bottom: 100),
-              child: IconButton(
-                onPressed: () {
-                  navigateTo(
-                      context,
-                      AddEditMenuScreen(
-                        isEdit: false,
-                        merchantIsDanus: dataMerchant!.danusInformation != null
-                            ? true
-                            : false,
-                        danusOrganization: dataMerchant!.danusInformation !=
-                                null
-                            ? dataMerchant!.danusInformation!.organizationName!
-                            : '',
-                        danusActivity: dataMerchant!.danusInformation != null
-                            ? dataMerchant!.danusInformation!.activityName!
-                            : '',
-                      ));
-                },
-                icon: Icon(
-                  UIcons.solidRounded.plus_small,
-                ),
-                iconSize: 40,
-                color: Colors.white,
-                style: IconButton.styleFrom(
-                  backgroundColor: Warna.biru,
-                ),
-              ),
+      floatingActionButton: dataMerchant == null && dataSpecificMenu == null
+          ? Container(
+              height: 0,
             )
-          : storeMenuCountInfo(),
+          : widget.isOwner == true
+              ? Padding(
+                  padding: const EdgeInsets.only(bottom: 100),
+                  child: IconButton(
+                    onPressed: () {
+                      navigateTo(
+                          context,
+                          AddEditMenuScreen(
+                            isEdit: false,
+                            merchantIsDanus:
+                                dataMerchant!.danusInformation != null
+                                    ? true
+                                    : false,
+                            danusOrganization:
+                                dataMerchant!.danusInformation != null
+                                    ? dataMerchant!
+                                        .danusInformation!.organizationName!
+                                    : '',
+                            danusActivity: dataMerchant!.danusInformation !=
+                                    null
+                                ? dataMerchant!.danusInformation!.activityName!
+                                : '',
+                          ));
+                    },
+                    icon: Icon(
+                      UIcons.solidRounded.plus_small,
+                    ),
+                    iconSize: 40,
+                    color: Colors.white,
+                    style: IconButton.styleFrom(
+                      backgroundColor: Warna.biru,
+                    ),
+                  ),
+                )
+              : storeMenuCountInfo(),
       floatingActionButtonLocation: widget.isOwner == true
           ? FloatingActionButtonLocation.endDocked
           : FloatingActionButtonLocation.centerDocked,
@@ -1107,34 +1164,42 @@ class _CanteenScreenState extends State<CanteenScreen>
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              dataMerchant?.merchantType! == 'WIRAUSAHA'
-                  ? Icon(
-                      CommunityMaterialIcons.handshake,
-                      color: Warna.kuning,
-                      size: 35,
-                    )
-                  : Icon(
-                      Icons.store,
-                      color: Warna.biru.withOpacity(0.70),
-                      size: 35,
+          dataMerchant == null
+              ? shimmerBox(
+                  enabled: true,
+                  height: 25,
+                  width: 250,
+                  radius: 8,
+                )
+              : Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    dataMerchant?.merchantType! == 'WIRAUSAHA'
+                        ? Icon(
+                            CommunityMaterialIcons.handshake,
+                            color: Warna.kuning,
+                            size: 35,
+                          )
+                        : Icon(
+                            Icons.store,
+                            color: Warna.biru.withOpacity(0.70),
+                            size: 35,
+                          ),
+                    const SizedBox(
+                      width: 15,
                     ),
-              const SizedBox(
-                width: 15,
-              ),
-              Flexible(
-                child: Text(
-                  dataMerchant!.merchantName!,
-                  style: AppTextStyles.title,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
+                    Flexible(
+                      child: Text(
+                        dataMerchant!.merchantName!,
+                        style: AppTextStyles.title,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-            ],
-          ),
+
           // const Text(
           //   '[List Kategori Kantin]',
           //   style: AppTextStyles.textRegular,
@@ -1143,6 +1208,7 @@ class _CanteenScreenState extends State<CanteenScreen>
             height: 16,
           ),
           storeReviewContainer(),
+
           const SizedBox(
             height: 16,
           ),
@@ -1152,47 +1218,52 @@ class _CanteenScreenState extends State<CanteenScreen>
               contentPadding: EdgeInsets.zero,
               leading: ClipRRect(
                 borderRadius: BorderRadius.circular(50),
-                child: Container(
-                  height: 40,
-                  width: 40,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(50),
-                    color: Warna.abu2,
-                  ),
-                  child: Image.network(
-                    '${AppConfig.URL_IMAGES_PATH}${dataMerchant?.studentInformation?.userPhoto}', // userPhoto
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
+                child: dataMerchant == null
+                    ? shimmerBox(
+                        enabled: true, height: 40, width: 40, radius: 50)
+                    : Container(
                         height: 40,
                         width: 40,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(50),
                           color: Warna.abu2,
                         ),
-                      );
-                    },
-                  ),
-                ),
+                        child: Image.network(
+                          '${AppConfig.URL_IMAGES_PATH}${dataMerchant?.studentInformation?.userPhoto}', // userPhoto
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              height: 40,
+                              width: 40,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(50),
+                                color: Warna.abu2,
+                              ),
+                            );
+                          },
+                        ),
+                      ),
               ),
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('${dataMerchant?.studentInformation?.userName}',
+              title: dataMerchant == null
+                  ? shimmerBox(enabled: true, height: 15, width: 100, radius: 8)
+                  : Text('${dataMerchant?.studentInformation?.userName}',
                       style: const TextStyle(fontWeight: FontWeight.w700)),
-                  Text('${dataMerchant?.studentInformation?.studyProgramName}',
+              subtitle: dataMerchant == null
+                  ? shimmerBox(enabled: true, height: 15, width: 45, radius: 8)
+                  : Text(
+                      '${dataMerchant?.studentInformation?.studyProgramName}',
                       style: const TextStyle(fontSize: 12)),
-                ],
-              ),
             ),
           ),
           const SizedBox(
             height: 16,
           ),
-          Text(
-            '${dataMerchant?.merchantDesc}',
-            style: AppTextStyles.textRegular,
-          ),
+          dataMerchant == null
+              ? shimmerBox(enabled: true, height: 15, width: 190, radius: 8)
+              : Text(
+                  '${dataMerchant?.merchantDesc}',
+                  style: AppTextStyles.textRegular,
+                ),
           const SizedBox(
             height: 8,
           ),
@@ -1343,6 +1414,22 @@ class _CanteenScreenState extends State<CanteenScreen>
                                   menuId: item.id!,
                                   updateState: updateState,
                                   menuItem: item);
+                            },
+                            onPressedShare: () {
+                              onTapOpenShareOption(
+                                context,
+                                pathSegment: 'menu',
+                                menuId: item.id.toString(),
+                                merchantId: dataMerchant!.merchantId.toString(),
+                                merchantType: dataMerchant!.merchantType,
+                                imageUrl: item.menuPhoto,
+                                menuName: item.menuName!,
+                                dsc: item.menuDesc!,
+                                menuPrice: formatNumberWithThousandsSeparator(
+                                    item.menuPrice!),
+                                merchantName: dataMerchant!.merchantName!,
+                                // imagePath: dataMerchant!.merchantPhoto,
+                              );
                             },
                             onPressed: item.variants!.isNotEmpty
                                 ? () {
@@ -1568,140 +1655,156 @@ class _CanteenScreenState extends State<CanteenScreen>
   }
 
   Widget storeReviewContainer() {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        dataMerchant!.open == true
-            ? Container()
-            : Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(4),
-                    border: Border.all(color: Warna.like, width: 1),
-                    color: Warna.like.withOpacity(0.10)),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      UIcons.solidRounded.time_oclock,
-                      size: 13,
-                      color: Warna.like,
-                    ),
-                    const Text(
-                      ' Tutup',
-                      style: TextStyle(fontSize: 12),
-                    ),
-                  ],
-                ),
-              ),
-        dataMerchant!.open == true
-            ? Container()
-            : const SizedBox(
+    return dataMerchant == null
+        ? Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              shimmerBox(enabled: true, height: 25, width: 45, radius: 8),
+              const SizedBox(
                 width: 8,
               ),
-        dataMerchant!.location == null
-            ? Container()
-            : Container(
+              shimmerBox(enabled: true, height: 25, width: 45, radius: 8),
+              const Spacer(),
+              shimmerBox(enabled: true, height: 25, width: 100, radius: 8),
+            ],
+          )
+        : Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              dataMerchant!.open == true
+                  ? Container()
+                  : Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 6, vertical: 1),
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(4),
+                          border: Border.all(color: Warna.like, width: 1),
+                          color: Warna.like.withOpacity(0.10)),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            UIcons.solidRounded.time_oclock,
+                            size: 13,
+                            color: Warna.like,
+                          ),
+                          const Text(
+                            ' Tutup',
+                            style: TextStyle(fontSize: 12),
+                          ),
+                        ],
+                      ),
+                    ),
+              dataMerchant!.open == true
+                  ? Container()
+                  : const SizedBox(
+                      width: 8,
+                    ),
+              dataMerchant!.location == null
+                  ? Container()
+                  : Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 6, vertical: 1),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(4),
+                        border: Border.all(
+                            color: Warna.hijau.withOpacity(0.60), width: 1),
+                        color: Warna.hijau.withOpacity(0.10),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.location_pin,
+                            size: 15,
+                            color: Warna.hijau,
+                          ),
+                          Text(
+                            dataMerchant!.location!,
+                            style: const TextStyle(fontSize: 12),
+                          ),
+                        ],
+                      ),
+                    ),
+              dataMerchant!.location == null
+                  ? Container()
+                  : const SizedBox(
+                      width: 8,
+                    ),
+              Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(4),
-                  border: Border.all(
-                      color: Warna.hijau.withOpacity(0.60), width: 1),
-                  color: Warna.hijau.withOpacity(0.10),
+                  border: Border.all(color: Warna.like, width: 1),
+                  color: Warna.like.withOpacity(0.10),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(
-                      Icons.location_pin,
+                      Icons.favorite,
                       size: 15,
-                      color: Warna.hijau,
+                      color: Warna.like,
                     ),
                     Text(
-                      dataMerchant!.location!,
+                      dataMerchant!.followers!.toString(),
                       style: const TextStyle(fontSize: 12),
                     ),
                   ],
                 ),
               ),
-        dataMerchant!.location == null
-            ? Container()
-            : const SizedBox(
+              const SizedBox(
                 width: 8,
               ),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(4),
-            border: Border.all(color: Warna.like, width: 1),
-            color: Warna.like.withOpacity(0.10),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.favorite,
-                size: 15,
-                color: Warna.like,
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(4),
+                  border: Border.all(color: Warna.kuning, width: 1),
+                  color: Warna.kuning.withOpacity(0.10),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.star,
+                      size: 15,
+                      color: Warna.kuning,
+                    ),
+                    Text(
+                      dataMerchant!.rating!.toString(),
+                      style: const TextStyle(fontSize: 12),
+                    ),
+                  ],
+                ),
               ),
-              Text(
-                dataMerchant!.followers!.toString(),
-                style: const TextStyle(fontSize: 12),
+              const Spacer(),
+              CYellowMoreButton(
+                onPressed: () {
+                  navigateTo(
+                    context,
+                    const ReviewScreen(
+                      storeName: 'Nama Toko',
+                      likes: '100',
+                      rate: '4.4',
+                      imgUrl: '/.jpg',
+                      storeId: '000',
+                      type: 'Menu',
+                    ),
+                  );
+                },
+                height: 30,
+                textStyle: TextStyle(
+                  fontSize: 13,
+                  color: Warna.regulerFontColor,
+                  fontWeight: FontWeight.w600,
+                ),
+                text: 'Lihat Ulasan >',
               ),
             ],
-          ),
-        ),
-        const SizedBox(
-          width: 8,
-        ),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(4),
-            border: Border.all(color: Warna.kuning, width: 1),
-            color: Warna.kuning.withOpacity(0.10),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.star,
-                size: 15,
-                color: Warna.kuning,
-              ),
-              Text(
-                dataMerchant!.rating!.toString(),
-                style: const TextStyle(fontSize: 12),
-              ),
-            ],
-          ),
-        ),
-        const Spacer(),
-        CYellowMoreButton(
-          onPressed: () {
-            navigateTo(
-              context,
-              const ReviewScreen(
-                storeName: 'Nama Toko',
-                likes: '100',
-                rate: '4.4',
-                imgUrl: '/.jpg',
-                storeId: '000',
-                type: 'Menu',
-              ),
-            );
-          },
-          height: 30,
-          textStyle: TextStyle(
-            fontSize: 13,
-            color: Warna.regulerFontColor,
-            fontWeight: FontWeight.w600,
-          ),
-          text: 'Lihat Ulasan >',
-        ),
-      ],
-    );
+          );
   }
 
   Widget storeMenuCountInfo() {
@@ -1850,6 +1953,21 @@ class _CanteenScreenState extends State<CanteenScreen>
                                 updateState: updateState,
                                 menuItem: item);
                           },
+                          onPressedShare: () {
+                            onTapOpenShareOption(
+                              context,
+                              pathSegment: 'menu',
+                              menuId: item.id.toString(),
+                              merchantId: dataMerchant!.merchantId.toString(),
+                              merchantType: dataMerchant!.merchantType,
+                              imageUrl: item.menuPhoto,
+                              menuName: item.menuName!,
+                              dsc: item.menuDesc!,
+                              menuPrice: formatNumberWithThousandsSeparator(
+                                  item.menuPrice!),
+                              merchantName: dataMerchant!.merchantName!,
+                            );
+                          },
                           onPressed: () {},
                           onTapAdd: () {},
                           onTapRemove: () {},
@@ -1892,6 +2010,21 @@ class _CanteenScreenState extends State<CanteenScreen>
                                 menuId: item.id!,
                                 updateState: updateState,
                                 menuItem: item);
+                          },
+                          onPressedShare: () {
+                            onTapOpenShareOption(
+                              context,
+                              pathSegment: 'menu',
+                              menuId: item.id.toString(),
+                              merchantId: dataMerchant!.merchantId.toString(),
+                              merchantType: dataMerchant!.merchantType,
+                              imageUrl: item.menuPhoto,
+                              menuName: item.menuName!,
+                              dsc: item.menuDesc!,
+                              menuPrice: formatNumberWithThousandsSeparator(
+                                  item.menuPrice!),
+                              merchantName: dataMerchant!.merchantName!,
+                            );
                           },
                           onPressed: () {
                             // perbaiki
@@ -2113,3 +2246,87 @@ class _CanteenScreenState extends State<CanteenScreen>
     );
   }
 }
+
+// String encryptUrl(
+//   String url,
+//   Map<String, String> keyMap,
+//   Map<String, String> numberMap,
+// ) {
+//   log(keyMap.toString());
+//   // Parsing URL
+//   final uri = Uri.parse(url);
+
+//   // Ganti path URL sesuai dengan keyMap
+//   String path = uri.path;
+//   String encryptedPath = path;
+//   keyMap.forEach((key, value) {
+//     if (encryptedPath.contains(key)) {
+//       encryptedPath = encryptedPath.replaceAll(key, value);
+//     }
+//   });
+
+//   // Ganti query parameter
+//   final queryParameters = uri.queryParameters;
+//   final encryptedParams = <String, String>{};
+//   queryParameters.forEach((key, value) {
+//     // Ganti kunci sesuai dengan keyMap
+//     String newKey = keyMap[key].toString();
+//     log("new key : $newKey");
+//     String encryptedKey = keyMap[key] ?? key;
+//     // Ganti nilai jika berupa angka
+//     String encryptedValue = value;
+//     if (numberMap.containsKey(value)) {
+//       encryptedValue = numberMap[value] ?? value;
+//     }
+//     encryptedParams[encryptedKey] = encryptedValue;
+//   });
+//   log('queryParameters : $queryParameters');
+//   log('encryptedParams : $encryptedParams');
+
+//   final encryptedUri = uri.replace(path: encryptedPath, queryParameters: encryptedParams);
+//   return encryptedUri.toString();
+// }
+
+// String decryptUrl(
+//   String url,
+//   Map<String, String> keyMap,
+//   Map<String, String> numberMap,
+// ) {
+//   // Parsing URL
+//   final uri = Uri.parse(url);
+
+//   // Ganti path URL sesuai dengan keyMap
+//   String path = uri.path;
+//   String decryptedPath = path;
+//   keyMap.forEach((value, key) {
+//     if (decryptedPath.contains(value)) {
+//       decryptedPath = decryptedPath.replaceAll(value, key);
+//     }
+//   });
+
+//   // Ganti query parameter
+//   final queryParameters = uri.queryParameters;
+//   final decryptedParams = <String, String>{};
+//   queryParameters.forEach((key, value) {
+//     // Ganti kunci sesuai dengan keyMap
+//     String decryptedKey = keyMap.entries
+//         .firstWhere(
+//           (entry) => entry.value == key,
+//           orElse: () => MapEntry(key, key),
+//         )
+//         .key;
+
+//     // Ganti nilai jika berupa angka
+//     String decryptedValue = value;
+//     if (numberMap.containsValue(value)) {
+//       decryptedValue = numberMap.entries
+//           .firstWhere((entry) => entry.value == value)
+//           .key;
+//     }
+
+//     decryptedParams[decryptedKey] = decryptedValue;
+//   });
+
+//   final decryptedUri = uri.replace(path: decryptedPath, queryParameters: decryptedParams);
+//   return decryptedUri.toString();
+// }

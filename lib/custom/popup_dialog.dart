@@ -13,6 +13,7 @@ Future<void> showMyCustomDialog(
   final Color? colorYes,
   final Color? colorNO,
   final bool justYEs = false,
+  final Widget? content,
 }) async {
   return showDialog<void>(
     context: context,
@@ -26,6 +27,7 @@ Future<void> showMyCustomDialog(
           style: AppTextStyles.textRegular,
           textAlign: TextAlign.center,
         ),
+        content: content,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
         ),

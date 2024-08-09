@@ -1,4 +1,3 @@
-
 import 'package:cfood/custom/shimmer.dart';
 import 'package:cfood/style.dart';
 import 'package:cfood/utils/common.dart';
@@ -132,6 +131,23 @@ class ProductCardBox extends StatelessWidget {
                             fit: BoxFit.cover,
                             width: double.infinity,
                             height: double.infinity,
+                             loadingBuilder:
+                                        (context, child, loadingProgress) {
+                                      bool shimmerEnabled =
+                                          loadingProgress != null
+                                              ? true
+                                              : false;
+                                      if (loadingProgress == null) {
+                                        return child;
+                                      } else {
+                                        return shimmerBox(
+                                          enabled: shimmerEnabled,
+                                          height: double.infinity,
+                                          width: double.infinity,
+                                          // radius: 8,
+                                        );
+                                      }
+                                    },
                           ),
                   ),
                   if (isDanus ??
@@ -403,6 +419,23 @@ class ProductCardBoxHorizontal extends StatelessWidget {
                                   child: Image.network(
                                     imgUrl!,
                                     fit: BoxFit.cover,
+                                    loadingBuilder:
+                                        (context, child, loadingProgress) {
+                                      bool shimmerEnabled =
+                                          loadingProgress != null
+                                              ? true
+                                              : false;
+                                      if (loadingProgress == null) {
+                                        return child;
+                                      } else {
+                                        return shimmerBox(
+                                          enabled: shimmerEnabled,
+                                          height: innerContentSize ?? 133,
+                                          width: double.infinity,
+                                          radius: 8,
+                                        );
+                                      }
+                                    },
                                   )),
                         ),
                         Align(
@@ -447,6 +480,21 @@ class ProductCardBoxHorizontal extends StatelessWidget {
                             child: Image.network(
                               imgUrl!,
                               fit: BoxFit.cover,
+                              loadingBuilder:
+                                  (context, child, loadingProgress) {
+                                bool shimmerEnabled =
+                                    loadingProgress != null ? true : false;
+                                if (loadingProgress == null) {
+                                  return child;
+                                } else {
+                                  return shimmerBox(
+                                    enabled: shimmerEnabled,
+                                    height: innerContentSize ?? 133,
+                                    width: double.infinity,
+                                    radius: 8,
+                                  );
+                                }
+                              },
                             )),
                   ),
             Expanded(
@@ -805,6 +853,20 @@ class CanteenCardBox extends StatelessWidget {
                     : Image.network(
                         imgUrl!,
                         fit: BoxFit.cover,
+                        loadingBuilder: (context, child, loadingProgress) {
+                          bool shimmerEnabled =
+                              loadingProgress != null ? true : false;
+                          if (loadingProgress == null) {
+                            return child;
+                          } else {
+                            return shimmerBox(
+                              enabled: shimmerEnabled,
+                              height: 130,
+                              width: 130,
+                              radius: 8,
+                            );
+                          }
+                        },
                       ),
               ),
             ),
@@ -1052,6 +1114,20 @@ class OrganizationCardBox extends StatelessWidget {
                           fit: BoxFit.cover,
                           width: 80,
                           height: 80,
+                          loadingBuilder: (context, child, loadingProgress) {
+                            bool shimmerEnabled =
+                                loadingProgress != null ? true : false;
+                            if (loadingProgress == null) {
+                              return child;
+                            } else {
+                              return shimmerBox(
+                                enabled: shimmerEnabled,
+                                height: 80,
+                                width: 80,
+                                radius: 8,
+                              );
+                            }
+                          },
                         )
                       : Container(
                           height: 80,

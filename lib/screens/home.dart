@@ -4,6 +4,7 @@ import 'package:cfood/custom/CButtons.dart';
 import 'package:cfood/custom/CPageMover.dart';
 import 'package:cfood/custom/card.dart';
 import 'package:cfood/custom/reload_indicator.dart';
+import 'package:cfood/custom/shimmer.dart';
 import 'package:cfood/model/getl_all_merchant_response.dart';
 import 'package:cfood/model/get_all_menu_response.dart';
 import 'package:cfood/model/get_all_organization_response.dart';
@@ -208,7 +209,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     title: InkWell(
                       onTap: () {
                         print('go to search page');
-                        navigateTo(context, SearchScreen(campusId: AppConfig.USER_CAMPUS_ID,));
+                        navigateTo(
+                            context,
+                            SearchScreen(
+                              campusId: AppConfig.USER_CAMPUS_ID,
+                            ));
                       },
                       borderRadius: BorderRadius.circular(58),
                       focusColor: Warna.abu,
@@ -435,11 +440,20 @@ class _HomeScreenState extends State<HomeScreen> {
             textAlign: TextAlign.left,
           ),
         ),
+
         SizedBox(
           // lagi di bikin
-          height: 315,
+          height: dataMenus?.content == null ? 245 : 315,
           child: dataMenus?.content == null
-              ? Container()
+              ? SizedBox(
+                  height: 245,
+                  child: shimmerListBuilder(
+                    context,
+                    enabled: dataMenus?.content == null ? true : false,
+                    isVertical: false,
+                    itemCount: 3,
+                  ),
+                )
               : ListView.builder(
                   itemCount: dataMenus?.content!.length,
                   physics: const BouncingScrollPhysics(),
@@ -554,10 +568,21 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
         ),
+
         SizedBox(
-          height: 224,
+          height: dataOrganizations?.organizations == null ? 200 : 224,
           child: dataOrganizations?.organizations == null
-              ? Container()
+              ? SizedBox(
+                  height: 200,
+                  child: shimmerListBuilder(
+                    context,
+                    enabled:
+                        dataOrganizations?.organizations == null ? true : false,
+                    isVertical: false,
+                    isBox: true,
+                    itemCount: 3,
+                  ),
+                )
               : ListView.builder(
                   itemCount: dataOrganizations?.organizations!.length,
                   physics: const BouncingScrollPhysics(),
@@ -597,7 +622,12 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         dataMerchants?.merchants == null
-            ? Container()
+            ? shimmerListBuilder(
+                context,
+                enabled: dataMerchants?.merchants == null ? true : false,
+                isVertical: true,
+                itemCount: 3,
+              )
             : ListView.builder(
                 itemCount: dataMerchants?.merchants?.length,
                 physics: const NeverScrollableScrollPhysics(),
@@ -631,8 +661,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   );
                 },
               ),
-
-        // shimmerListBuilder(context, item)
 
         const SizedBox(
           height: 100,

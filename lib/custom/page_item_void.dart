@@ -38,11 +38,11 @@ Widget itemsEmptyBody(BuildContext context,
 }
 
 
-Widget pageOnLoading(BuildContext context) {
+Widget pageOnLoading(BuildContext context, {Color? bgColor}) {
   return Container(
     height: double.infinity,
     width: double.infinity,
-    color: Colors.white,
+    color: bgColor ?? Colors.white,
     child: Center(
       child: SizedBox(
         height: 50,

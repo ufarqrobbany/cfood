@@ -26,6 +26,8 @@ class Constant {
 class AppConfig {
   static const String BASE_URL = "http://cfood.id/api/";
 
+  static const String APPLINK_DOMAIN = "https://campusfood.id/";
+
   static int USER_ID = 0;
 
   static int STUDENT_ID = 0;
@@ -59,6 +61,8 @@ class AppConfig {
   static bool MERCHANT_OPEN = false;
 
   static bool ON_DASHBOARD = false;
+
+  static bool FROM_LINK = false;
 }
 
 class MenuConfig {

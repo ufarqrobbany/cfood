@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:app_links/app_links.dart';
 import 'package:cfood/custom/CPageMover.dart';
@@ -30,6 +31,7 @@ import 'package:cfood/screens/user_info.dart';
 import 'package:cfood/screens/verification.dart';
 
 import 'package:cfood/style.dart';
+import 'package:cfood/utils/auth.dart';
 // import 'package:cfood/utils/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -55,9 +57,8 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  final _navigatorKey = GlobalKey<NavigatorState>();
-  late AppLinks _appLinks;
-  StreamSubscription<Uri>? _linkSubscription;
+  
+
   @override
   void initState() {
     // Mengatur gaya overlay sistem saat aplikasi diinisialisasi
@@ -67,31 +68,11 @@ class _MyAppState extends State<MyApp> {
       statusBarIconBrightness:
           Brightness.light, // Mengatur ikon status bar menjadi putih
     ));
+    // initDeepLinks();
     super.initState();
-
-    initDeepLinks();
   }
 
-  @override
-  void dispose() {
-    _linkSubscription?.cancel();
-
-    super.dispose();
-  }
-
-  Future<void> initDeepLinks() async {
-    _appLinks = AppLinks();
-
-    // Handle links
-    _linkSubscription = _appLinks.uriLinkStream.listen((uri) {
-      debugPrint('onAppLink: $uri');
-      openAppLink(uri);
-    });
-  }
-
-  void openAppLink(Uri uri) {
-    _navigatorKey.currentState?.pushNamed(uri.fragment);
-  }
+  
 
   // This widget is the root of your application.
   @override
@@ -99,7 +80,7 @@ class _MyAppState extends State<MyApp> {
     debugPrint('on main main');
     return MaterialApp(
       initialRoute: '/splash',
-      navigatorObservers: [RouteLogger()], 
+      navigatorObservers: [RouteLogger()],
       onGenerateInitialRoutes: (String initialRouteName) {
         debugPrint('Generating initial route: $initialRouteName');
         List<Route<dynamic>> initialRoutes;
@@ -113,70 +94,188 @@ class _MyAppState extends State<MyApp> {
           ];
         } else {
           initialRoutes = [
-            MaterialPageRoute(builder: (context) => const StartUpScreen())
+            MaterialPageRoute(builder: (context) => const SplashScreen())
           ];
         }
+        // else {
+        //   if (dataUser!['id'] == '' &&
+        //       dataUser!['email'] == '' &&
+        //       dataUser!['password'] == '') {
+        //     initialRoutes = [
+        //       MaterialPageRoute(builder: (context) => const LoginScreen())
+        //     ];
+        //   } else {
+        //     if (initialRouteName == '/menu') {
+        //       initialRoutes = [
+        //         MaterialPageRoute(
+        //             builder: (context) => CanteenScreen(
+        //                   menuId: menuId,
+        //                   merchantId: int.parse(merchantId),
+        //                   merchantType: merchantType,
+        //                 ))
+        //       ];
+        //     } else if (initialRouteName == '/merchant') {
+        //       initialRoutes = [
+        //         MaterialPageRoute(
+        //             builder: (context) => CanteenScreen(
+        //                   merchantId: int.parse(merchantId),
+        //                   merchantType: merchantType,
+        //                   isOwner: false,
+        //                 ))
+        //       ];
+        //     } else {
+        //       initialRoutes = [
+        //         MaterialPageRoute(builder: (context) => const MainScreen())
+        //       ];
+        //     }
+        //   }
+        // }
+        log("######### initialroutes on startup : $initialRoutes ##########");
         return initialRoutes;
       },
       onGenerateRoute: (settings) {
         debugPrint('Navigating to ${settings.name}');
         switch (settings.name) {
           case '/splash':
-            return MaterialPageRoute(settings: settings, builder: (context) => const SplashScreen(), );
+            return MaterialPageRoute(
+              settings: settings,
+              builder: (context) => const SplashScreen(),
+            );
           case '/startup':
-            return MaterialPageRoute(settings: settings, builder: (context) => const StartUpScreen(), );
+            return MaterialPageRoute(
+              settings: settings,
+              builder: (context) => const StartUpScreen(),
+            );
           case '/login':
-            return MaterialPageRoute(settings: settings, builder: (context) => const LoginScreen(),);
+            return MaterialPageRoute(
+              settings: settings,
+              builder: (context) => const LoginScreen(),
+            );
           case '/register':
-            return MaterialPageRoute(settings: settings, builder: (context) => const SignupScreen(),);
+            return MaterialPageRoute(
+              settings: settings,
+              builder: (context) => const SignupScreen(),
+            );
           case '/register-student':
-            return MaterialPageRoute(settings: settings, builder: (context) => const SignUpStudentScreen(),);
+            return MaterialPageRoute(
+              settings: settings,
+              builder: (context) => const SignUpStudentScreen(),
+            );
           case '/verification':
-            return MaterialPageRoute(settings: settings, builder: (context) => VerificationScreen(),);
+            return MaterialPageRoute(
+              settings: settings,
+              builder: (context) => VerificationScreen(),
+            );
           case '/verification-success':
-            return MaterialPageRoute(settings: settings, builder: (context) => VerificationSuccess(),);
+            return MaterialPageRoute(
+              settings: settings,
+              builder: (context) => VerificationSuccess(),
+            );
           case '/create-pass':
-            return MaterialPageRoute(settings: settings, builder: (context) => CreatePasswordScreen(),);
+            return MaterialPageRoute(
+              settings: settings,
+              builder: (context) => CreatePasswordScreen(),
+            );
           case '/forgot-pass':
-            return MaterialPageRoute(settings: settings, builder: (context) => const ForgotPasswordScreen(),);
+            return MaterialPageRoute(
+              settings: settings,
+              builder: (context) => const ForgotPasswordScreen(),
+            );
           case '/':
-            return MaterialPageRoute(settings: settings, builder: (context) => const MainScreen(),);
+            return MaterialPageRoute(
+              settings: settings,
+              builder: (context) => const MainScreen(),
+            );
           case '/home':
-            return MaterialPageRoute(settings: settings, builder: (context) => const HomeScreen(),);
+            return MaterialPageRoute(
+              settings: settings,
+              builder: (context) => const HomeScreen(),
+            );
           case '/cart':
-            return MaterialPageRoute(settings: settings, builder: (context) => const CartScreen(),);
+            return MaterialPageRoute(
+              settings: settings,
+              builder: (context) => const CartScreen(),
+            );
           case '/order':
-            return MaterialPageRoute(settings: settings, builder: (context) => const OrderScreen(),);
+            return MaterialPageRoute(
+              settings: settings,
+              builder: (context) => const OrderScreen(),
+            );
           case '/order-detail':
-            return MaterialPageRoute(settings: settings, builder: (context) => const OrderDetailScreen(),);
+            return MaterialPageRoute(
+              settings: settings,
+              builder: (context) => const OrderDetailScreen(),
+            );
           case '/order-status':
-            return MaterialPageRoute(settings: settings, builder: (context) => const OrderStatusScreen(),);
+            return MaterialPageRoute(
+              settings: settings,
+              builder: (context) => const OrderStatusScreen(),
+            );
           case '/inbox':
-            return MaterialPageRoute(settings: settings, builder: (context) => InboxScreen(),);
+            return MaterialPageRoute(
+              settings: settings,
+              builder: (context) => InboxScreen(),
+            );
           case '/chat':
-            return MaterialPageRoute(settings: settings, builder: (context) => ChatScreen(),);
+            return MaterialPageRoute(
+              settings: settings,
+              builder: (context) => ChatScreen(),
+            );
           case '/organization':
-            return MaterialPageRoute(settings: settings, builder: (context) => const OrganizationScreen(),);
+            return MaterialPageRoute(
+              settings: settings,
+              builder: (context) => const OrganizationScreen(),
+            );
           case '/see-all':
-            return MaterialPageRoute(settings: settings, builder: (context) => const SeeAllItemsScreen(),);
+            return MaterialPageRoute(
+              settings: settings,
+              builder: (context) => const SeeAllItemsScreen(),
+            );
           case '/profile':
-            return MaterialPageRoute(settings: settings, builder: (context) => ProfileScreen(),);
+            return MaterialPageRoute(
+              settings: settings,
+              builder: (context) => ProfileScreen(),
+            );
           case '/user-info':
-            return MaterialPageRoute(settings: settings, builder: (context) => const UserInformationScreen(),);
+            return MaterialPageRoute(
+              settings: settings,
+              builder: (context) => const UserInformationScreen(),
+            );
           case '/favorite':
-            return MaterialPageRoute(settings: settings, builder: (context) => const FavoriteScreen(),);
+            return MaterialPageRoute(
+              settings: settings,
+              builder: (context) => const FavoriteScreen(),
+            );
           case '/canteen':
-            return MaterialPageRoute(settings: settings, builder: (context) => const CanteenScreen(),);
+            return MaterialPageRoute(
+              settings: settings,
+              builder: (context) => const CanteenScreen(),
+            );
           case '/review':
-            return MaterialPageRoute(settings: settings, builder: (context) => const ReviewScreen(),);
+            return MaterialPageRoute(
+              settings: settings,
+              builder: (context) => const ReviewScreen(),
+            );
           case '/main-canteen':
-            return MaterialPageRoute(settings: settings, builder: (context) => const MainScreenCanteen(),);
+            return MaterialPageRoute(
+              settings: settings,
+              builder: (context) => const MainScreenCanteen(),
+            );
           case '/order-canteen':
-            return MaterialPageRoute(settings: settings, builder: (context) => const OrderCanteenScreen(),);
+            return MaterialPageRoute(
+              settings: settings,
+              builder: (context) => const OrderCanteenScreen(),
+            );
           case '/transaction':
-            return MaterialPageRoute(settings: settings, builder: (context) => const TransactionScreen(),);
+            return MaterialPageRoute(
+              settings: settings,
+              builder: (context) => const TransactionScreen(),
+            );
           default:
-            return MaterialPageRoute(settings: settings, builder: (context) => const SplashScreen(),);
+            return MaterialPageRoute(
+              settings: settings,
+              builder: (context) => const SplashScreen(),
+            );
         }
       },
       routes: {

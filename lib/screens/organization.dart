@@ -4,8 +4,10 @@ import 'package:cfood/custom/CButtons.dart';
 import 'package:cfood/custom/CPageMover.dart';
 import 'package:cfood/custom/card.dart';
 import 'package:cfood/custom/reload_indicator.dart';
+import 'package:cfood/custom/sharee.dart';
 import 'package:cfood/model/get_detail_organization_response.dart';
 import 'package:cfood/screens/canteen.dart';
+import 'package:cfood/screens/main.dart';
 import 'package:cfood/style.dart';
 import 'package:community_material_icon/community_material_icon.dart';
 import 'package:flutter/material.dart';
@@ -83,8 +85,17 @@ class _OrganizationScreenState extends State<OrganizationScreen>
       appBar: AppBar(
         leadingWidth: 90,
         leading: backButtonCustom(
-          context: context,
-        ),
+            context: context,
+            customTap: () {
+              if (AppConfig.FROM_LINK) {
+                navigateToRep(context, const MainScreen());
+                setState(() {
+                  AppConfig.FROM_LINK = false;
+                });
+              } else {
+                navigateBack(context);
+              }
+            }),
         backgroundColor: Colors.white,
         foregroundColor: Colors.white,
         scrolledUnderElevation: 10,
@@ -93,7 +104,15 @@ class _OrganizationScreenState extends State<OrganizationScreen>
         actions: [
           actionButtonCustom(
             icons: UIcons.solidRounded.share,
-            onPressed: () {},
+            onPressed: () {
+              onTapOpenShareOption(
+                context,
+                pathSegment: 'danus',
+                danusId: widget.id.toString(),
+                imageUrl: dataOrganization!.organizationLogo,
+                danusName: dataOrganization!.organizationName!,
+              );
+            },
           ),
           const SizedBox(
             width: 25,
@@ -143,14 +162,16 @@ class _OrganizationScreenState extends State<OrganizationScreen>
                                 child: Center(
                                   child: SizedBox(
                                     width: 50,
-                                    child: LoadingAnimationWidget.staggeredDotsWave(
-                                        color: Warna.biru, size: 30),
+                                    child: LoadingAnimationWidget
+                                        .staggeredDotsWave(
+                                            color: Warna.biru, size: 30),
                                   ),
                                 ),
                               );
                             }
                           },
-                          errorBuilder: (context, error, stackTrace) => Container(
+                          errorBuilder: (context, error, stackTrace) =>
+                              Container(
                             height: 200,
                             width: double.infinity,
                             color: Warna.abu2,
