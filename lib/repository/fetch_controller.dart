@@ -30,7 +30,7 @@ class FetchController {
     return Uri.parse('$baseUrl$endpoint');
   }
 
-  Future<dynamic> getData() async {
+  Future<dynamic> getData({bool ignoreErrorToast = false}) async {
     Uri url = getUrl();
     final response = await http.get(
       url,
@@ -47,7 +47,9 @@ class FetchController {
     } else {
       ErrorResponse data = errorResponseFromJson(response.body);
       log(response.body);
-      showToast(data.error!);
+      if (ignoreErrorToast == false) {
+        showToast(data.error!);
+      }
       throw Exception(data.status);
     }
   }
@@ -134,7 +136,7 @@ class FetchController {
     required String dataKeyName,
     required Map<String, dynamic> data,
     required File file,
-    required String fileKeyName, 
+    required String fileKeyName,
     bool customToJson = false,
     var dataFromCustomToJson,
     // required List<MultipartFile> files,
