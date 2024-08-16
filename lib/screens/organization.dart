@@ -3,8 +3,10 @@ import 'dart:developer';
 import 'package:cfood/custom/CButtons.dart';
 import 'package:cfood/custom/CPageMover.dart';
 import 'package:cfood/custom/card.dart';
+import 'package:cfood/custom/page_item_void.dart';
 import 'package:cfood/custom/reload_indicator.dart';
 import 'package:cfood/custom/sharee.dart';
+import 'package:cfood/custom/shimmer.dart';
 import 'package:cfood/model/get_detail_organization_response.dart';
 import 'package:cfood/screens/canteen.dart';
 import 'package:cfood/screens/main.dart';
@@ -136,51 +138,64 @@ class _OrganizationScreenState extends State<OrganizationScreen>
               // ),
               SliverList(
                   delegate: SliverChildListDelegate([
-                Container(
-                  width: double.infinity,
-                  height: 170,
-                  padding: const EdgeInsets.only(bottom: 25),
-                  child: Center(
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(150),
-                      child: SizedBox(
-                        height: 150,
-                        width: 150,
-                        child: Image.network(
-                          logoOrganization ?? './jpg',
-                          fit: BoxFit.cover,
-                          loadingBuilder: (context, child, loadingProgress) {
-                            if (loadingProgress == null) {
-                              // Jika loadingProgress null, itu berarti gambar sudah selesai dimuat
-                              return child;
-                            } else {
-                              // Tampilkan loading indicator selama gambar belum selesai dimuat
-                              return Container(
-                                height: 200,
-                                width: double.infinity,
-                                color: Warna.abu2,
-                                child: Center(
-                                  child: SizedBox(
-                                    width: 50,
-                                    child: LoadingAnimationWidget
-                                        .staggeredDotsWave(
-                                            color: Warna.biru, size: 30),
-                                  ),
+                dataOrganization == null
+                    ? Center(
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 25),
+                        child: shimmerBox(
+                            enabled: true,
+                            height: 150,
+                            width: 150,
+                            radius: 150,
+                          ),
+                      ),
+                    )
+                    : Container(
+                        width: double.infinity,
+                        height: 170,
+                        padding: const EdgeInsets.only(bottom: 25),
+                        child: Center(
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(150),
+                            child: SizedBox(
+                              height: 150,
+                              width: 150,
+                              child: Image.network(
+                                logoOrganization ?? './jpg',
+                                fit: BoxFit.cover,
+                                loadingBuilder:
+                                    (context, child, loadingProgress) {
+                                  if (loadingProgress == null) {
+                                    // Jika loadingProgress null, itu berarti gambar sudah selesai dimuat
+                                    return child;
+                                  } else {
+                                    // Tampilkan loading indicator selama gambar belum selesai dimuat
+                                    return Container(
+                                      height: 200,
+                                      width: double.infinity,
+                                      color: Warna.abu2,
+                                      child: Center(
+                                        child: SizedBox(
+                                          width: 50,
+                                          child: LoadingAnimationWidget
+                                              .staggeredDotsWave(
+                                                  color: Warna.biru, size: 30),
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                },
+                                errorBuilder: (context, error, stackTrace) =>
+                                    Container(
+                                  height: 200,
+                                  width: double.infinity,
+                                  color: Warna.abu2,
                                 ),
-                              );
-                            }
-                          },
-                          errorBuilder: (context, error, stackTrace) =>
-                              Container(
-                            height: 200,
-                            width: double.infinity,
-                            color: Warna.abu2,
+                              ),
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ),
-                ),
               ])),
               SliverList(
                 delegate: SliverChildListDelegate(
@@ -225,6 +240,7 @@ class _OrganizationScreenState extends State<OrganizationScreen>
               const SizedBox(
                 width: 15,
               ),
+              dataOrganization == null ? shimmerBox(enabled: true, height: 20, width: 180, radius: 8) :
               Text(
                 '${dataOrganization?.organizationName}',
                 style: AppTextStyles.title,
@@ -235,6 +251,7 @@ class _OrganizationScreenState extends State<OrganizationScreen>
           const SizedBox(
             height: 12,
           ),
+          dataOrganization == null ? shimmerBox(enabled: true, height: 15, width: 100, radius: 8) :
           Text(
             '${dataOrganization?.totalActivity} Kegiatan',
             style: AppTextStyles.textRegular,
@@ -242,6 +259,17 @@ class _OrganizationScreenState extends State<OrganizationScreen>
           const SizedBox(
             height: 16,
           ),
+          dataOrganization == null ? Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              shimmerBox(enabled: true, height: 20, width: 80, radius: 8),
+              const SizedBox(
+                width: 8,
+              ),
+              shimmerBox(enabled: true, height: 20, width: 80, radius: 8),
+            ],
+          ) :
           Row(
             children: [
               Container(
@@ -328,44 +356,58 @@ class _OrganizationScreenState extends State<OrganizationScreen>
         const SizedBox(
           height: 20,
         ),
-        ListView.builder(
-          itemCount: organizationMaps[selectedTab]?.length ?? 0,
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemBuilder: (context, index) {
-            var merchants = organizationMaps[selectedTab]!;
-            var merchant = merchants[index];
-            log('Merchant data: ${merchant.toString()}');
-            debugPrint('Merchant data: ${merchant.toString()}');
-            return Container(
-                color: Colors.white,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 25,
-                ),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                  child: CanteenCardBox(
-                    canteenId: '${merchant.merchantId}',
-                    imgUrl:
-                        '${AppConfig.URL_IMAGES_PATH}${merchant?.merchantPhoto}',
-                    canteenName: merchant.merchantName,
-                    likes: ' ${merchant?.followers}',
-                    rate: '${merchant?.rating}',
-                    type: merchant?.merchantType,
-                    open: merchant!.open!,
-                    danus: merchant.danus!,
-                    onPressed: () => navigateTo(
-                        context,
-                        CanteenScreen(
-                          merchantId: merchant.merchantId,
-                          isOwner: false,
-                          merchantType: merchant.merchantType!,
-                          itsDanusan: merchant.danus,
-                        )),
+        dataOrganization == null
+            ? shimmerListBuilder(
+                context,
+                enabled: organizationMaps[selectedTab] == [] ? true : false,
+                isVertical: true,
+                itemCount: 3,
+              )
+            : organizationMaps[selectedTab]!.length == 0
+                ? itemsEmptyBody(context,
+                    bgcolors: Colors.white,
+                    icons: Icons.store_rounded,
+                    iconsColor: Warna.kuning,
+                    text:
+                        'Danus ${dataOrganization!.organizationName} belum memiliki Toko.')
+                : ListView.builder(
+                    itemCount: organizationMaps[selectedTab]?.length ?? 0,
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemBuilder: (context, index) {
+                      var merchants = organizationMaps[selectedTab]!;
+                      var merchant = merchants[index];
+                      log('Merchant data: ${merchant.toString()}');
+                      debugPrint('Merchant data: ${merchant.toString()}');
+                      return Container(
+                          color: Colors.white,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 25,
+                          ),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            child: CanteenCardBox(
+                              canteenId: '${merchant.merchantId}',
+                              imgUrl:
+                                  '${AppConfig.URL_IMAGES_PATH}${merchant?.merchantPhoto}',
+                              canteenName: merchant.merchantName,
+                              likes: ' ${merchant?.followers}',
+                              rate: '${merchant?.rating}',
+                              type: merchant?.merchantType,
+                              open: merchant!.open!,
+                              danus: merchant.danus!,
+                              onPressed: () => navigateTo(
+                                  context,
+                                  CanteenScreen(
+                                    merchantId: merchant.merchantId,
+                                    isOwner: false,
+                                    merchantType: merchant.merchantType!,
+                                    itsDanusan: merchant.danus,
+                                  )),
+                            ),
+                          ));
+                    },
                   ),
-                ));
-          },
-        ),
       ],
     );
   }

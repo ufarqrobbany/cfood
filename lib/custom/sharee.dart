@@ -97,6 +97,7 @@ Map<String, String> randomDataMap = {
 
     log(textShare);
     showMyCustomDialog(context,
+    barrierDismissible: true,
         text: pathSegment == 'menu' ? menuName : pathSegment == 'merchant' ? merchantName : pathSegment == 'danus' ? danusName : 'Share!!',
         content: Column(
           mainAxisSize: MainAxisSize.min,

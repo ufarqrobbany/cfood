@@ -1258,7 +1258,14 @@ class _CanteenScreenState extends State<CanteenScreen>
             height: 16,
           ),
           dataMerchant == null
-              ? shimmerBox(enabled: true, height: 15, width: 190, radius: 8)
+              ? Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  shimmerBox(enabled: true, height: 15, width: 250, radius: 8),
+                  const SizedBox(height: 5,),
+                  shimmerBox(enabled: true, height: 15, width: 190, radius: 8),
+                ],
+              )
               : Text(
                   '${dataMerchant?.merchantDesc}',
                   style: AppTextStyles.textRegular,

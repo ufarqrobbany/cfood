@@ -14,10 +14,11 @@ Future<void> showMyCustomDialog(
   final Color? colorNO,
   final bool justYEs = false,
   final Widget? content,
+  final bool barrierDismissible = false,
 }) async {
   return showDialog<void>(
     context: context,
-    barrierDismissible: false, // user must tap button!
+    barrierDismissible: barrierDismissible, // user must tap button!
     builder: (BuildContext context) {
       return AlertDialog(
         // actionsPadding: const EdgeInsets.all(10),

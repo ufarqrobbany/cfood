@@ -49,6 +49,7 @@ class _OrderConfirmScreenState extends State<OrderConfirmScreen> {
   ConfirmCartResponse? confirmCartResponse;
   DataConfirmCart? dataConfirmCart;
   String selectedPaymentMethod = '';
+  String selectedPaymentMethodName = '';
 
   @override
   void initState() {
@@ -176,14 +177,14 @@ class _OrderConfirmScreenState extends State<OrderConfirmScreen> {
                               const BorderRadius.all(Radius.circular(100)),
                           child:
                               dataConfirmCart?.userInformation.userPhoto == null
-                                  ?  Container(
-                                    height: 40,
-                                    width: 40,
-                                    decoration: BoxDecoration(
-                                      color: Warna.abu,
-                                      borderRadius: BorderRadius.circular(50),
-                                    ),
-                                    child: Icon(Icons.person))
+                                  ? Container(
+                                      height: 40,
+                                      width: 40,
+                                      decoration: BoxDecoration(
+                                        color: Warna.abu,
+                                        borderRadius: BorderRadius.circular(50),
+                                      ),
+                                      child: Icon(Icons.person))
                                   : Image.network(
                                       "${AppConfig.URL_IMAGES_PATH}${dataConfirmCart!.userInformation.userPhoto}",
                                       fit: BoxFit.cover,
@@ -198,15 +199,22 @@ class _OrderConfirmScreenState extends State<OrderConfirmScreen> {
                             fontWeight: FontWeight.w500,
                           ),
                         ),
-                        subtitle: dataConfirmCart!.userInformation.studentInformation == null ? null : Text(
-                          dataConfirmCart!.userInformation.studentInformation!
-                              .studyProgramInformation.studyProgramName,
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: Warna.abu4,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
+                        subtitle: dataConfirmCart!
+                                    .userInformation.studentInformation ==
+                                null
+                            ? null
+                            : Text(
+                                dataConfirmCart!
+                                    .userInformation
+                                    .studentInformation!
+                                    .studyProgramInformation
+                                    .studyProgramName,
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: Warna.abu4,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
                       ),
                       Divider(
                         height: 10,
@@ -226,6 +234,32 @@ class _OrderConfirmScreenState extends State<OrderConfirmScreen> {
                       const SizedBox(
                         height: 20,
                       ),
+                      selectedPaymentMethod == '' ? Container() :
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Metode Pembayaran',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.normal,
+                              color: Warna.regulerFontColor,
+                            ),
+                          ),
+                          Text(
+                            selectedPaymentMethodName,
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.normal,
+                              color: Warna.biru,
+                            ),
+                          )
+                        ],
+                      ),
+                      selectedPaymentMethod == '' ? Container() :
+                      const SizedBox(
+                        height: 20,
+                      ),
                       SizedBox(
                         height: 50,
                         width: double.infinity,
@@ -236,7 +270,8 @@ class _OrderConfirmScreenState extends State<OrderConfirmScreen> {
                               navigateTo(context, const PaymentMethodScreen())
                                   .then((value) {
                                 setState(() {
-                                  selectedPaymentMethod = value;
+                                  selectedPaymentMethodName = value['name'];
+                                  selectedPaymentMethod = value['code'];
                                   log('payement method : $selectedPaymentMethod');
                                 });
                               });
