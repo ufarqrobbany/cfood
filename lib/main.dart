@@ -2,7 +2,9 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:app_links/app_links.dart';
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:cfood/custom/CPageMover.dart';
+import 'package:cfood/repository/notifications.dart';
 import 'package:cfood/screens/canteen.dart';
 import 'package:cfood/screens/cart.dart';
 import 'package:cfood/screens/chat.dart';
@@ -46,10 +48,16 @@ void main() async {
   //   log('${details.context}');
   // };
   await initializeDateFormatting('id_ID', null);
+  WidgetsFlutterBinding.ensureInitialized();
+  await NotificationController.initializeLocalNotifications();
+  await NotificationController.initializeIsolateReceivePort();
   runApp(const MyApp());
 }
 
 class MyApp extends StatefulWidget {
+  static final GlobalKey<NavigatorState> navigatorKey =
+      GlobalKey<NavigatorState>();
+
   const MyApp({super.key});
 
   @override
@@ -57,8 +65,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  
-
   @override
   void initState() {
     // Mengatur gaya overlay sistem saat aplikasi diinisialisasi
@@ -69,16 +75,37 @@ class _MyAppState extends State<MyApp> {
           Brightness.light, // Mengatur ikon status bar menjadi putih
     ));
     // initDeepLinks();
+    AwesomeNotifications().setListeners(
+      onActionReceivedMethod: (receivedAction) {
+        log(receivedAction.toString());
+        return NotificationController().onActionReceivedMethod(receivedAction, context);
+      },
+      onNotificationCreatedMethod: (receivedNotification) {
+        return NotificationController.onNotificationCreatedMethod(receivedNotification, context);
+      },
+      onDismissActionReceivedMethod: (receivedAction) {
+        return NotificationController.onDismissActionReceivedMethod(receivedAction);
+      },
+      onNotificationDisplayedMethod: (receivedNotification) {
+        return NotificationController.onNotificationDisplayedMethod(receivedNotification);
+      },
+      
+    );
     super.initState();
   }
 
-  
+  @override
+  void dispose() {
+    AwesomeNotifications().dispose();
+    super.dispose();
+  }
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     debugPrint('on main main');
     return MaterialApp(
+      navigatorKey: MyApp.navigatorKey,
       initialRoute: '/splash',
       navigatorObservers: [RouteLogger()],
       onGenerateInitialRoutes: (String initialRouteName) {

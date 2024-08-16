@@ -80,7 +80,7 @@ class _MainScreenState extends State<MainScreen> {
           AppConfig.USER_TYPE = dataUser?.isPenjual ?? 'reguler';
           AppConfig.IS_DRIVER = dataUser?.kurir ?? false;
           AppConfig.URL_PHOTO_PROFILE =
-              '${AppConfig.URL_PHOTO_PROFILE}${dataUser?.userPhoto ?? ''}';
+              '${AppConfig.URL_IMAGES_PATH}${dataUser?.userPhoto ?? ''}';
         });
 
         AuthHelper().setUserData(
