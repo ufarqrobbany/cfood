@@ -282,8 +282,14 @@ class _SplashScreenState extends State<SplashScreen> {
             text:
                 'Versi terbaru aplikasi C-Food sudah tersedia. Ayo segera update!',
             justYEs: true,
-            yesText: "Update Sekarang", onTapYes: () {
-          openUrl(Uri.parse('https://campusfood.id'));
+            yesText: "Update Sekarang", onTapYes: () async {
+          // openUrl(Uri.parse('https://campusfood.id'));
+          log('open url');
+          final Uri url = Uri(scheme: 'https', host: 'www.campusfood.id');
+          if (!await launchUrl(url)) {
+            throw Exception(
+                'Could not launch $url');
+          }
         });
       }
     } catch (e) {
@@ -293,7 +299,8 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> openUrl(Uri url) async {
-    if (!await launchUrl(url)) {
+    log('open url');
+    if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
       throw Exception('Could not launch $url');
     }
   }
