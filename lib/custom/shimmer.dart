@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cfood/style.dart';
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
@@ -34,13 +36,13 @@ Widget shimmerBox({
       ));
 }
 
-Widget shimmerProductCard({required bool? enabled}) {
+Widget shimmerProductCard({required bool? enabled,EdgeInsets? padding,}) {
   return Container(
     constraints: const BoxConstraints(
       minWidth: 160,
       maxWidth: 170,
     ),
-    margin: const EdgeInsets.symmetric(horizontal: 10),
+    margin: padding ?? const EdgeInsets.symmetric(horizontal: 10),
     padding: const EdgeInsets.all(10),
     decoration: BoxDecoration(
       color: Colors.white,
@@ -67,7 +69,9 @@ Widget shimmerProductCard({required bool? enabled}) {
         const SizedBox(height: 10),
         shimmerBox(enabled: enabled, height: 15, width: 100),
         const SizedBox(height: 10),
-        shimmerBox(enabled: enabled, height: 15, width: 60),
+        shimmerBox(enabled: enabled, height: 15, width: 80),
+        const SizedBox(height: 10),
+        shimmerBox(enabled: enabled, height: 18, width: 60),
         const SizedBox(height: 10),
         Row(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -171,12 +175,70 @@ Widget shimmerStoreCard({required bool? enabled}) {
   );
 }
 
-Widget shimmerListBuilder(BuildContext context,
-    {required bool? enabled,
-    int? itemCount,
-    bool isBox = false,
-    bool? isVertical,
-    EdgeInsets? padding}) {
+Widget shimmerOrganizationCard({required bool? enabled}) {
+  log('organization shimmer card');
+  return Container(
+    margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+    padding: const EdgeInsets.all(10),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(8),
+      boxShadow: [
+        BoxShadow(
+          blurRadius: 20,
+          spreadRadius: 0,
+          color: Warna.shadow.withOpacity(0.12),
+          offset: const Offset(0, 0),
+        ),
+      ],
+    ),
+    child: Row(
+      mainAxisSize: MainAxisSize.max,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(8),
+          child: shimmerBox(enabled: enabled, height: 80, width: 80, radius: 80),
+        ),
+        const SizedBox(
+          width: 10,
+        ),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 10),
+            shimmerBox(enabled: enabled, height: 18, width: 100, radius: 8),
+            const SizedBox(height: 10),
+            shimmerBox(enabled: enabled, height: 15, width: 100, radius: 8),
+            const SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                shimmerBox(enabled: enabled, height: 17, width: 70, radius: 8),
+                const SizedBox(
+                  width: 10,
+                ),
+                shimmerBox(enabled: enabled, height: 17, width: 50, radius: 8),
+              ],
+            ),
+            const SizedBox(height: 10),
+            // const Spacer(),
+          ],
+        ),
+      ],
+    ),
+  );
+}
+
+Widget shimmerListBuilder(
+  BuildContext context, {
+  required bool? enabled,
+  int? itemCount,
+  bool isBox = false,
+  bool? isVertical,
+  EdgeInsets? padding,
+  bool organization = false,
+}) {
   return ListView.builder(
     itemCount: itemCount ?? 3,
     shrinkWrap: true,
@@ -188,8 +250,17 @@ Widget shimmerListBuilder(BuildContext context,
       return isBox
           ? shimmerBoxCard(enabled: enabled)
           : isVertical
-              ? shimmerStoreCard(enabled: enabled)
+              ? organization
+                  ? shimmerOrganizationCard(enabled: enabled)
+                  : shimmerStoreCard(enabled: enabled)
               : shimmerProductCard(enabled: enabled);
+      // return isBox
+      //     ? shimmerBoxCard(enabled: enabled)
+      //     : isVertical
+      //         ? shimmerStoreCard(enabled: enabled)
+      //         : organization
+      //             ? shimmerOrganizationCard(enabled: enabled)
+      //             : shimmerProductCard(enabled: enabled);
     },
   );
 }
