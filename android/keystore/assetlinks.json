@@ -1,0 +1,9 @@
+[{
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.cfood.id",
+      "sha256_cert_fingerprints":
+      ["00:8C:1C:63:05:B2:55:06:43:6F:51:36:A1:E8:39:DC:A2:50:66:EF:CD:03:F9:C3:57:8A:C0:9E:5E:23:90:3C"]
+    }
+  }]
