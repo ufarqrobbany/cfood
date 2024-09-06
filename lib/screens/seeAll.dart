@@ -6,6 +6,7 @@ import 'package:cfood/custom/CTextField.dart';
 import 'package:cfood/custom/card.dart';
 import 'package:cfood/custom/page_item_void.dart';
 import 'package:cfood/custom/reload_indicator.dart';
+import 'package:cfood/custom/shimmer.dart';
 import 'package:cfood/model/getl_all_merchant_response.dart';
 import 'package:cfood/model/get_all_organization_response.dart';
 import 'package:cfood/repository/fetch_controller.dart';
@@ -15,6 +16,7 @@ import 'package:cfood/style.dart';
 import 'package:cfood/utils/constant.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class SeeAllItemsScreen extends StatefulWidget {
   final String? typeName;
@@ -41,9 +43,14 @@ class _SeeAllItemsScreenState extends State<SeeAllItemsScreen> {
   DataGetOrganization? dataOrganizations;
   OrganizationItems? organizationListItems;
 
+  ScrollController scrollController = ScrollController();
+  bool isLoadingMore = false;
+  int initialPage = 1;
+
   @override
   void initState() {
     super.initState();
+    scrollController.addListener(_scrollListener);
     fetchData();
   }
 
@@ -58,29 +65,51 @@ class _SeeAllItemsScreenState extends State<SeeAllItemsScreen> {
     }
   }
 
-  Future<void> getAllMerchants(BuildContext context,
-      {String searchItem = ''}) async {
+  Future<void> getAllMerchants(
+    BuildContext context, {
+    String searchItem = '',
+    int page = 1,
+    bool loadMore = false,
+  }) async {
     dataMerchantsResponse = await FetchController(
       endpoint:
-          'merchants/all?page=1&size=10&type=${widget.typeCode}&isOpen=all&searchName=$searchItem',
+          'merchants/all?page=$page&size=10&type=${widget.typeCode}&isOpen=all&searchName=$searchItem',
       fromJson: (json) => GetAllMerchantsResponse.fromJson(json),
     ).getData();
 
-    setState(() {
-      dataMerchants = dataMerchantsResponse?.data;
-    });
+    if (loadMore) {
+      setState(() {
+        dataMerchants!.merchants!
+            .addAll(dataMerchantsResponse!.data!.merchants!);
+        initialPage = page;
+      });
+    } else {
+      setState(() {
+        dataMerchants = dataMerchantsResponse?.data;
+        initialPage = page;
+      });
+    }
   }
 
   Future<void> getAllOrganizations(BuildContext context,
-      {String searchItem = ''}) async {
+      {String searchItem = '', int page = 1, bool loadMore = false}) async {
     dataOrganizationsResponse = await FetchController(
-      endpoint: 'organizations/?campusId=1&page=1&size=50&name=$searchItem',
+      endpoint: 'organizations/?campusId=1&page=$page&size=50&name=$searchItem',
       fromJson: (json) => GetAllOrganizationsResponse.fromJson(json),
     ).getData();
 
-    setState(() {
-      dataOrganizations = dataOrganizationsResponse?.data;
-    });
+    if (loadMore) {
+      setState(() {
+        dataOrganizations!.organizations!
+            .addAll(dataOrganizationsResponse!.data!.organizations!);
+        initialPage = page;
+      });
+    } else {
+      setState(() {
+        dataOrganizations = dataOrganizationsResponse?.data;
+        initialPage = page;
+      });
+    }
   }
 
   void onSearch({String searchItem = ''}) {
@@ -91,6 +120,50 @@ class _SeeAllItemsScreenState extends State<SeeAllItemsScreen> {
     if (widget.typeCode == 'organisasi') {
       getAllOrganizations(context, searchItem: searchItem);
     }
+  }
+
+  void _scrollListener() {
+    if (scrollController.position.pixels ==
+            scrollController.position.maxScrollExtent &&
+        !isLoadingMore) {
+      // Ketika mencapai akhir list, muat lebih banyak data
+      loadMoreData();
+      // log('load more data');
+    }
+  }
+
+  Future<void> loadMoreData() async {
+    setState(() {
+      isLoadingMore = true;
+      log('loading more true');
+    });
+
+    // Panggil API untuk memuat lebih banyak data
+    // await fetchMoreData();
+    log('initial page : $initialPage');
+    log('load more data');
+    log('get data type : ${widget.typeCode}');
+    if (widget.typeCode == 'wirausaha' || widget.typeCode == 'kantin') {
+      getAllMerchants(context, page: initialPage + 1, loadMore: true);
+    }
+
+    if (widget.typeCode == 'organisasi') {
+      getAllOrganizations(context, page: initialPage + 1, loadMore: true);
+    }
+
+    Future.delayed(
+      const Duration(seconds: 10),
+      () => setState(() {
+        isLoadingMore = false;
+        log('loading more false');
+      }),
+    );
+  }
+
+  @override
+  void dispose() {
+    scrollController.dispose();
+    super.dispose();
   }
 
   @override
@@ -207,42 +280,82 @@ class _SeeAllItemsScreenState extends State<SeeAllItemsScreen> {
     return ReloadIndicatorType1(
       onRefresh: fetchData,
       child: SingleChildScrollView(
+        controller: scrollController,
         physics: const AlwaysScrollableScrollPhysics(),
         child: dataMerchants?.merchants == null
-            ? Container()
+            ? shimmerListBuilder(
+                context,
+                enabled: dataMerchants?.merchants == null ? true : false,
+                isVertical: true,
+                itemCount: 3,
+              )
             : dataMerchants?.totalElements == 0
                 ? itemsEmptyBody(context)
-                : ListView.builder(
-                    itemCount: dataMerchants?.merchants?.length,
-                    physics: const NeverScrollableScrollPhysics(),
-                    shrinkWrap: true,
-                    padding: const EdgeInsets.fromLTRB(25, 15, 25, 40),
-                    itemBuilder: (context, index) {
-                      MerchantItems? items = dataMerchants?.merchants![index];
-                      return Container(
-                        // margin: const EdgeInsets.only(top: 25, bottom: 10, left: 25, right: 25),
-                        padding: const EdgeInsets.symmetric(vertical: 10),
-                        child: CanteenCardBox(
-                          imgUrl:
-                              '${AppConfig.URL_IMAGES_PATH}${items?.merchantPhoto}',
-                          canteenName: items?.merchantName,
-                          // menuList: 'kosong',
-                          likes: ' ${items?.followers}',
-                          rate: '${items?.rating}',
-                          type: items?.merchantType,
-                          open: items!.open!,
-                          danus: items.danus!,
-                          onPressed: () => navigateTo(
-                              context,
-                              CanteenScreen(
-                                merchantId: items.merchantId,
-                                isOwner: false,
-                                merchantType: items.merchantType!,
-                                itsDanusan: items.danus,
-                              )),
-                        ),
-                      );
-                    },
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      ListView.builder(
+                        // controller: scrollController,
+                        itemCount: dataMerchants?.merchants?.length,
+                        physics: const NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        padding: const EdgeInsets.fromLTRB(25, 15, 25, 0),
+                        itemBuilder: (context, index) {
+                          MerchantItems? items =
+                              dataMerchants?.merchants![index];
+                          return Container(
+                            // margin: const EdgeInsets.only(top: 25, bottom: 10, left: 25, right: 25),
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            child: CanteenCardBox(
+                              imgUrl:
+                                  '${AppConfig.URL_IMAGES_PATH}${items?.merchantPhoto}',
+                              canteenName: items?.merchantName,
+                              // menuList: 'kosong',
+                              likes: ' ${items?.followers}',
+                              rate: '${items?.rating}',
+                              type: items?.merchantType,
+                              open: items!.open!,
+                              danus: items.danus!,
+                              onPressed: () => navigateTo(
+                                  context,
+                                  CanteenScreen(
+                                    merchantId: items.merchantId,
+                                    isOwner: false,
+                                    merchantType: items.merchantType!,
+                                    itsDanusan: items.danus,
+                                  )),
+                            ),
+                          );
+                        },
+                      ),
+                      // if (isLoadingMore)
+                      isLoadingMore
+                          ? Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                shimmerListBuilder(
+                                  context,
+                                  enabled: isLoadingMore,
+                                  isVertical: true,
+                                  itemCount: 2,
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 15, vertical: 0),
+                                ),
+                                const SizedBox(
+                                  height: 15,
+                                ),
+                                LoadingAnimationWidget.staggeredDotsWave(
+                                    color: Warna.biru, size: 30),
+                                const SizedBox(
+                                  height: 15,
+                                ),
+                              ],
+                            )
+                          : Container(
+                              height: 40,
+                            ),
+                    ],
                   ),
       ),
     );
@@ -252,38 +365,78 @@ class _SeeAllItemsScreenState extends State<SeeAllItemsScreen> {
     return ReloadIndicatorType1(
       onRefresh: fetchData,
       child: SingleChildScrollView(
+        controller: scrollController,
         physics: const AlwaysScrollableScrollPhysics(),
         child: dataOrganizations?.organizations == null
-            ? Container()
+            ?  shimmerListBuilder(
+                context,
+                enabled: dataOrganizations?.organizations == null ? true : false,
+                isVertical: true,
+                itemCount: 3,
+                organization: true,
+              )
             : dataOrganizations?.totalElements == 0
                 ? itemsEmptyBody(context)
-                : ListView.builder(
-                    itemCount: dataOrganizations?.organizations?.length,
-                    physics: const NeverScrollableScrollPhysics(),
-                    shrinkWrap: true,
-                    padding: const EdgeInsets.fromLTRB(25, 25, 25, 20),
-                    itemBuilder: (context, index) {
-                      OrganizationItems? items =
-                          dataOrganizations?.organizations![index];
-                      return Container(
-                        // margin: const EdgeInsets.only(top: 25, bottom: 10, left: 25, right: 25),
-                        padding: const EdgeInsets.symmetric(vertical: 10),
-                        child: OrganizationCardBox(
-                          organizationId: items?.id,
-                          imgUrl:
-                              '${AppConfig.URL_IMAGES_PATH}${items?.organizationLogo}',
-                          organizationName: items?.organizationName,
-                          totalActivity: '${items?.totalActivity}',
-                          totalWirausaha: '${items?.totalWirausaha}',
-                          totalMenu: '${items?.totalMenu}',
-                          onPressed: () => navigateTo(
-                            context,
-                            OrganizationScreen(id: items?.id),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
+                : Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    ListView.builder(
+                        itemCount: dataOrganizations?.organizations?.length,
+                        physics: const NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        padding: const EdgeInsets.fromLTRB(25, 25, 25, 0),
+                        itemBuilder: (context, index) {
+                          OrganizationItems? items =
+                              dataOrganizations?.organizations![index];
+                          return Container(
+                            // margin: const EdgeInsets.only(top: 25, bottom: 10, left: 25, right: 25),
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            child: OrganizationCardBox(
+                              organizationId: items?.id,
+                              imgUrl:
+                                  '${AppConfig.URL_IMAGES_PATH}${items?.organizationLogo}',
+                              organizationName: items?.organizationName,
+                              totalActivity: '${items?.totalActivity}',
+                              totalWirausaha: '${items?.totalWirausaha}',
+                              totalMenu: '${items?.totalMenu}',
+                              onPressed: () => navigateTo(
+                                context,
+                                OrganizationScreen(id: items?.id),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+
+                       isLoadingMore
+                          ? Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                shimmerListBuilder(
+                                  context,
+                                  enabled: isLoadingMore,
+                                  isVertical: true,
+                                  organization: true,
+                                  itemCount: 2,
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 15, vertical: 0),
+                                ),
+                                const SizedBox(
+                                  height: 15,
+                                ),
+                                LoadingAnimationWidget.staggeredDotsWave(
+                                    color: Warna.biru, size: 30),
+                                const SizedBox(
+                                  height: 15,
+                                ),
+                              ],
+                            )
+                          : Container(
+                              height: 40,
+                            ),
+                  ],
+                ),
       ),
     );
   }

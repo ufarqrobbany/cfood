@@ -22,6 +22,7 @@ import 'package:cfood/style.dart';
 import 'package:cfood/utils/constant.dart';
 import 'package:community_material_icon/community_material_icon.dart';
 import 'package:flutter/material.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:uicons/uicons.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -33,6 +34,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final ScrollController _mainScrollController = ScrollController();
+  int initialPage = 1;
+  bool isLoadingMore = false;
   String nama_user = '';
   String first_name = '';
 
@@ -50,6 +53,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    _mainScrollController.addListener(_scrollListener);
 
     if (dataMenusResponse == null) {
       log('load all menus');
@@ -89,6 +93,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void dispose() {
     super.dispose();
+    _mainScrollController.dispose();
   }
 
   Future<void> getAllMenus(BuildContext context) async {
@@ -115,16 +120,57 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  Future<void> getAllMerchants(BuildContext context) async {
+  Future<void> getAllMerchants(BuildContext context,
+      {int page = 1, bool loadMore = false}) async {
     dataMerchantsResponse = await FetchController(
-      endpoint: 'merchants/all?page=1&size=10&type=all&isOpen=all&searchName=',
+      endpoint:
+          'merchants/all?page=$page&size=10&type=all&isOpen=all&searchName=',
       fromJson: (json) => GetAllMerchantsResponse.fromJson(json),
     ).getData();
 
+    if (loadMore) {
+      setState(() {
+        dataMerchants?.merchants!
+            .addAll(dataMerchantsResponse!.data!.merchants!);
+        initialPage = page;
+      });
+    } else {
+      setState(() {
+        dataMerchants = dataMerchantsResponse?.data;
+        log(dataMerchants.toString());
+      });
+    }
+  }
+
+  void _scrollListener() {
+    if (_mainScrollController.position.pixels ==
+            _mainScrollController.position.maxScrollExtent &&
+        !isLoadingMore) {
+      // Ketika mencapai akhir list, muat lebih banyak data
+      loadMoreData();
+      // log('load more data');
+    }
+  }
+
+  Future<void> loadMoreData() async {
     setState(() {
-      dataMerchants = dataMerchantsResponse?.data;
-      log(dataMerchants.toString());
+      isLoadingMore = true;
+      log('loading more true');
     });
+
+    // Panggil API untuk memuat lebih banyak data
+    // await fetchMoreData();
+    log('initial page : $initialPage');
+    log('load more data');
+    getAllMerchants(context, page: initialPage + 1, loadMore: true);
+
+    Future.delayed(
+      const Duration(seconds: 10),
+      () => setState(() {
+        isLoadingMore = false;
+        log('loading more false');
+      }),
+    );
   }
 
   @override
@@ -469,10 +515,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
         SizedBox(
           // lagi di bikin
-          height: dataMenus?.content == null ? 245 : 315,
+          height: dataMenus?.content == null ? 275 : 315,
           child: dataMenus?.content == null
               ? SizedBox(
-                  height: 245,
+                  height: 275,
                   child: shimmerListBuilder(
                     context,
                     enabled: dataMenus?.content == null ? true : false,
@@ -654,38 +700,69 @@ class _HomeScreenState extends State<HomeScreen> {
                 isVertical: true,
                 itemCount: 3,
               )
-            : ListView.builder(
-                itemCount: dataMerchants?.merchants?.length,
-                physics: const NeverScrollableScrollPhysics(),
-                shrinkWrap: true,
-                padding: const EdgeInsets.fromLTRB(25, 15, 25, 40),
-                itemBuilder: (context, index) {
-                  MerchantItems? items = dataMerchants?.merchants![index];
-                  return Container(
-                    // margin: const EdgeInsets.only(top: 25, bottom: 10, left: 25, right: 25),
-                    padding: const EdgeInsets.symmetric(vertical: 10),
-                    child: CanteenCardBox(
-                      imgUrl:
-                          '${AppConfig.URL_IMAGES_PATH}${items?.merchantPhoto}',
-                      canteenName: items?.merchantName,
-                      // menuList: 'kosong',
-                      // likes: ' 0',
-                      likes: ' ${items?.followers}',
-                      rate: '${items?.rating}',
-                      type: items?.merchantType,
-                      open: items!.open!,
-                      danus: items.danus!,
-                      onPressed: () => navigateTo(
-                          context,
-                          CanteenScreen(
-                            merchantId: items.merchantId,
-                            isOwner: false,
-                            merchantType: items.merchantType!,
-                            itsDanusan: items.danus,
-                          )),
-                    ),
-                  );
-                },
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  ListView.builder(
+                    itemCount: dataMerchants?.merchants?.length,
+                    physics: const NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    padding: const EdgeInsets.fromLTRB(25, 15, 25, 0),
+                    itemBuilder: (context, index) {
+                      MerchantItems? items = dataMerchants?.merchants![index];
+                      return Container(
+                        // margin: const EdgeInsets.only(top: 25, bottom: 10, left: 25, right: 25),
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        child: CanteenCardBox(
+                          imgUrl:
+                              '${AppConfig.URL_IMAGES_PATH}${items?.merchantPhoto}',
+                          canteenName: items?.merchantName,
+                          // menuList: 'kosong',
+                          // likes: ' 0',
+                          likes: ' ${items?.followers}',
+                          rate: '${items?.rating}',
+                          type: items?.merchantType,
+                          open: items!.open!,
+                          danus: items.danus!,
+                          onPressed: () => navigateTo(
+                              context,
+                              CanteenScreen(
+                                merchantId: items.merchantId,
+                                isOwner: false,
+                                merchantType: items.merchantType!,
+                                itsDanusan: items.danus,
+                              )),
+                        ),
+                      );
+                    },
+                  ),
+                  isLoadingMore
+                      ? Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            shimmerListBuilder(
+                              context,
+                              enabled: isLoadingMore,
+                              isVertical: true,
+                              itemCount: 2,
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 15, vertical: 0),
+                            ),
+                            const SizedBox(
+                              height: 15,
+                            ),
+                            LoadingAnimationWidget.staggeredDotsWave(
+                                color: Warna.biru, size: 30),
+                            const SizedBox(
+                              height: 15,
+                            ),
+                          ],
+                        )
+                      : Container(
+                          height: 40,
+                        ),
+                ],
               ),
 
         const SizedBox(

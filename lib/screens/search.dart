@@ -5,6 +5,8 @@ import 'package:cfood/custom/CPageMover.dart';
 import 'package:cfood/custom/CTextField.dart';
 import 'package:cfood/custom/card.dart';
 import 'package:cfood/custom/page_item_void.dart';
+import 'package:cfood/custom/reload_indicator.dart';
+import 'package:cfood/custom/shimmer.dart';
 import 'package:cfood/model/get_all_menu_response.dart';
 import 'package:cfood/model/get_all_organization_response.dart';
 import 'package:cfood/model/getl_all_merchant_response.dart';
@@ -16,6 +18,7 @@ import 'package:cfood/utils/constant.dart';
 import 'package:community_material_icon/community_material_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class SearchScreen extends StatefulWidget {
   final int campusId;
@@ -31,6 +34,8 @@ class SearchScreen extends StatefulWidget {
 class _SearchScreenState extends State<SearchScreen> {
   TextEditingController searchTextController = TextEditingController();
   ScrollController onSearchScrollController = ScrollController();
+  bool isLoadingMore = false;
+  int initialPage = 1;
   ScrollController searchResultScrollController = ScrollController();
   bool searchDone = false;
   String selectedTab = 'menu';
@@ -82,7 +87,7 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   void initState() {
     super.initState();
-
+    searchResultScrollController.addListener(_scrollListener);
     // searchTextController.addListener(_filterSearch);
   }
 
@@ -128,6 +133,10 @@ class _SearchScreenState extends State<SearchScreen> {
     }
   }
 
+  Future<void> refreshTab() async {
+    searchItemsBy(context, query: searchTextController.text);
+  }
+
   void searchItemsBy(BuildContext context, {String query = ''}) {
     log('$query -- $selectedTab');
     if (selectedTab == 'menu') {
@@ -158,32 +167,114 @@ class _SearchScreenState extends State<SearchScreen> {
     });
   }
 
-  Future<void> getAllOrganizations(BuildContext context,
-      {String query = ''}) async {
+  Future<void> getAllOrganizations(
+    BuildContext context, {
+    String query = '',
+    int page = 1,
+    bool loadMore = false,
+  }) async {
     dataOrganizationsResponse = await FetchController(
-      endpoint: 'organizations/?campusId=${widget.campusId}&page=1&size=50&name=$query',
+      endpoint:
+          'organizations/?campusId=${widget.campusId}&page=$page&size=50&name=$query',
       // endpoint: 'organizations/?campusId=${widget.campusId}&name=$query',
       fromJson: (json) => GetAllOrganizationsResponse.fromJson(json),
     ).getData();
 
-    setState(() {
-      dataOrganizations = dataOrganizationsResponse?.data;
-      log(dataOrganizations.toString());
-    });
+    if (loadMore) {
+      setState(() {
+        dataOrganizations!.organizations!
+            .addAll(dataOrganizationsResponse!.data!.organizations!);
+        initialPage = page;
+      });
+    } else {
+      setState(() {
+        dataOrganizations = dataOrganizationsResponse?.data;
+        log(dataOrganizations.toString());
+      });
+    }
   }
 
-  Future<void> getAllMerchants(BuildContext context,
-      {String query = ''}) async {
+  Future<void> getAllMerchants(
+    BuildContext context, {
+    String query = '',
+    int page = 1,
+    bool loadMore = false,
+  }) async {
     dataMerchantsResponse = await FetchController(
       endpoint:
-          'merchants/all?page=1&size=50&type=all&isOpen=all&searchName=$query',
+          'merchants/all?page=$page&size=50&type=all&isOpen=all&searchName=$query',
       fromJson: (json) => GetAllMerchantsResponse.fromJson(json),
     ).getData();
 
+    if (loadMore) {
+      setState(() {
+        dataMerchants!.merchants!
+            .addAll(dataMerchantsResponse!.data!.merchants!);
+        initialPage = page;
+        log(dataMerchants.toString());
+      });
+    } else {
+      setState(() {
+        dataMerchants = dataMerchantsResponse?.data;
+        log(dataMerchants.toString());
+      });
+    }
+  }
+
+  void _scrollListener() {
+    if (searchResultScrollController.position.pixels ==
+            searchResultScrollController.position.maxScrollExtent &&
+        !isLoadingMore) {
+      // Ketika mencapai akhir list, muat lebih banyak data
+      loadMoreData();
+      // log('load more data');
+    }
+  }
+
+  Future<void> loadMoreData() async {
     setState(() {
-      dataMerchants = dataMerchantsResponse?.data;
-      log(dataMerchants.toString());
+      isLoadingMore = true;
+      log('loading more true');
     });
+
+    // Panggil API untuk memuat lebih banyak data
+    // await fetchMoreData();
+    log('initial page : $initialPage');
+    log('load more data');
+    // log('get data type : ${widget.typeCode}');
+    log('${searchTextController.text} -- $selectedTab');
+    if (selectedTab == 'menu') {
+      getAllMenus(
+        context,
+        query: searchTextController.text,
+      );
+    }
+
+    if (selectedTab == 'wirausaha') {
+      getAllMerchants(
+        context,
+        query: searchTextController.text,
+        loadMore: true,
+        page: initialPage + 1,
+      );
+    }
+
+    if (selectedTab == 'organisasi') {
+      getAllOrganizations(
+        context,
+        query: searchTextController.text,
+        loadMore: true,
+        page: initialPage + 1,
+      );
+    }
+
+    Future.delayed(
+      const Duration(seconds: 10),
+      () => setState(() {
+        isLoadingMore = false;
+        log('loading more false');
+      }),
+    );
   }
 
   @override
@@ -371,10 +462,13 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   Widget searchResultBody() {
-    return SingleChildScrollView(
-      controller: searchResultScrollController,
-      physics: const BouncingScrollPhysics(),
-      child: searchResultsBodyItems(selectedTab),
+    return ReloadIndicatorType1(
+      onRefresh: refreshTab,
+      child: SingleChildScrollView(
+        controller: searchResultScrollController,
+        physics: const AlwaysScrollableScrollPhysics(),
+        child: searchResultsBodyItems(selectedTab),
+      ),
     );
   }
 
@@ -396,39 +490,83 @@ class _SearchScreenState extends State<SearchScreen> {
                     icons: Icons.fastfood_rounded,
                     iconsColor: Warna.oranye1,
                     bgcolors: Warna.pageBackgroundColor)
-                : MasonryGridView.count(
-                    itemCount: dataMenus?.content?.length,
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 25, vertical: 25),
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 20,
-                    mainAxisSpacing: 20,
-                    itemBuilder: (context, index) {
-                      MenuItems? items = dataMenus?.content![index];
-                      return ProductCardBox(
-                          onPressed: () {
-                            navigateTo(
-                              context,
-                              CanteenScreen(
-                                menuId: '${items!.menuId}',
-                                merchantId: items.merchants?.merchantId,
-                                merchantType:
-                                      items.merchants!.merchantType!
-                              ),
-                            );
-                          },
-                          imgUrl:
-                              '${AppConfig.URL_IMAGES_PATH}${items?.menuPhoto}',
-                          productName: '${items?.menuName}',
-                          storeName: '${items?.merchants?.merchantName}',
-                          price: items?.menuPrice,
-                          likes: '${items?.menuLikes}',
-                          rate: '${items?.menuRating}',
-                          merchantType: '${items?.merchants?.merchantType}',
-                          isDanus: items?.menuIsDanus!);
-                    },
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      MasonryGridView.count(
+                        // itemCount: isLoadingMore
+                        //     ? (dataMenus?.content?.length ?? 0) +
+                        //         ((dataMenus?.content?.length ?? 0) % 2 == 0 ? 0 : 3)
+                        //     : dataMenus?.content?.length,
+                        itemCount: isLoadingMore
+                            ? (dataMenus?.content?.length ?? 0) +
+                                ((dataMenus?.content?.length ?? 0) % 2 == 0
+                                    ? 2
+                                    : 3)
+                            : dataMenus?.content?.length ?? 0,
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 25, vertical: 25),
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 20,
+                        mainAxisSpacing: 20,
+                        itemBuilder: (context, index) {
+                          // if (isLoadingMore &&
+                          //     index == dataMenus?.content?.length) {
+                          //   return shimmerProductCard(
+                          //     enabled: true,
+                          //     padding: EdgeInsets.zero,
+                          //   ); // Kotak kosong untuk menjaga grid tetap rapi
+                          // }
+                          if (isLoadingMore &&
+                              index >= (dataMenus?.content?.length ?? 0)) {
+                            return shimmerProductCard(
+                                enabled: true,
+                                padding:
+                                    EdgeInsets.zero); // Shimmer untuk loading
+                          }
+
+                          MenuItems? items = dataMenus?.content![index];
+                          return ProductCardBox(
+                              onPressed: () {
+                                navigateTo(
+                                  context,
+                                  CanteenScreen(
+                                      menuId: '${items!.menuId}',
+                                      merchantId: items.merchants?.merchantId,
+                                      merchantType:
+                                          items.merchants!.merchantType!),
+                                );
+                              },
+                              imgUrl:
+                                  '${AppConfig.URL_IMAGES_PATH}${items?.menuPhoto}',
+                              productName: '${items?.menuName}',
+                              storeName: '${items?.merchants?.merchantName}',
+                              price: items?.menuPrice,
+                              likes: '${items?.menuLikes}',
+                              rate: '${items?.menuRating}',
+                              merchantType: '${items?.merchants?.merchantType}',
+                              isDanus: items?.menuIsDanus!);
+                        },
+                      ),
+                      isLoadingMore
+                          ? Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const SizedBox(
+                                  height: 15,
+                                ),
+                                LoadingAnimationWidget.staggeredDotsWave(
+                                    color: Warna.biru, size: 30),
+                                const SizedBox(
+                                  height: 15,
+                                ),
+                              ],
+                            )
+                          : Container(),
+                    ],
                   ); // Replace with the widget you want to show for 'menu'
       }
       // else if (selectedTab == 'kantin') {
@@ -454,86 +592,165 @@ class _SearchScreenState extends State<SearchScreen> {
       // }
       else if (selectedTab == 'wirausaha') {
         return dataMerchants?.merchants! == null
-            ? itemsEmptyBody(context,
-                bgcolors: Warna.pageBackgroundColor,
-                icons: CommunityMaterialIcons.handshake,
-                iconsColor: Warna.kuning,
-                text: 'Cari Wirausaha')
+            ?
+            // itemsEmptyBody(context,
+            //     bgcolors: Warna.pageBackgroundColor,
+            //     icons: CommunityMaterialIcons.handshake,
+            //     iconsColor: Warna.kuning,
+            //     text: 'Cari Wirausaha')
+            shimmerListBuilder(
+                context,
+                enabled: dataMerchants?.merchants == null ? true : false,
+                isVertical: true,
+                itemCount: 3,
+              )
             : dataMerchants!.merchants!.isEmpty
                 ? itemsEmptyBody(context,
                     icons: CommunityMaterialIcons.handshake,
                     iconsColor: Warna.kuning,
                     bgcolors: Warna.pageBackgroundColor)
-                : ListView.builder(
-                    itemCount: dataMerchants?.merchants?.length,
-                    physics: const NeverScrollableScrollPhysics(),
-                    shrinkWrap: true,
-                    padding: const EdgeInsets.fromLTRB(25, 15, 25, 20),
-                    itemBuilder: (context, index) {
-                      MerchantItems? items = dataMerchants?.merchants![index];
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 10),
-                        child: CanteenCardBox(
-                          imgUrl:
-                              '${AppConfig.URL_IMAGES_PATH}${items?.merchantPhoto}',
-                          canteenName: items?.merchantName,
-                          // menuList: 'kosong',
-                          // likes: ' 0',
-                          likes: ' ${items?.followers}',
-                          rate: '${items?.rating}',
-                          type: items?.merchantType,
-                          open: items!.open!,
-                          danus: items.danus!,
-                          onPressed: () => navigateTo(
-                              context,
-                              CanteenScreen(
-                                merchantId: items.merchantId,
-                                isOwner: false,
-                                merchantType: items.merchantType!,
-                                itsDanusan: items.danus,
-                              )),
-                        ),
-                      );
-                    },
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      ListView.builder(
+                        itemCount: dataMerchants?.merchants?.length,
+                        physics: const NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        padding: const EdgeInsets.fromLTRB(25, 15, 25, 0),
+                        itemBuilder: (context, index) {
+                          MerchantItems? items =
+                              dataMerchants?.merchants![index];
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            child: CanteenCardBox(
+                              imgUrl:
+                                  '${AppConfig.URL_IMAGES_PATH}${items?.merchantPhoto}',
+                              canteenName: items?.merchantName,
+                              // menuList: 'kosong',
+                              // likes: ' 0',
+                              likes: ' ${items?.followers}',
+                              rate: '${items?.rating}',
+                              type: items?.merchantType,
+                              open: items!.open!,
+                              danus: items.danus!,
+                              onPressed: () => navigateTo(
+                                  context,
+                                  CanteenScreen(
+                                    merchantId: items.merchantId,
+                                    isOwner: false,
+                                    merchantType: items.merchantType!,
+                                    itsDanusan: items.danus,
+                                  )),
+                            ),
+                          );
+                        },
+                      ),
+                      isLoadingMore
+                          ? Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                shimmerListBuilder(
+                                  context,
+                                  enabled: isLoadingMore,
+                                  isVertical: true,
+                                  itemCount: 2,
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 15, vertical: 0),
+                                ),
+                                const SizedBox(
+                                  height: 15,
+                                ),
+                                LoadingAnimationWidget.staggeredDotsWave(
+                                    color: Warna.biru, size: 30),
+                                const SizedBox(
+                                  height: 15,
+                                ),
+                              ],
+                            )
+                          : Container(
+                              height: 40,
+                            ),
+                    ],
                   ); // Default case if selectedTab doesn't match 'menu' or 'kantin'
       } else {
         return dataOrganizations?.organizations == null
-            ? itemsEmptyBody(context,
-                icons: Icons.groups,
-                iconsColor: Warna.biru,
-                text: 'Cari Organisasi',
-                bgcolors: Warna.pageBackgroundColor)
+            ? shimmerListBuilder(
+                context,
+                enabled:
+                    dataOrganizations?.organizations == null ? true : false,
+                isVertical: true,
+                organization: true,
+                itemCount: 3,
+              )
+            // itemsEmptyBody(context,
+            //     icons: Icons.groups,
+            //     iconsColor: Warna.biru,
+            //     text: 'Cari Organisasi',
+            //     bgcolors: Warna.pageBackgroundColor)
             : dataOrganizations!.organizations!.isEmpty
                 ? itemsEmptyBody(context,
                     icons: Icons.groups,
                     iconsColor: Warna.biru,
                     bgcolors: Warna.pageBackgroundColor)
-                : ListView.builder(
-                    itemCount: dataOrganizations?.organizations?.length,
-                    physics: const NeverScrollableScrollPhysics(),
-                    shrinkWrap: true,
-                    padding: const EdgeInsets.fromLTRB(25, 15, 25, 20),
-                    itemBuilder: (context, index) {
-                       OrganizationItems? items =
-                          dataOrganizations?.organizations![index];
-                      return Container(
-                        // margin: const EdgeInsets.only(top: 25, bottom: 10, left: 25, right: 25),
-                        padding: const EdgeInsets.symmetric(vertical: 10),
-                        child: OrganizationCardBox(
-                          organizationId: items?.id,
-                          imgUrl:
-                              '${AppConfig.URL_IMAGES_PATH}${items?.organizationLogo}',
-                          organizationName: items?.organizationName,
-                          totalActivity: '${items?.totalActivity}',
-                          totalWirausaha: '${items?.totalWirausaha}',
-                          totalMenu: '${items?.totalMenu}',
-                          onPressed: () => navigateTo(
-                            context,
-                            OrganizationScreen(id: items?.id),
-                          ),
-                        ),
-                      );
-                    },
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      ListView.builder(
+                        itemCount: dataOrganizations?.organizations?.length,
+                        physics: const NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        padding: const EdgeInsets.fromLTRB(25, 15, 25, 0),
+                        itemBuilder: (context, index) {
+                          OrganizationItems? items =
+                              dataOrganizations?.organizations![index];
+                          return Container(
+                            // margin: const EdgeInsets.only(top: 25, bottom: 10, left: 25, right: 25),
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            child: OrganizationCardBox(
+                              organizationId: items?.id,
+                              imgUrl:
+                                  '${AppConfig.URL_IMAGES_PATH}${items?.organizationLogo}',
+                              organizationName: items?.organizationName,
+                              totalActivity: '${items?.totalActivity}',
+                              totalWirausaha: '${items?.totalWirausaha}',
+                              totalMenu: '${items?.totalMenu}',
+                              onPressed: () => navigateTo(
+                                context,
+                                OrganizationScreen(id: items?.id),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                      isLoadingMore
+                          ? Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                shimmerListBuilder(
+                                  context,
+                                  enabled: isLoadingMore,
+                                  isVertical: true,
+                                  organization: true,
+                                  itemCount: 2,
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 15, vertical: 0),
+                                ),
+                                const SizedBox(
+                                  height: 15,
+                                ),
+                                LoadingAnimationWidget.staggeredDotsWave(
+                                    color: Warna.biru, size: 30),
+                                const SizedBox(
+                                  height: 15,
+                                ),
+                              ],
+                            )
+                          : Container(
+                              height: 40,
+                            ),
+                    ],
                   );
       }
     }

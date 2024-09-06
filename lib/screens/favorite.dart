@@ -27,6 +27,10 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
   GetLikedResponse? dataLikedMenus;
   List<DataLiked>? dataLiked;
 
+  ScrollController scrollController = ScrollController();
+  int initialPage = 1;
+  bool isLoadingMore = false;
+
   @override
   void initState() {
     super.initState();
