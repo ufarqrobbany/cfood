@@ -52,13 +52,13 @@ class AppTextStyles {
   );
 
   static const TextStyle labelInput = TextStyle(
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: FontWeight.w600,
     color: Color(0xFF4A4A4A),
   );
 
   static const TextStyle placeholderInput = TextStyle(
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: FontWeight.normal,
     color: Color(0xFFB6B6B6),
   );

@@ -79,7 +79,13 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           loadState = false;
         });
         log('go to verification');
-        navigateTo(context, VerificationScreen(forgotPass: true,userId: verifyEmail.userId,),);
+        navigateTo(
+          context,
+          VerificationScreen(
+            forgotPass: true,
+            userId: verifyEmail.userId,
+          ),
+        );
       }
     } on Exception catch (e) {
       setState(() {
@@ -134,7 +140,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 25),
               child: CTextField(
                 controller: emailController,
-                hintText: 'umar.faruq.tif423@polban.ac.id',
+                hintText: 'Masukkan email kamu',
                 labelText: 'Email',
               ),
             ),

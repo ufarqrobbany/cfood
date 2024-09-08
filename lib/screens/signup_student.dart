@@ -243,21 +243,21 @@ class _SignUpStudentScreenState extends State<SignUpStudentScreen> {
             checked = false;
           });
           log('and data nim availalble is : $nimAvailable');
-           log('go to create pass');
-            navigateTo(
-              context,
-              CreatePasswordScreen(
-                email: widget.email,
-                name: widget.name,
-                campusId: widget.campusId,
-                nim: int.parse(nimController.text),
-                addmissionYear: int.parse(admissionController.text),
-                majorId: selectedMajorId,
-                studyProgramId: selectedStudyProgramId,
-                forgotPass: false,
-                isStudent: true,
-              ),
-            );
+          log('go to create pass');
+          navigateTo(
+            context,
+            CreatePasswordScreen(
+              email: widget.email,
+              name: widget.name,
+              campusId: widget.campusId,
+              nim: int.parse(nimController.text),
+              addmissionYear: int.parse(admissionController.text),
+              majorId: selectedMajorId,
+              studyProgramId: selectedStudyProgramId,
+              forgotPass: false,
+              isStudent: true,
+            ),
+          );
         }
       });
     }
@@ -306,7 +306,6 @@ class _SignUpStudentScreenState extends State<SignUpStudentScreen> {
       });
       showToast(emptyField);
     }
-
   }
 
   @override
@@ -352,7 +351,7 @@ class _SignUpStudentScreenState extends State<SignUpStudentScreen> {
               child: CTextField(
                 keyboardType: TextInputType.number,
                 controller: nimController,
-                hintText: '231524028',
+                hintText: '23xxxxxxx',
                 labelText: 'NIM',
               ),
             ),
@@ -365,8 +364,8 @@ class _SignUpStudentScreenState extends State<SignUpStudentScreen> {
               child: CTextField(
                 keyboardType: TextInputType.number,
                 controller: admissionController,
-                hintText: '2023',
-                labelText: 'Angkatan',
+                hintText: '20xx',
+                labelText: 'Tahun Angkatan',
               ),
             ),
             const SizedBox(
@@ -378,7 +377,7 @@ class _SignUpStudentScreenState extends State<SignUpStudentScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 25),
               child: CTextField(
                 controller: majorController,
-                hintText: 'Teknik Komputer dan Informatika',
+                hintText: 'Pilih jurusan kamu',
                 labelText: 'Jurusan',
                 onChanged: (p0) {
                   _majorItenmsFilter();
@@ -412,7 +411,7 @@ class _SignUpStudentScreenState extends State<SignUpStudentScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 25),
               child: CTextField(
                 controller: departementController,
-                hintText: 'D4 Teknik Informatika',
+                hintText: 'Pilih prodi kamu',
                 labelText: 'Program Studi',
                 onChanged: (p0) {
                   _departementItenmsFilter();

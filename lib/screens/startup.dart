@@ -1,4 +1,4 @@
-import 'package:carousel_slider/carousel_slider.dart';
+import 'package:carousel_slider/carousel_slider.dart' as slider;
 import 'package:cfood/custom/CPageMover.dart';
 import 'package:cfood/screens/login.dart';
 import 'package:cfood/style.dart';
@@ -13,7 +13,8 @@ class StartUpScreen extends StatefulWidget {
 }
 
 class _StartUpScreenState extends State<StartUpScreen> {
-  final CarouselController sliderController = CarouselController();
+  final slider.CarouselController sliderController =
+      slider.CarouselController();
   int sliderNumber = 0;
 
   final List<Map<String, dynamic>> startUpItems = [
@@ -21,18 +22,20 @@ class _StartUpScreenState extends State<StartUpScreen> {
       'no': 1,
       'image': 'assets/startup_img_slider_1.png',
       'title': 'Dari C-Food Menuju Perut',
-      'description': 'Gak Perlu Ribet ke kantin buat jajan, tinggal pesan aja lewat C-Food, langsung diantar ke posisi kamu. Praktis banget!'
+      'description':
+          'Gak Perlu Ribet ke kantin buat jajan, tinggal pesan aja lewat C-Food, langsung diantar ke posisi kamu. Praktis banget!'
     },
     {
       'no': 2,
       'image': 'assets/startup_img_slider_2.png',
       'title': 'Dapatkan Penghasilan',
-      'description': 'Jadi penjual atau kurir di kampus lewat C-Food, gampang banget dapet cuan tambahan, ayo gabung!'
+      'description':
+          'Jadi penjual atau kurir di kampus lewat C-Food, gampang banget dapet cuan tambahan, ayo gabung!'
     },
   ];
 
   @override
-  void initState(){
+  void initState() {
     super.initState();
   }
 
@@ -41,7 +44,7 @@ class _StartUpScreenState extends State<StartUpScreen> {
       sliderNumber = (sliderNumber + 1) % startUpItems.length;
     });
     // sliderController.jumpToPage(sliderNumber);
-     sliderController.animateToPage(
+    sliderController.animateToPage(
       sliderNumber,
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeInOut,
@@ -70,8 +73,8 @@ class _StartUpScreenState extends State<StartUpScreen> {
           // CAROUSEL SLIDER
           Container(
             // height: MediaQuery.of(context).size.height * 0.60,
-            child: CarouselSlider.builder(
-              options: CarouselOptions(
+            child: slider.CarouselSlider.builder(
+              options: slider.CarouselOptions(
                 height: MediaQuery.of(context).size.height * 0.60,
                 autoPlay: false,
                 animateToClosest: false,
@@ -83,14 +86,15 @@ class _StartUpScreenState extends State<StartUpScreen> {
                 initialPage: 0,
                 scrollDirection: Axis.horizontal,
                 onPageChanged: (index, reason) {
-                setState(() {
-                  sliderNumber = index;
-                });
-            },
+                  setState(() {
+                    sliderNumber = index;
+                  });
+                },
               ),
               itemCount: startUpItems.length,
               carouselController: sliderController,
-              itemBuilder: (BuildContext context, int itemIndex, int pageViewIndex) {
+              itemBuilder:
+                  (BuildContext context, int itemIndex, int pageViewIndex) {
                 return Column(
                   children: [
                     // IMAGE
@@ -121,21 +125,20 @@ class _StartUpScreenState extends State<StartUpScreen> {
                     )
                   ],
                 );
-              }, 
+              },
             ),
           ),
           // INDICATOR
           Padding(
-            padding: const EdgeInsets.only(bottom: 50),
-            child: sliderIndicator()),
+              padding: const EdgeInsets.only(bottom: 50),
+              child: sliderIndicator()),
           // BUTTON
           MaterialButton(
             height: 55,
             minWidth: MediaQuery.of(context).size.width * 0.88,
             color: Warna.biru,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12)
-            ),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             onPressed: () {
               if (sliderNumber == startUpItems.length - 1) {
                 navigateToRep(context, const LoginScreen());
@@ -147,14 +150,12 @@ class _StartUpScreenState extends State<StartUpScreen> {
               // sliderController.nextPage(
               //     duration: const Duration(milliseconds: 300),
               //     curve: Curves.linear);
-              
             },
             child: Text(
               sliderNumber == 0 ? 'Lanjut' : 'Masuk',
               style: AppTextStyles.textButtonBackgroundDark,
             ),
           ),
-
         ],
       ),
     );

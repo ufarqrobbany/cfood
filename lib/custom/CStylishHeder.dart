@@ -8,7 +8,7 @@ class CStylishHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return  Container(
+    return Container(
       color: Colors.white,
       child: Row(
         children: [
@@ -18,33 +18,41 @@ class CStylishHeader extends StatelessWidget {
               padding: const EdgeInsets.only(top: 50),
               width: 120,
               height: 160,
-              alignment:Alignment.center,
+              alignment: Alignment.center,
               color: Warna.biru,
               child: Container(
-                // padding: const EdgeInsets.only(bottom: 20),
-                margin: const EdgeInsets.only(bottom: 20),
-                width: 70,
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(19), 
-                    topRight: Radius.circular(19),
-                    )
-                ),
-                child: Image.asset('assets/logo.png',)),
+                  // padding: const EdgeInsets.only(bottom: 20),
+                  margin: const EdgeInsets.only(bottom: 10),
+                  padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
+                  width: 70,
+                  decoration: const BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(19),
+                        topRight: Radius.circular(19),
+                      )),
+                  child: Image.asset(
+                    'assets/logo.png',
+                  )),
             ),
           ),
           Expanded(
             child: Container(
               height: 160,
               color: Warna.biru,
-              padding: const EdgeInsets.only(top: 20),
+              padding: const EdgeInsets.fromLTRB(0, 64, 20, 0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  Text(title, style: AppTextStyles.titleBackgroundDark,),
-                  Text(description, style: AppTextStyles.textRegularBackgroundDark,),
+                  Text(
+                    title,
+                    style: AppTextStyles.titleBackgroundDark,
+                  ),
+                  Text(
+                    description,
+                    style: AppTextStyles.textRegularBackgroundDark,
+                  ),
                 ],
               ),
             ),
@@ -67,9 +75,8 @@ class CustomClipPath extends CustomClipper<Path> {
         radius: Radius.circular(radius));
     path.lineTo(size.width, size.height - arcHeight / 2);
     path.lineTo(0, size.height - arcHeight / 2);
-    path.lineTo(0,size.height- arcHeight);
-     path.arcToPoint(Offset(0, size.height),
-        radius: Radius.circular(radius));
+    path.lineTo(0, size.height - arcHeight);
+    path.arcToPoint(Offset(0, size.height), radius: Radius.circular(radius));
 
     path.close();
     return path;

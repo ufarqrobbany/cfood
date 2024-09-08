@@ -14,7 +14,8 @@ import 'package:toast/toast.dart';
 class ActivityAddScreen extends StatefulWidget {
   final int organizationId;
   final int campusId;
-  const ActivityAddScreen({super.key, this.organizationId = 0, this.campusId = 0});
+  const ActivityAddScreen(
+      {super.key, this.organizationId = 0, this.campusId = 0});
 
   @override
   State<ActivityAddScreen> createState() => _ActivityAddScreenState();
@@ -24,7 +25,7 @@ class _ActivityAddScreenState extends State<ActivityAddScreen> {
   TextEditingController organizationController = TextEditingController();
   TextEditingController programController = TextEditingController();
   bool organizationSuggestion = false;
-   List<DataGetOrganization>? organizationList;
+  List<DataGetOrganization>? organizationList;
   String selectedOrganization = '';
   int selectedOrganizationId = 0;
 
@@ -42,7 +43,7 @@ class _ActivityAddScreenState extends State<ActivityAddScreen> {
     super.dispose();
   }
 
-    Future<void> getOrganizations(BuildContext context,
+  Future<void> getOrganizations(BuildContext context,
       {String name = ''}) async {
     GetAllOrganizationResponse? dataResponse = await FetchController(
       endpoint: 'organizations/?campusId=${widget.campusId}&name=$name',
@@ -83,10 +84,12 @@ class _ActivityAddScreenState extends State<ActivityAddScreen> {
       await FetchController(
         endpoint: 'organizations/activities',
         fromJson: (json) => AddActivityResponse.fromJson(json),
-      ).postData({
+      ).postData(
+        {
           "activityName": programController.text,
           "organizationId": selectedOrganizationId,
-        },);
+        },
+      );
       setState(() {
         buttonLoad = false;
       });
@@ -101,7 +104,6 @@ class _ActivityAddScreenState extends State<ActivityAddScreen> {
       showToast(e.toString().replaceAll('Exception: ', ''));
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -121,13 +123,15 @@ class _ActivityAddScreenState extends State<ActivityAddScreen> {
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
-        child: Padding(padding: const EdgeInsets.symmetric(horizontal: 25), child: Column(
-          children: [
-             const SizedBox(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 25),
+          child: Column(
+            children: [
+              const SizedBox(
                 height: 25,
               ),
               CTextField(
-                hintText: 'Himpunan Mahasiswa Komputer',
+                hintText: 'Masukkan nama organisasi',
                 labelText: 'Organisasi',
                 controller: organizationController,
                 onChanged: (p0) {
@@ -154,13 +158,14 @@ class _ActivityAddScreenState extends State<ActivityAddScreen> {
               const SizedBox(
                 height: 20,
               ),
-
               CTextField(
                 controller: programController,
                 hintText: '',
                 labelText: 'Nama Program Kerja/Kegiatan',
               ),
-              const SizedBox(height: 40,),
+              const SizedBox(
+                height: 40,
+              ),
               SizedBox(
                 height: 50,
                 width: double.infinity,
@@ -173,13 +178,14 @@ class _ActivityAddScreenState extends State<ActivityAddScreen> {
                   text: 'Tambah',
                 ),
               ),
-          ],
-        ),),
+            ],
+          ),
+        ),
       ),
     );
   }
 
-    Widget organizationSelection() {
+  Widget organizationSelection() {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 0, vertical: 5),
       decoration: BoxDecoration(

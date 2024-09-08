@@ -52,7 +52,6 @@ class _CreatePasswordScreenState extends State<CreatePasswordScreen> {
   bool loadButton = false;
   int? userId;
 
-
   @override
   void initState() {
     super.initState();
@@ -214,7 +213,7 @@ class _CreatePasswordScreenState extends State<CreatePasswordScreen> {
           VerificationScreen(
             userId: dataUser.id!,
           ));
-    
+
       // log('request otp');
       // await RegisterRepository().sendPostOtp(
       //   context,

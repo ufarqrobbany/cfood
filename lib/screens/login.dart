@@ -203,7 +203,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 25),
                 child: CTextField(
                   controller: emailController,
-                  hintText: 'umar.faruq.tif423@polban.ac.id',
+                  hintText: 'Masukkan email kamu',
                   labelText: 'Email',
                 ),
               ),
@@ -250,39 +250,65 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
               const SizedBox(
-                height: 13,
+                height: 20,
               ),
               // FORGOT PASS
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 25),
-                  child: TextButton(
-                      onPressed: () {
-                        // setState(() {
-                        //   loadState = false;
-                        // });
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  const ForgotPasswordScreen(),
-                            ));
-                      },
-                      style: TextButton.styleFrom(
-                        padding: EdgeInsets.zero,
-                      ),
-                      child: Text(
-                        'Lupa Password',
-                        style: TextStyle(
-                          color: Warna.biru,
-                          fontSize: 15,
-                        ),
-                      )),
+              // Align(
+              //   alignment: Alignment.centerLeft,
+              //   child: Padding(
+              //     padding: const EdgeInsets.only(left: 25),
+              //     child: TextButton(
+              //         onPressed: () {
+              //           // setState(() {
+              //           //   loadState = false;
+              //           // });
+              //           Navigator.push(
+              //               context,
+              //               MaterialPageRoute(
+              //                 builder: (context) =>
+              //                     const ForgotPasswordScreen(),
+              //               ));
+              //         },
+              //         style: TextButton.styleFrom(
+              //           padding: EdgeInsets.zero,
+              //         ),
+              //         child: Text(
+              //           'Lupa Password',
+              //           style: TextStyle(
+              //               color: Warna.biru1,
+              //               fontSize: 15,
+              //               fontWeight: FontWeight.bold),
+              //         )),
+              //   ),
+              // ),
+
+              Padding(
+                padding: const EdgeInsets.only(left: 25), // Left padding of 25
+                child: Align(
+                  alignment: Alignment.centerLeft, // Align to the left
+                  child: RichText(
+                    text: TextSpan(
+                      text: 'Lupa Password ',
+                      style: TextStyle(
+                          color: Warna.biru1,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500),
+                      recognizer: TapGestureRecognizer()
+                        ..onTap = () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    const ForgotPasswordScreen(),
+                              ));
+                        },
+                    ),
+                  ),
                 ),
               ),
+
               const SizedBox(
-                height: 20,
+                height: 32,
               ),
               // SIGNIN BUTTON
               Container(
@@ -321,11 +347,14 @@ class _LoginScreenState extends State<LoginScreen> {
               RichText(
                 text: TextSpan(
                   text: 'Belum punya akun? ',
-                  style: TextStyle(color: Colors.grey.shade900, fontSize: 15),
+                  style: TextStyle(color: Colors.grey.shade900, fontSize: 14),
                   children: [
                     TextSpan(
                       text: 'Daftar sekarang',
-                      style: TextStyle(color: Warna.biru, fontSize: 15),
+                      style: TextStyle(
+                          color: Warna.biru1,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500),
                       recognizer: TapGestureRecognizer()
                         ..onTap = () {
                           // context.pushReplacementNamed('register');

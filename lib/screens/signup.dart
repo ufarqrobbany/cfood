@@ -31,7 +31,7 @@ class _SignupScreenState extends State<SignupScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController campusController = TextEditingController();
   bool imStudent = true;
-  final String _selectedOptionStudent = 'ya';
+  String _selectedOptionStudent = 'ya';
   bool _showSuggestions = false;
   String selectedCampus = '';
   List<DataCampusesItem> campusesList = [];
@@ -93,25 +93,27 @@ class _SignupScreenState extends State<SignupScreen> {
   //   return checkVerifiedEmail!.verified;
   // }
 
-  Future<VerifyEmailResult?> checkVerifyEmail(String email, BuildContext context) async {
-  CheckVerifyEmailResponse checkVerifyEmailResponse =
-      await RegisterRepository().checkGetVerifyEmail(
-    email: email,
-    context: context,
-  );
-  DataVerifyEmail? checkVerifiedEmail = checkVerifyEmailResponse.data;
-
-  log(checkVerifiedEmail.toString());
-
-  if (checkVerifiedEmail != null) {
-    return VerifyEmailResult(
-      verified: checkVerifiedEmail.verified ?? false,
-      userId: checkVerifiedEmail.userId ?? 1, // Pastikan DataVerifyEmail memiliki field userId
+  Future<VerifyEmailResult?> checkVerifyEmail(
+      String email, BuildContext context) async {
+    CheckVerifyEmailResponse checkVerifyEmailResponse =
+        await RegisterRepository().checkGetVerifyEmail(
+      email: email,
+      context: context,
     );
-  } else {
-    return null;
+    DataVerifyEmail? checkVerifiedEmail = checkVerifyEmailResponse.data;
+
+    log(checkVerifiedEmail.toString());
+
+    if (checkVerifiedEmail != null) {
+      return VerifyEmailResult(
+        verified: checkVerifiedEmail.verified ?? false,
+        userId: checkVerifiedEmail.userId ??
+            1, // Pastikan DataVerifyEmail memiliki field userId
+      );
+    } else {
+      return null;
+    }
   }
-}
 
 //   Future<DataVerifyEmail?> checkVerifyEmail(String email, BuildContext context) async {
 //   CheckVerifyEmailResponse checkVerifyEmailResponse =
@@ -133,7 +135,6 @@ class _SignupScreenState extends State<SignupScreen> {
 //     verified: checkVerifiedEmail.verified ?? false,
 //   );
 // }
-
 
   Future<bool?> validateEmailStudent({
     required String email,
@@ -273,24 +274,25 @@ class _SignupScreenState extends State<SignupScreen> {
                 // Check if the email is verified
                 checkVerifyEmail(emailController.text, context)
                     .then((emailVerified) {
-                      if(emailVerified != null) {
-                        if (emailVerified.verified) {
-                          showToast('Email Sudah Terdaftar');
-                          setState(() {
-                            loadButton = false;
-                          });
-                        } else {
-                          emptyField = 'Email Belum Terverifikasi';
-                          showToast(emptyField);
-                          log(emptyField);
-                          setState(() {
-                            loadButton = false;
-                          });
-                          navigateTo(context, VerificationScreen(
-                              forgotPass: false,
-                              userId: emailVerified.userId                            ));
-                        }
-                      }
+                  if (emailVerified != null) {
+                    if (emailVerified.verified) {
+                      showToast('Email Sudah Terdaftar');
+                      setState(() {
+                        loadButton = false;
+                      });
+                    } else {
+                      emptyField = 'Email Belum Terverifikasi';
+                      showToast(emptyField);
+                      log(emptyField);
+                      setState(() {
+                        loadButton = false;
+                      });
+                      navigateTo(
+                          context,
+                          VerificationScreen(
+                              forgotPass: false, userId: emailVerified.userId));
+                    }
+                  }
                 });
               }
             });
@@ -378,7 +380,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 25),
                 child: CTextField(
                   controller: nameController,
-                  hintText: 'Umar Faruq Robbany',
+                  hintText: 'Masukkan nama kamu',
                   labelText: 'Nama Lengkap',
                 ),
               ),
@@ -390,7 +392,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 25),
                 child: CTextField(
                   controller: emailController,
-                  hintText: 'umar.faruq.tif423@polban.ac.id',
+                  hintText: 'Masukkan email kamu',
                   labelText: 'Email',
                 ),
               ),
@@ -402,7 +404,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 25),
                 child: CTextField(
                   controller: campusController,
-                  hintText: 'Politeknik Negeri Bandung',
+                  hintText: 'Pilih kampus',
                   labelText: 'Kampus',
                   onChanged: (p0) {
                     _filterCampuses();
@@ -425,21 +427,22 @@ class _SignupScreenState extends State<SignupScreen> {
               ),
               if (_showSuggestions && campusController.text.isNotEmpty)
                 campusSelection(),
-      
-              // const SizedBox(
-              //   height: 15,
-              // ),
-              // const Align(
-              //   alignment: Alignment.centerLeft,
-              //   child: Padding(
-              //     padding: EdgeInsets.only(left: 25),
-              //     child: Text(
-              //       'Apakah Kamu Mahasiswa?',
-              //       style: AppTextStyles.textRegular,
-              //     ),
-              //   ),
-              // ),
-              // studentSelection(),
+
+              const SizedBox(
+                height: 15,
+              ),
+              const Align(
+                alignment: Alignment.centerLeft,
+                child: Padding(
+                  padding: EdgeInsets.only(left: 25),
+                  child: Text(
+                    'Apakah Kamu seorang Mahasiswa?',
+                    style: AppTextStyles.labelInput,
+                    textScaler: TextScaler.linear(1),
+                  ),
+                ),
+              ),
+              studentSelection(),
               const SizedBox(
                 height: 40,
               ),
@@ -451,7 +454,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 child: CBlueButton(
                     isLoading: loadButton,
                     onPressed: () {
-                      dataCheck(context);
+                      // dataCheck(context);
                       // Sign up button logic
                       // if (dataCheck(context)) {
                       //   if (_selectedOption == 'ya') {
@@ -475,11 +478,14 @@ class _SignupScreenState extends State<SignupScreen> {
               RichText(
                 text: TextSpan(
                   text: 'Sudah punya akun? ',
-                  style: TextStyle(color: Colors.grey.shade900, fontSize: 15),
+                  style: TextStyle(color: Colors.grey.shade900, fontSize: 14),
                   children: [
                     TextSpan(
                       text: 'Masuk sekarang',
-                      style: TextStyle(color: Warna.biru, fontSize: 15),
+                      style: TextStyle(
+                          color: Warna.biru1,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500),
                       recognizer: TapGestureRecognizer()
                         ..onTap = () {
                           // context.pushReplacementNamed('login');
@@ -530,46 +536,55 @@ class _SignupScreenState extends State<SignupScreen> {
     );
   }
 
-  // Widget studentSelection() {
-  //   return Column(
-  //     children: [
-  //       Container(
-  //         padding: const EdgeInsets.symmetric(horizontal: 20),
-  //         height: 30,
-  //         child: Row(
-  //           children: [
-  //             Radio<String>(
-  //               value: 'ya',
-  //               groupValue: _selectedOptionStudent,
-  //               onChanged: (String? value) {
-  //                 setState(() {
-  //                   _selectedOptionStudent = value!;
-  //                 });
-  //               },
-  //             ),
-  //             const Text('Ya'),
-  //           ],
-  //         ),
-  //       ),
-  //       Container(
-  //         padding: const EdgeInsets.symmetric(horizontal: 20),
-  //         height: 30,
-  //         child: Row(
-  //           children: [
-  //             Radio<String>(
-  //               value: 'tidak',
-  //               groupValue: _selectedOptionStudent,
-  //               onChanged: (String? value) {
-  //                 setState(() {
-  //                   _selectedOptionStudent = value!;
-  //                 });
-  //               },
-  //             ),
-  //             const Text('Tidak'),
-  //           ],
-  //         ),
-  //       ),
-  //     ],
-  //   );
-  // }
+  Widget studentSelection() {
+    return Column(
+      children: [
+        Container(
+          margin: const EdgeInsets.only(top: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          height: 30,
+          child: Row(
+            children: [
+              Radio<String>(
+                value: 'ya',
+                groupValue: _selectedOptionStudent,
+                onChanged: (String? value) {
+                  setState(() {
+                    _selectedOptionStudent = value!;
+                  });
+                },
+              ),
+              const Text(
+                'Ya, saya Mahasiswa',
+                style: TextStyle(fontSize: 13),
+                textScaler: TextScaler.linear(1),
+              ),
+            ],
+          ),
+        ),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          height: 30,
+          child: Row(
+            children: [
+              Radio<String>(
+                value: 'tidak',
+                groupValue: _selectedOptionStudent,
+                onChanged: (String? value) {
+                  setState(() {
+                    _selectedOptionStudent = value!;
+                  });
+                },
+              ),
+              const Text(
+                'Bukan',
+                style: TextStyle(fontSize: 13),
+                textScaler: TextScaler.linear(1),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
 }
