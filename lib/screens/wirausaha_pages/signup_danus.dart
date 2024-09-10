@@ -161,7 +161,7 @@ class _SignUpDanusScreenState extends State<SignUpDanusScreen> {
                 height: 25,
               ),
               CTextField(
-                hintText: 'Himpunan Mahasiswa Komputer',
+                hintText: 'Masukkan nama organisasi',
                 labelText: 'Organisasi',
                 controller: organizationController,
                 onChanged: (p0) {
@@ -219,7 +219,7 @@ class _SignUpDanusScreenState extends State<SignUpDanusScreen> {
                 height: 20,
               ),
               CTextField(
-                hintText: 'Tisigram',
+                hintText: 'Masukkan nama kegiatan',
                 labelText: 'Program Kerja/Kegiatan',
                 controller: programController,
                 onChanged: (p0) {

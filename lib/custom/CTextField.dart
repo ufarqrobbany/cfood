@@ -18,13 +18,14 @@ class CTextField extends StatelessWidget {
   final Color? fillColor;
   final Color? borderColor;
   final double borderRadius;
-  final Function(String)? onChanged; 
+  final Function(String)? onChanged;
   final String? subLabelText;
   final TextInputAction? textInputAction;
   final Function(String)? onSubmitted;
   final EdgeInsets? contentPadding;
 
-  const CTextField({super.key, 
+  const CTextField({
+    super.key,
     this.controller,
     this.hintText,
     this.labelText,
@@ -59,14 +60,11 @@ class CTextField extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 4),
               color: fillColor ?? Colors.white,
-              // child: Text(
-              //   labelText!,
-              //   style: labelStyle ?? AppTextStyles.labelInput,
-              // ),
               child: RichText(
                 text: TextSpan(
                   text: labelText,
                   style: labelStyle ?? AppTextStyles.labelInput,
+                  // style: TextStyle(fontSize: 10, color: Warna.regulerFontColor),
                   children: [
                     TextSpan(
                       text: subLabelText,
@@ -80,13 +78,12 @@ class CTextField extends StatelessWidget {
               ),
             ),
           ),
-
         TextField(
           controller: controller,
           obscureText: obscureText,
           obscuringCharacter: '●',
           keyboardType: keyboardType,
-          textInputAction: textInputAction?? TextInputAction.done,
+          textInputAction: textInputAction ?? TextInputAction.done,
           maxLines: maxLines,
           minLines: minLines,
           enabled: enabled,
@@ -100,13 +97,15 @@ class CTextField extends StatelessWidget {
             fillColor: fillColor ?? Colors.white,
             prefixIcon: prefixIcon,
             suffixIcon: suffixIcon,
-            contentPadding: contentPadding ?? const EdgeInsets.symmetric(vertical: 15, horizontal: 18),
+            contentPadding: contentPadding ??
+                const EdgeInsets.symmetric(vertical: 15, horizontal: 18),
             enabledBorder: OutlineInputBorder(
               borderSide: BorderSide(color: borderColor ?? Colors.grey),
               borderRadius: BorderRadius.circular(borderRadius),
             ),
             focusedBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: borderColor ?? Theme.of(context).primaryColor),
+              borderSide: BorderSide(
+                  color: borderColor ?? Theme.of(context).primaryColor),
               borderRadius: BorderRadius.circular(borderRadius),
             ),
             disabledBorder: OutlineInputBorder(
@@ -119,14 +118,10 @@ class CTextField extends StatelessWidget {
             ),
           ),
         ),
-        
       ],
     );
   }
 }
-
-
-
 
 class searchBarr extends StatelessWidget {
   final TextEditingController? controller;
@@ -145,10 +140,11 @@ class searchBarr extends StatelessWidget {
   final Color? fillColor;
   final Color? borderColor;
   final double borderRadius;
-  final Function(String)? onChanged; 
+  final Function(String)? onChanged;
   final String? subLabelText;
 
-  const searchBarr({super.key, 
+  const searchBarr({
+    super.key,
     this.controller,
     this.hintText,
     this.labelText,
@@ -188,13 +184,15 @@ class searchBarr extends StatelessWidget {
         fillColor: fillColor ?? Colors.white,
         prefixIcon: prefixIcon,
         suffixIcon: suffixIcon,
-        contentPadding: const EdgeInsets.symmetric(vertical: 15, horizontal: 18),
+        contentPadding:
+            const EdgeInsets.symmetric(vertical: 15, horizontal: 18),
         enabledBorder: OutlineInputBorder(
           borderSide: BorderSide(color: borderColor ?? Colors.grey),
           borderRadius: BorderRadius.circular(borderRadius),
         ),
         focusedBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: borderColor ?? Theme.of(context).primaryColor),
+          borderSide:
+              BorderSide(color: borderColor ?? Theme.of(context).primaryColor),
           borderRadius: BorderRadius.circular(borderRadius),
         ),
         disabledBorder: OutlineInputBorder(
@@ -209,9 +207,6 @@ class searchBarr extends StatelessWidget {
     );
   }
 }
-
-
-
 
 class TextInputC extends StatelessWidget {
   final TextEditingController? controller;
@@ -229,10 +224,11 @@ class TextInputC extends StatelessWidget {
   final Color? fillColor;
   final Color? borderColor;
   final double borderRadius;
-  final Function(String)? onChanged; 
+  final Function(String)? onChanged;
   final String? subLabelText;
 
-  const TextInputC({super.key, 
+  const TextInputC({
+    super.key,
     this.controller,
     this.hintText,
     this.hintStyle,
@@ -271,13 +267,15 @@ class TextInputC extends StatelessWidget {
         fillColor: fillColor ?? Colors.white,
         prefixIcon: prefixIcon,
         suffixIcon: suffixIcon,
-        contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 24),
+        contentPadding:
+            const EdgeInsets.symmetric(vertical: 10, horizontal: 24),
         enabledBorder: OutlineInputBorder(
           borderSide: BorderSide(color: borderColor ?? Colors.grey),
           borderRadius: BorderRadius.circular(borderRadius),
         ),
         focusedBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: borderColor ?? Theme.of(context).primaryColor),
+          borderSide:
+              BorderSide(color: borderColor ?? Theme.of(context).primaryColor),
           borderRadius: BorderRadius.circular(borderRadius),
         ),
         disabledBorder: OutlineInputBorder(
@@ -292,4 +290,3 @@ class TextInputC extends StatelessWidget {
     );
   }
 }
-

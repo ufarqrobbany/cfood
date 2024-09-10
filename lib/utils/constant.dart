@@ -24,7 +24,7 @@ class Constant {
 }
 
 class AppConfig {
-  static const String BASE_URL = "http://cfood.id/api/";
+  static const String BASE_URL = "https://cfood.id/api/";
 
   static const String APPLINK_DOMAIN = "https://campusfood.id/";
 
