@@ -63,6 +63,9 @@ dependencies:
   app_links: ^6.1.4
   share_plus: ^10.0.0
   awesome_notifications: ^0.9.3+1
+  xml: ^6.5.0
+  latlong2: ^0.9.1
+  flutter_map: ^7.0.2
 
 
 
@@ -104,6 +107,7 @@ flutter:
   assets:
     - assets/
     - assets/order_timeline_status_image/
+    - assets/maps/
 
   # example:
   fonts:
