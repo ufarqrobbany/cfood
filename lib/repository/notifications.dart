@@ -86,8 +86,8 @@ class NotificationController {
           context: MyApp.navigatorKey.currentContext!,
           builder: (context) {
             return AlertDialog(
-              title: Text('Notification Permission'),
-              content: Text(
+              title: const Text('Notification Permission'),
+              content: const Text(
                   'Aplikasi ini memerlukan izin notifikasi untuk memberi tahu Anda tentang hal penting.'),
               actions: [
                 TextButton(

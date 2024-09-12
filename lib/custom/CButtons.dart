@@ -284,6 +284,7 @@ Widget notifIconButton(
           color: iconColor ?? Colors.white,
         ),
       ),
+      notifCount == '0' ? Container() :
       Positioned(
           right: 11,
           top: 11,

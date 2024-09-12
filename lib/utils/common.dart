@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:intl/intl.dart';
+import 'package:latlong2/latlong.dart';
 
 String formatNumberWithThousandsSeparator(int number) {
   final numberFormat = NumberFormat(
@@ -87,3 +88,16 @@ Map<String, String> punctuationMap = {
 //   '/': generateRandomString(3),
 //   ':': generateRandomString(3),
 // };
+
+class UserLocation {
+
+  static const Map<String, dynamic> DATA= {
+       "id": 3,
+      "type": '',
+      "name": "",
+      "menu": "",
+      "harga": "",
+      "lokasi": LatLng(0, 0),
+      // "lokasi": const LatLng(-6.871736, 107.574984)
+  };
+}

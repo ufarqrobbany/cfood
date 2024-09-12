@@ -19,6 +19,8 @@ import 'package:cfood/screens/kurir_pages/delivery.dart';
 import 'package:cfood/screens/kurir_pages/order_available.dart';
 import 'package:cfood/screens/login.dart';
 import 'package:cfood/screens/main.dart';
+import 'package:cfood/screens/maps.dart';
+import 'package:cfood/screens/profile_image_update.dart';
 import 'package:cfood/screens/user_info.dart';
 import 'package:cfood/screens/wirausaha_pages/main.dart';
 import 'package:cfood/screens/wirausaha_pages/signup_wirausaha.dart';
@@ -297,7 +299,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           icons: UIcons.solidRounded.marker,
                           showBorder: true,
                           text: 'Lokasi Antar',
-                          onTap: () {},
+                          onTap: () {
+                            navigateTo(
+                              context,
+                              const MapsScreen(),
+                            );
+                          },
                         ),
                         menuItemContainer(
                           icons: UIcons.solidRounded.sign_out_alt,
@@ -550,7 +557,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
         children: [
           InkWell(
             onTap: () {
-              showOptionsPicker();
+              // showOptionsPicker();
+              navigateTo(
+                  context,
+                  ProfileImageUpdateScreen(
+                    imageProfile: dataUser?.userPhoto,
+                  )).then((value) {
+                if (value == 'updated') {
+                  log(value);
+                  refreshPage();
+                } else {
+                  refreshPage();
+                  log('no update');
+                }
+              });
             },
             child: ClipRRect(
               borderRadius: BorderRadius.circular(80),
