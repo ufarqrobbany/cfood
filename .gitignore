@@ -45,3 +45,9 @@ app.*.map.json
 # /keystore/cfood.keystore
 /keystore/assetlinks.json
 /keystore/debug.keystore
+
+# Ignore Gradle project-specific cache directory
+.gradle
+
+# Ignore Gradle build output directory
+build
