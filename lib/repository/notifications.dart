@@ -1,15 +1,11 @@
-import 'dart:convert';
 import 'dart:developer';
-import 'dart:io';
 import 'dart:isolate';
 import 'dart:ui';
 
 import 'package:awesome_notifications/awesome_notifications.dart';
-import 'package:cfood/custom/CPageMover.dart';
 import 'package:cfood/main.dart';
 import 'package:cfood/model/get_detail_merchant_response.dart';
 import 'package:cfood/screens/canteen.dart';
-import 'package:cfood/screens/inbox.dart';
 import 'package:cfood/screens/main.dart';
 import 'package:cfood/screens/organization.dart';
 import 'package:cfood/style.dart';
@@ -94,7 +90,7 @@ class NotificationController {
                   onPressed: () {
                     Navigator.of(context).pop(false);
                   },
-                  child: Text('Tolak'),
+                  child: const Text('Tolak'),
                 ),
                 TextButton(
                   onPressed: () {
@@ -104,7 +100,7 @@ class NotificationController {
                       Navigator.of(context).pop(value);
                     });
                   },
-                  child: Text('Izinkan'),
+                  child: const Text('Izinkan'),
                 ),
               ],
             );
@@ -246,8 +242,9 @@ class NotificationController {
     String? icon,
   }) async {
     bool isAllowed = await AwesomeNotifications().isNotificationAllowed();
-    if (!isAllowed)
+    if (!isAllowed) {
       isAllowed = await NotificationController.displayNotificationRationale();
+    }
     if (!isAllowed) return;
 
     log("notif $notifType go to $notifType screen");

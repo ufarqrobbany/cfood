@@ -1,7 +1,7 @@
 import 'dart:developer';
-import 'dart:io';
 
 import 'package:cfood/custom/CButtons.dart';
+import 'package:cfood/custom/popup_dialog.dart';
 import 'package:cfood/repository/routing_navigation/direction_controller.dart';
 import 'package:cfood/repository/routing_navigation/direction_layer.dart';
 import 'package:cfood/style.dart';
@@ -19,7 +19,15 @@ import 'package:permission_handler/permission_handler.dart';
 // import 'package:webview_flutter/webview_flutter.dart';
 
 class MapsScreen extends StatefulWidget {
-  const MapsScreen({super.key});
+  bool showAppbar;
+  Map<String, dynamic>? newDataLocation;
+  final Function(Map<String, dynamic> updatedLocation)? onLocationChanged;
+  MapsScreen({
+    super.key,
+    this.showAppbar = true,
+    this.newDataLocation,
+    this.onLocationChanged,
+  });
 
   @override
   State<MapsScreen> createState() => _MapsScreenState();
@@ -53,6 +61,84 @@ class _MapsScreenState extends State<MapsScreen> {
     //   "lokasi": const LatLng(-6.872503, 107.572476),
     //   // "lokasi": const LatLng(-6.871736, 107.574984)
     // },
+  ];
+
+  List<Map<String, dynamic>> buildingData = [
+    {
+      'id': 1,
+      'name': 'Polban gedung 1',
+      'latitude': -6.871372,
+      'longitude': 107.571951,
+      'floor_count': 2,
+      'floor': [
+        {
+          'floor': 1,
+          'room_count': 2,
+          'rooms': [
+            {
+              'room_id': 11,
+              'room_name': 'ruangan 1',
+            },
+            {
+              'room_id': 12,
+              'room_name': 'ruangan 2',
+            },
+          ],
+        },
+        {
+          'floor': 2,
+          'room_count': 2,
+          'rooms': [
+            {
+              'room_id': 21,
+              'room_name': 'ruangan 1',
+            },
+            {
+              'room_id': 22,
+              'room_name': 'rungan 2',
+            }
+          ],
+        },
+      ],
+    },
+    {
+      'id': 2,
+      'name': 'Polban Gedung 2',
+      'latitude': -6.870211,
+      'longitude': 107.571948,
+      'floor_count': 1,
+      'floor': [
+        {
+          'floor': 1,
+          'room_count': 1,
+          'rooms': [
+            {
+              'room_id': 1,
+              'room_name': 'iugkjblkglkjlbkj',
+            }
+          ],
+        },
+      ],
+    },
+    {
+      'id': 3,
+      'name': 'Gedung Polban 2',
+      'latitude': -6.871412,
+      'longitude': 107.574021,
+      'floor_count': 1,
+      'floor': [
+        {
+          'floor': 1,
+          'room_count': 1,
+          'rooms': [
+            {
+              'room_id': 1,
+              'room_name': 'rungangan knlkjbnkjnlkjn',
+            }
+          ],
+        },
+      ],
+    },
   ];
   List<LatLng> coordinates = [
     const LatLng(-6.869821, 107.572844),
@@ -99,9 +185,7 @@ class _MapsScreenState extends State<MapsScreen> {
         Position userPosition = await _determinePosition();
         log("lokasi user : $userPosition");
 
-        if (userPosition.latitude != null &&
-            userPosition.longitude != null &&
-            userPosition.latitude.abs() <= 90.0 &&
+        if (userPosition.latitude.abs() <= 90.0 &&
             userPosition.longitude.abs() <= 180.0) {
           dataOrder.add(
             {
@@ -145,7 +229,7 @@ class _MapsScreenState extends State<MapsScreen> {
 
     // Menyesuaikan peta dengan batas koordinat
     _mapController.fitCamera(
-      CameraFit.bounds(bounds: bounds, padding: EdgeInsets.all(50)),
+      CameraFit.bounds(bounds: bounds, padding: const EdgeInsets.all(50)),
     );
 
     // Mengupdate rute di controller
@@ -177,28 +261,32 @@ class _MapsScreenState extends State<MapsScreen> {
     return await Geolocator.getCurrentPosition();
   }
 
+  void addNewLocation() {}
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: backButtonCustom(context: context),
-        leadingWidth: 90,
-        // backgroundColor: Colors.white.withOpacity(0.10),
-        // foregroundColor: Colors.white.withOpacity(0.10),
-        // scrolledUnderElevation: 100,
-        elevation: 0,
-        forceMaterialTransparency: false,
-        actions: [
-          notifIconButton(
-            icons: UIcons.solidRounded.loading,
-            iconColor: Warna.biru,
-            notifCount: '0',
-            onPressed: () {
-              loadUserLocation();
-            },
-          )
-        ],
-      ),
+      appBar: !widget.showAppbar
+          ? null
+          : AppBar(
+              leading: backButtonCustom(context: context),
+              leadingWidth: 90,
+              // backgroundColor: Colors.white.withOpacity(0.10),
+              // foregroundColor: Colors.white.withOpacity(0.10),
+              // scrolledUnderElevation: 100,
+              elevation: 0,
+              forceMaterialTransparency: false,
+              actions: [
+                notifIconButton(
+                  icons: UIcons.solidRounded.loading,
+                  iconColor: Warna.biru,
+                  notifCount: '0',
+                  onPressed: () {
+                    loadUserLocation();
+                  },
+                )
+              ],
+            ),
       body: FlutterMap(
         mapController: _mapController,
         options: const MapOptions(
@@ -208,7 +296,7 @@ class _MapsScreenState extends State<MapsScreen> {
         children: [
           TileLayer(
             urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-            subdomains: ['a', 'b', 'c'],
+            subdomains: const ['a', 'b', 'c'],
 
             // attributionBuilder: (_) {
             //   return Text("© OpenStreetMap contributors");
@@ -222,6 +310,42 @@ class _MapsScreenState extends State<MapsScreen> {
             },
             controller: _directionController,
           ),
+          MarkerLayer(
+              markers: buildingData.map((building) {
+            return Marker(
+              point: LatLng(building['latitude'], building['longitude']),
+              child: InkWell(
+                onTap: () {
+                  log(building['name'].toString());
+                  log(building['floor'].toString());
+                  log(building['floor'][0]['rooms'].toString());
+                  showMyCustomDialog(
+                    context,
+                    barrierDismissible: true,
+                    text: building['name'].toString(),
+                    content: buildingMenu(
+                      floorData: building['floor'],
+                      buildingItem: building,
+                    ),
+                    customActions: [],
+                  );
+                },
+                child: Container(
+                  // padding: EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(100),
+                  ),
+                  child: Icon(
+                    // Icons.location_city_rounded,
+                    UIcons.solidRounded.building,
+                    color: Warna.hijau,
+                    size: 20,
+                  ),
+                ),
+              ),
+            );
+          }).toList()),
           MarkerLayer(
             markers: dataOrder.map((coord) {
               return Marker(
@@ -277,115 +401,193 @@ class _MapsScreenState extends State<MapsScreen> {
       ),
     );
   }
+
+  Widget buildingMenu({
+    List<Map<String, dynamic>>? floorData,
+    Map<String, dynamic>? buildingItem,
+  }) {
+    int selectedFloorId = 0;
+    return SizedBox(
+      width: MediaQuery.of(context).size.width - 20,
+      height: MediaQuery.of(context).size.height -
+          MediaQuery.of(context).size.height * 0.50,
+      child: ListView.builder(
+        itemCount: floorData?.length,
+        shrinkWrap: true,
+        scrollDirection: Axis.vertical,
+        physics: const BouncingScrollPhysics(),
+        itemBuilder: (context, index) {
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                contentPadding: const EdgeInsets.symmetric(horizontal: 10),
+                title: Text("Lantai ${floorData![index]['floor']}"),
+                trailing: Icon(
+                  Icons.arrow_drop_down_rounded,
+                  color: Warna.biru,
+                ),
+                onTap: () {
+                  setState(() {
+                    selectedFloorId = floorData[index]['floor'];
+                  });
+                  log(selectedFloorId.toString());
+                  log(floorData[index]['rooms'].toString());
+                },
+              ),
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 800),
+                // height: 100,
+                child: ListView.builder(
+                  itemCount: floorData[index]['rooms'].length,
+                  shrinkWrap: true,
+                  scrollDirection: Axis.vertical,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemBuilder: (context, indexRoom) {
+                    var room = floorData[index]['rooms'][indexRoom];
+                    var selectedRoom = 0;
+                    return ListTile(
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 30),
+                      // tileColor: selectedRoom == room['room_id']
+                      //     ? Warna.kuning
+                      //     : Colors.transparent,
+                      title: Text(room['room_name'].toString()),
+                      onTap: () {
+                        setState(() {
+                          selectedRoom = room['room_id'];
+                          widget.newDataLocation?.addAll(buildingItem!);
+
+                          if (widget.onLocationChanged != null) {
+                            widget.onLocationChanged!(widget.newDataLocation!);
+                          }
+                        });
+
+                        log(selectedRoom.toString());
+                        log(widget.newDataLocation.toString());
+                      },
+                    );
+                  },
+                ),
+              ),
+              Divider(
+                color: Warna.biru.withOpacity(0.50),
+                height: 1,
+                thickness: 1,
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
 }
 
-  // Future<void> loadOSMFile() async {
-  //   try {
-  //     // Access the OSM file from the uploaded path
-  //     // final directory = await getApplicationDocumentsDirectory();
-  //     // final filePath =
-  //     //     '${directory.path}/map.osm'; // Adjust the path accordingly
-  //     final file = File('assets/maps/map.osm');
+// Future<void> loadOSMFile() async {
+//   try {
+//     // Access the OSM file from the uploaded path
+//     // final directory = await getApplicationDocumentsDirectory();
+//     // final filePath =
+//     //     '${directory.path}/map.osm'; // Adjust the path accordingly
+//     final file = File('assets/maps/map.osm');
 
-  //     // Ensure file is copied to the app's documents directory (if not there already)
-  //     if (!await file.exists()) {
-  //       // Copy from assets to the app documents folder
-  //       final byteData = await File('assets/maps/map.osm').readAsBytes();
-  //       await file.writeAsBytes(byteData);
-  //     }
+//     // Ensure file is copied to the app's documents directory (if not there already)
+//     if (!await file.exists()) {
+//       // Copy from assets to the app documents folder
+//       final byteData = await File('assets/maps/map.osm').readAsBytes();
+//       await file.writeAsBytes(byteData);
+//     }
 
-  //     // Reading file content
-  //     final content = await file.readAsString();
+//     // Reading file content
+//     final content = await file.readAsString();
 
-  //     // Parse XML content from OSM file
-  //     final document = xml.parse(content);
+//     // Parse XML content from OSM file
+//     final document = xml.parse(content);
 
-  //     // Extract all nodes from the OSM file
-  //     final nodeElements = document.findAllElements('node');
-  //     for (var node in nodeElements) {
-  //       final id = node.getAttribute('id') ?? '';
-  //       final lat = double.parse(node.getAttribute('lat') ?? '0');
-  //       final lon = double.parse(node.getAttribute('lon') ?? '0');
-  //       nodes[id] = LatLng(lat, lon);
-  //     }
+//     // Extract all nodes from the OSM file
+//     final nodeElements = document.findAllElements('node');
+//     for (var node in nodeElements) {
+//       final id = node.getAttribute('id') ?? '';
+//       final lat = double.parse(node.getAttribute('lat') ?? '0');
+//       final lon = double.parse(node.getAttribute('lon') ?? '0');
+//       nodes[id] = LatLng(lat, lon);
+//     }
 
-  //     // Extract ways that connect nodes
-  //     final wayElements = document.findAllElements('way');
-  //     for (var way in wayElements) {
-  //       List<String> wayNodes = [];
-  //       final ndElements = way.findAllElements('nd');
-  //       for (var nd in ndElements) {
-  //         final nodeId = nd.getAttribute('ref') ?? '';
-  //         wayNodes.add(nodeId);
-  //       }
-  //       ways.add(wayNodes);
-  //     }
+//     // Extract ways that connect nodes
+//     final wayElements = document.findAllElements('way');
+//     for (var way in wayElements) {
+//       List<String> wayNodes = [];
+//       final ndElements = way.findAllElements('nd');
+//       for (var nd in ndElements) {
+//         final nodeId = nd.getAttribute('ref') ?? '';
+//         wayNodes.add(nodeId);
+//       }
+//       ways.add(wayNodes);
+//     }
 
-  //     // Initialize with the coordinates of the first way
-  //     if (ways.isNotEmpty) {
-  //       coordinates = ways[0].map((id) => nodes[id]!).toList();
-  //     }
+//     // Initialize with the coordinates of the first way
+//     if (ways.isNotEmpty) {
+//       coordinates = ways[0].map((id) => nodes[id]!).toList();
+//     }
 
-  //     // Update the UI to display the route
-  //     setState(() {});
-  //   } catch (e) {
-  //     log("Error loading OSM file: $e");
-  //   }
-  // }
+//     // Update the UI to display the route
+//     setState(() {});
+//   } catch (e) {
+//     log("Error loading OSM file: $e");
+//   }
+// }
 
-     // if (coordinates.isNotEmpty)
-          //   PolylineLayer(
-          //     polylines: [
-          //       Polyline(
-          //         points: coordinates,
-          //         strokeWidth: 4.0,
-          //         color: Colors.blue,
-          //       ),
-          //     ],
-          //   ),
-          // PolylineLayer(
-          //   polylines: [
-          //     Polyline(
-          //       points: coordinates,
-          //       strokeWidth: 4.0,
-          //       color: Colors.blue,
-          //     ),
-          //   ],
+// if (coordinates.isNotEmpty)
+//   PolylineLayer(
+//     polylines: [
+//       Polyline(
+//         points: coordinates,
+//         strokeWidth: 4.0,
+//         color: Colors.blue,
+//       ),
+//     ],
+//   ),
+// PolylineLayer(
+//   polylines: [
+//     Polyline(
+//       points: coordinates,
+//       strokeWidth: 4.0,
+//       color: Colors.blue,
+//     ),
+//   ],
 
-    // body: SfMaps(
-      //   layers: [
-      //     MapTileLayer(
-      //       initialFocalLatLng: MapLatLng(-6.871451, 107.572846),
-      //       initialZoomLevel: 15,
-      //       urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-      //       sublayers: [
-      //         MapPolylineLayer(
-      //           polylines: Set.of([MapPolyline(
-      //             points: polylinePoints,
-      //           )]),
-      //         ),
-      //       ],
-      //       initialMarkersCount: 2,
-      //       markerBuilder: (context, index) {
-      //         if (index == 0) {
-      //           return MapMarker(
-      //               iconColor: Colors.white,
-      //               iconStrokeColor: Colors.blue,
-      //               iconStrokeWidth: 2,
-      //               latitude: polylinePoints[index].latitude,
-      //               longitude: polylinePoints[index].longitude);
-      //         }
-      //         return MapMarker(
-      //             iconColor: Colors.white,
-      //             iconStrokeColor: Colors.blue,
-      //             iconStrokeWidth: 2,
-      //             latitude: polylinePoints[polylinePoints.length - 1].latitude,
-      //             longitude: polylinePoints[polylinePoints.length - 1].longitude);
-      //       },
-      //     ),
-      //   ],
-      // ),
-
+// body: SfMaps(
+//   layers: [
+//     MapTileLayer(
+//       initialFocalLatLng: MapLatLng(-6.871451, 107.572846),
+//       initialZoomLevel: 15,
+//       urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+//       sublayers: [
+//         MapPolylineLayer(
+//           polylines: Set.of([MapPolyline(
+//             points: polylinePoints,
+//           )]),
+//         ),
+//       ],
+//       initialMarkersCount: 2,
+//       markerBuilder: (context, index) {
+//         if (index == 0) {
+//           return MapMarker(
+//               iconColor: Colors.white,
+//               iconStrokeColor: Colors.blue,
+//               iconStrokeWidth: 2,
+//               latitude: polylinePoints[index].latitude,
+//               longitude: polylinePoints[index].longitude);
+//         }
+//         return MapMarker(
+//             iconColor: Colors.white,
+//             iconStrokeColor: Colors.blue,
+//             iconStrokeWidth: 2,
+//             latitude: polylinePoints[polylinePoints.length - 1].latitude,
+//             longitude: polylinePoints[polylinePoints.length - 1].longitude);
+//       },
+//     ),
+//   ],
+// ),
 
 //  WebViewController controller = WebViewController()
 //   ..setJavaScriptMode(JavaScriptMode.unrestricted)

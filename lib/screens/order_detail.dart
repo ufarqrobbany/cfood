@@ -1,6 +1,5 @@
 import 'package:cfood/custom/CButtons.dart';
 import 'package:cfood/custom/CPageMover.dart';
-import 'package:cfood/custom/order_status_timeline_tile.dart';
 import 'package:cfood/model/confirm_cart_response.dart';
 import 'package:cfood/repository/fetch_controller.dart';
 import 'package:cfood/screens/chat.dart';
@@ -324,7 +323,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                                       color: Warna.abu,
                                       borderRadius: BorderRadius.circular(50),
                                     ),
-                                    child: Icon(Icons.person))
+                                    child: const Icon(Icons.person))
                                   : Image.network(
                                       "${AppConfig.URL_IMAGES_PATH}${dataConfirmCart!.userInformation.userPhoto}",
                                       fit: BoxFit.cover,

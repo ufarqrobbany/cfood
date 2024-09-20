@@ -135,15 +135,15 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   String decryptUrl(String encryptedUrl) {
-    String _keyString =
+    String keyString =
         'campusfoodempireempirecampusfood'; // Example key (32 bytes)
 
-    final key = encrypt.Key.fromUtf8(_keyString);
+    final key = encrypt.Key.fromUtf8(keyString);
 
     // Pisahkan IV dan data terenkripsi berdasarkan pemisah titik dua
     final parts = encryptedUrl.split(':');
     if (parts.length != 2) {
-      throw FormatException('Invalid encrypted URL format');
+      throw const FormatException('Invalid encrypted URL format');
     }
 
     // final iv = encrypt.IV.fromBase64(parts[0]);
@@ -184,7 +184,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
     String hexString = value.toRadixString(16);
     // Pastikan panjang hexString genap
-    if (hexString.length % 2 != 0) hexString = '0' + hexString;
+    if (hexString.length % 2 != 0) hexString = '0$hexString';
     return hex.decode(hexString);
   }
 

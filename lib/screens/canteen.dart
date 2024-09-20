@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
-import 'dart:typed_data';
-import 'dart:io';
 
 import 'package:cfood/custom/CBottomSheet.dart';
 import 'package:cfood/custom/CButtons.dart';
@@ -36,19 +34,10 @@ import 'package:cfood/style.dart';
 import 'package:cfood/utils/common.dart';
 import 'package:cfood/utils/constant.dart';
 import 'package:community_material_icon/community_material_icon.dart';
-import 'package:convert/convert.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:go_router/go_router.dart';
-import 'package:http/http.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:share_plus/share_plus.dart';
-import 'package:social_share/social_share.dart';
 import 'package:toast/toast.dart';
 import 'package:uicons/uicons.dart';
-import 'package:encrypt/encrypt.dart' as encrypt;
-import 'package:crypto/crypto.dart' as crypto;
 
 class CanteenScreen extends StatefulWidget {
   final int? merchantId;
@@ -1319,7 +1308,7 @@ class _CanteenScreenState extends State<CanteenScreen>
   // ERROR IN THIS LINES
   Widget bodyProductList() {
     log("log menu list from body ${menuMaps[selectedTab]!.length}");
-    log("menu list from body : ${menusMerchant}");
+    log("menu list from body : $menusMerchant");
     return Container(
       color: Colors.white,
       child: Column(
@@ -1358,7 +1347,7 @@ class _CanteenScreenState extends State<CanteenScreen>
                       isVertical: true,
                       itemCount: 3,
                     )
-                  : menuMaps[selectedTab]!.length == 0
+                  : menuMaps[selectedTab]!.isEmpty
                       ? 
                       itemsEmptyBody(context,
                           bgcolors: Colors.white,
@@ -1950,7 +1939,7 @@ class _CanteenScreenState extends State<CanteenScreen>
                                   child: Text(
                                     dataAddCartInfo == null
                                         ? '${calculateCartData?.totalMenus} Menu | ${calculateCartData?.totalItems} Item'
-                                        : '${calculateCartData?.totalMenus!} Menu | ${calculateCartData?.totalItems!} Item',
+                                        : '${calculateCartData?.totalMenus} Menu | ${calculateCartData?.totalItems} Item',
                                     style: const TextStyle(
                                       color: Colors.white,
                                       fontSize: 13,
@@ -1964,7 +1953,7 @@ class _CanteenScreenState extends State<CanteenScreen>
                                     child: Text(
                                       dataAddCartInfo == null
                                           ? 'Rp${formatNumberWithThousandsSeparator(calculateCartData!.totalPrices)}'
-                                          : 'Rp${formatNumberWithThousandsSeparator(calculateCartData!.totalPrices!)}',
+                                          : 'Rp${formatNumberWithThousandsSeparator(calculateCartData!.totalPrices)}',
                                       style: const TextStyle(
                                         color: Colors.white,
                                         fontSize: 16,

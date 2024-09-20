@@ -17,9 +17,9 @@ import 'package:cfood/screens/inbox.dart';
 import 'package:cfood/screens/kurir_pages/chat_seller.dart';
 import 'package:cfood/screens/kurir_pages/delivery.dart';
 import 'package:cfood/screens/kurir_pages/order_available.dart';
+import 'package:cfood/screens/locations.dart';
 import 'package:cfood/screens/login.dart';
 import 'package:cfood/screens/main.dart';
-import 'package:cfood/screens/maps.dart';
 import 'package:cfood/screens/profile_image_update.dart';
 import 'package:cfood/screens/user_info.dart';
 import 'package:cfood/screens/wirausaha_pages/main.dart';
@@ -302,7 +302,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           onTap: () {
                             navigateTo(
                               context,
-                              const MapsScreen(),
+                              const LocationScreen(),
+                              // MapsScreen(),
                             );
                           },
                         ),

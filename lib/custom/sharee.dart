@@ -12,7 +12,6 @@ import 'package:http/http.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:social_share/social_share.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
-import 'package:crypto/crypto.dart' as crypto;
 
 Map<String, String> randomDataMap = {
   'menu?': 'mu',
@@ -172,12 +171,12 @@ void onTapOpenShareOption(
 // }
 
 String encryptUrl(String url) {
-  String _keyString =
+  String keyString =
       'campusfoodempireempirecampusfood'; // Example key (32 bytes)
-  String _ivString = 'campusfoodempire'; // Example IV (16 bytes)
+  String ivString = 'campusfoodempire'; // Example IV (16 bytes)
 
-  final key = encrypt.Key.fromUtf8(_keyString);
-  final iv = encrypt.IV.fromUtf8(_ivString);
+  final key = encrypt.Key.fromUtf8(keyString);
+  final iv = encrypt.IV.fromUtf8(ivString);
   final encrypter =
       encrypt.Encrypter(encrypt.AES(key, mode: encrypt.AESMode.cbc));
 
@@ -189,15 +188,15 @@ String encryptUrl(String url) {
 }
 
 String decryptUrl(String encryptedUrl) {
-  String _keyString =
+  String keyString =
       'campusfoodempireempirecampusfood'; // Example key (32 bytes)
 
-  final key = encrypt.Key.fromUtf8(_keyString);
+  final key = encrypt.Key.fromUtf8(keyString);
 
   // Pisahkan IV dan data terenkripsi berdasarkan pemisah titik dua
   final parts = encryptedUrl.split(':');
   if (parts.length != 2) {
-    throw FormatException('Invalid encrypted URL format');
+    throw const FormatException('Invalid encrypted URL format');
   }
 
   // final iv = encrypt.IV.fromBase64(parts[0]);
@@ -237,6 +236,6 @@ List<int> base62Decode(String base62) {
 
   String hexString = value.toRadixString(16);
   // Pastikan panjang hexString genap
-  if (hexString.length % 2 != 0) hexString = '0' + hexString;
+  if (hexString.length % 2 != 0) hexString = '0$hexString';
   return hex.decode(hexString);
 }

@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:developer';
-import 'dart:ffi';
 import 'dart:io';
 
 import 'package:cfood/custom/CButtons.dart';
@@ -12,7 +11,6 @@ import 'package:cfood/model/add_menu_response.dart';
 import 'package:cfood/model/get_category_response.dart';
 import 'package:cfood/model/get_detail_merchant_response.dart';
 import 'package:cfood/model/get_specific_menu_response.dart';
-import 'package:cfood/model/reponse_handler.dart';
 import 'package:cfood/repository/fetch_controller.dart';
 import 'package:cfood/screens/wirausaha_pages/category_add.dart';
 import 'package:cfood/screens/wirausaha_pages/varianst_add_edit.dart';
@@ -704,7 +702,7 @@ class _AddEditMenuScreenState extends State<AddEditMenuScreen> {
                   ],
                 )),
             ListView.builder(
-              itemCount: listOption!.length,
+              itemCount: listOption.length,
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 5),

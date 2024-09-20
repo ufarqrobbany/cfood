@@ -1,7 +1,5 @@
-import 'dart:async';
 import 'dart:developer';
 
-import 'package:app_links/app_links.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:cfood/custom/CPageMover.dart';
 import 'package:cfood/repository/background/service_location.dart';
@@ -34,7 +32,6 @@ import 'package:cfood/screens/user_info.dart';
 import 'package:cfood/screens/verification.dart';
 
 import 'package:cfood/style.dart';
-import 'package:cfood/utils/auth.dart';
 // import 'package:cfood/utils/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

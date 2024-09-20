@@ -5,12 +5,10 @@ import 'package:cfood/custom/CPageMover.dart';
 import 'package:cfood/custom/card.dart';
 import 'package:cfood/custom/reload_indicator.dart';
 import 'package:cfood/custom/shimmer.dart';
-import 'package:cfood/model/get_detail_merchant_response.dart';
 import 'package:cfood/model/getl_all_merchant_response.dart';
 import 'package:cfood/model/get_all_menu_response.dart';
 import 'package:cfood/model/get_all_organization_response.dart';
 import 'package:cfood/repository/fetch_controller.dart';
-import 'package:cfood/repository/notifications.dart';
 import 'package:cfood/screens/canteen.dart';
 import 'package:cfood/screens/favorite.dart';
 import 'package:cfood/screens/inbox.dart';
@@ -214,7 +212,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       icons: UIcons.solidRounded.bell,
                       notifCount: '22',
                       onPressed: () {
-                        navigateTo(context, NotificationScreen());
+                        navigateTo(context, const NotificationScreen());
                         // log(AppConfig.URL_PHOTO_PROFILE);
                         // NotificationController(
                         //   notifType: 'menu',

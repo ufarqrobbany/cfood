@@ -15,6 +15,7 @@ Future<void> showMyCustomDialog(
   final bool justYEs = false,
   final Widget? content,
   final bool barrierDismissible = false,
+  final List<Widget>? customActions,
 }) async {
   return showDialog<void>(
     context: context,
@@ -35,7 +36,7 @@ Future<void> showMyCustomDialog(
         actionsAlignment: MainAxisAlignment.spaceAround,
         actionsOverflowAlignment: OverflowBarAlignment.end,
         actionsOverflowDirection: VerticalDirection.down,
-        actions: [
+        actions: customActions ?? [
           ClipRRect(
             borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(8), bottomRight: Radius.circular(8),),
             child: Row(
