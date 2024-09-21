@@ -69,6 +69,9 @@ class _ProfileImageUpdateScreenState extends State<ProfileImageUpdateScreen> {
       setState(() {
         isLoading = true;
       });
+
+      log('uploading');
+      log('file : ${formData.files}');
       var response = await dio.post(
         '${AppConfig.BASE_URL}users/${AppConfig.USER_ID}/upload-photo',
         data: formData,
@@ -76,45 +79,49 @@ class _ProfileImageUpdateScreenState extends State<ProfileImageUpdateScreen> {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
+          // Menambahkan validasi status kode respons agar tidak melempar error pada 500-an status code
+          validateStatus: (status) {
+            return status != null && status < 500; // 500+ dianggap error
+          },
         ),
       );
 
+      log(response.toString());
       log("formdata file: ${formData.files}");
 
-      if (response.statusCode == 200) {
-        // Handle successful response
-        // print('Photo uploaded successfully');
+      if (response.statusCode! >= 200 && response.statusCode! < 400) {
         showToast('Berhasil Mengubah Foto');
+        log('upload done');
         setState(() {
           _image_temp = _image;
-          _image = null; // Reset _image to null after successful upload
-          isUpdated = true;
+          _image = null; // Reset _image after successful upload
           isLoading = false;
         });
+        navigateBack(context, result: 'updated');
       } else {
-        // Handle error response
-        // print('Failed to upload photo');
+        showToast('Gagal Mengubah Foto');
+        log('upload failed with status code: ${response.statusCode}');
         setState(() {
+          _image = null; // Reset _image after failed upload
+          _image_temp = _image;
           isLoading = false;
         });
-        showToast('Gagal Mengubah Foto');
       }
     } catch (e) {
-      // print('Error: $e');
-      // showToast(e.toString());
       if (e is DioException && e.response?.statusCode == 502) {
-        showToast('Ukuran Gambar Terlalu Besar');
-        setState(() {
-          isLoading = false;
-        });
+        showToast('Ukuran Gambar Terlalu Besar: $e');
+      } else if (e is DioException && e.response?.statusCode == 500) {
+        // Jika error 500, log yang lebih informatif dan lanjutkan
+        showToast('Server Error: Coba lagi nanti');
+        log('Server error (500) : $e');
       } else {
         showToast('Gagal Mengubah Foto');
-        setState(() {
-          isLoading = false;
-        });
+        log('upload failed error : $e');
       }
+
       setState(() {
-        _image = null; // Reset _image to null after successful upload
+        _image = null; // Reset _image on any error
+        _image_temp = _image;
         isLoading = false;
       });
     }
@@ -183,10 +190,10 @@ class _ProfileImageUpdateScreenState extends State<ProfileImageUpdateScreen> {
         return back;
       } else {
         setState(() {
-          back = false;
+          back = true;
         });
         log('data not updated');
-        showToast('Foto Belum di Upload');
+        // showToast('Foto Belum di Upload');
         return back;
       }
     } else {
@@ -204,7 +211,8 @@ class _ProfileImageUpdateScreenState extends State<ProfileImageUpdateScreen> {
         navigateBack(context, result: 'updated');
         // return true;
       } else {
-        showToast('Foto Belum di Upload');
+        // showToast('Foto Belum di Upload');
+        navigateBack(context, result: 'updated');
         // return false;
       }
     } else {
@@ -329,3 +337,90 @@ class _ProfileImageUpdateScreenState extends State<ProfileImageUpdateScreen> {
         ));
   }
 }
+
+// Future<void> uploadPhotoProfile(BuildContext context) async {
+//     if (_image == null) return;
+
+//     var dio = Dio();
+//     var formData = FormData.fromMap({
+//       'file': await MultipartFile.fromFile(
+//         _image!.path,
+//         filename: path.basename(_image!.path),
+//         contentType: MediaType(
+//             'image', path.extension(_image!.path).replaceAll('.', '')),
+//       ),
+//     });
+
+//     try {
+//       setState(() {
+//         isLoading = true;
+//       });
+//       log('uploading');
+//       var response = await dio.post(
+//         '${AppConfig.BASE_URL}users/${AppConfig.USER_ID}/upload-photo',
+//         data: formData,
+//         options: Options(
+//           headers: {
+//             'Content-Type': 'multipart/form-data',
+//           },
+//         ),
+//       );
+
+//       log(response.toString());
+
+//       log("formdata file: ${formData.files}");
+
+//       if (response.statusCode! <= 399) {
+//         // Handle successful response
+//         // print('Photo uploaded successfully');
+//         showToast('Berhasil Mengubah Foto');
+//         log('upload done');
+//         setState(() {
+//           _image_temp = _image;
+//           _image = null; // Reset _image to null after successful upload
+//           // isUpdated = true;
+//           isLoading = false;
+//         });
+//         goBackk();
+//       } else {
+//         // Handle error response
+//         // print('Failed to upload photo');
+//         setState(() {
+//           _image = null; // Reset _image to null after successful upload
+//           _image_temp = _image;
+//           isUpdated = false;
+//           isLoading = false;
+//         });
+//         log('upload failed');
+//         showToast('Gagal Mengubah Foto');
+//       }
+//     } catch (e) {
+//       // print('Error: $e');
+//       // showToast(e.toString());
+//       if (e is DioException && e.response?.statusCode == 502) {
+//         showToast('Ukuran Gambar Terlalu Besar $e');
+//         setState(() {
+//           _image = null; // Reset _image to null after successful upload
+//           _image_temp = _image;
+//           isUpdated = false;
+//           isLoading = false;
+//         });
+//         log('upload failed size to big');
+//       } else {
+//         showToast('Gagal Mengubah Foto');
+//         log('upload failed error : $e');
+//         setState(() {
+//           _image = null; // Reset _image to null after successful upload
+//           _image_temp = _image;
+//           isUpdated = false;
+//           isLoading = false;
+//         });
+//       }
+//       setState(() {
+//         _image = null; // Reset _image to null after successful upload
+//         _image_temp = _image;
+//         isUpdated = false;
+//         isLoading = false;
+//       });
+//     }
+//   }
