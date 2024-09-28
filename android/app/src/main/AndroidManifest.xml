@@ -6,7 +6,6 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
        
      <!-- android:icon="@mipmap/launcher_icon" -->
     
@@ -51,8 +50,10 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="http" android:host="campusfood.id"/>
-                <data android:scheme="https" android:host="campusfood.id" />
+                <!-- <data android:scheme="http" android:host="campusfood.id"/>
+                <data android:scheme="https" android:host="campusfood.id" /> -->
+                <data android:scheme="http" android:host="campusfood.id" android:pathPrefix="/to/"/>
+                <data android:scheme="https" android:host="campusfood.id" android:pathPrefix="/to/" />
                 <!-- <data android:scheme="http" android:host="cfood.id" android:pathPrefix="/splash" />
                 <data android:scheme="https" android:host="cfood.id" android:pathPrefix="/splash" /> -->
                 <!-- <data android:scheme="https" /> -->

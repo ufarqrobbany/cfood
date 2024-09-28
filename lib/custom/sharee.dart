@@ -130,6 +130,7 @@ void onTapOpenShareOption(
       yesText: 'Copy Link',
       noText: 'Opsi Lain',
       colorYes: Warna.kuning, onTapYes: () {
+    log(realUrl);
     Clipboard.setData(ClipboardData(text: realUrl));
     navigateBack(context);
   }, onTapNo: () {

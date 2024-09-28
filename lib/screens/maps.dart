@@ -22,11 +22,15 @@ class MapsScreen extends StatefulWidget {
   bool showAppbar;
   Map<String, dynamic>? newDataLocation;
   final Function(Map<String, dynamic> updatedLocation)? onLocationChanged;
+  String? custtomerImage;
+  List<Map<String, dynamic>>? userLocation;
   MapsScreen({
     super.key,
     this.showAppbar = true,
     this.newDataLocation,
     this.onLocationChanged,
+    this.custtomerImage,
+    this.userLocation,
   });
 
   @override
@@ -35,23 +39,23 @@ class MapsScreen extends StatefulWidget {
 
 class _MapsScreenState extends State<MapsScreen> {
   List<Map<String, dynamic>> dataOrder = [
-    {
-      "id": 1,
-      "type": 'pembeli',
-      "name": "Pembeli 1",
-      "menu": "roti bakar",
-      "harga": "10000",
-      "lokasi": const LatLng(-6.869821, 107.572844),
-    },
-    {
-      "id": 2,
-      "type": 'penjual',
-      "name": "Penjual",
-      "menu": "roti bakar",
-      "harga": "10000",
-      // "lokasi": const LatLng(-6.870937, 107.572546),
-      "lokasi": const LatLng(-6.870870, 107.571301)
-    },
+    // {
+    //   "id": 1,
+    //   "type": 'pembeli',
+    //   "name": "Pembeli 1",
+    //   "menu": "roti bakar",
+    //   "harga": "10000",
+    //   "lokasi": const LatLng(-6.869821, 107.572844),
+    // },
+    // {
+    //   "id": 2,
+    //   "type": 'penjual',
+    //   "name": "Penjual",
+    //   "menu": "roti bakar",
+    //   "harga": "10000",
+    //   // "lokasi": const LatLng(-6.870937, 107.572546),
+    //   "lokasi": const LatLng(-6.870870, 107.571301)
+    // },
     // {
     //   "id": 3,
     //   "type": 'kurir',
@@ -189,8 +193,8 @@ class _MapsScreenState extends State<MapsScreen> {
             userPosition.longitude.abs() <= 180.0) {
           dataOrder.add(
             {
-              "id": 3,
-              "type": 'kurir',
+              "id": 1,
+              "type": 'pembeli',
               "name": "kurir",
               "menu": "roti bakar",
               "harga": "10000",
@@ -198,7 +202,7 @@ class _MapsScreenState extends State<MapsScreen> {
             },
           );
           log('Data order added: $dataOrder');
-          _loadNewRoute();
+          // _loadNewRoute();
         } else {
           log('Invalid location coordinates: ${userPosition.latitude}, ${userPosition.longitude}');
         }
@@ -287,118 +291,226 @@ class _MapsScreenState extends State<MapsScreen> {
                 )
               ],
             ),
-      body: FlutterMap(
-        mapController: _mapController,
-        options: const MapOptions(
-          initialCenter: LatLng(-6.871451, 107.572846), // Koordinat default
-          initialZoom: 17.0,
-        ),
-        children: [
-          TileLayer(
-            urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-            subdomains: const ['a', 'b', 'c'],
-
-            // attributionBuilder: (_) {
-            //   return Text("© OpenStreetMap contributors");
-            // },
-          ),
-          DirectionsLayer(
-            coordinates: _coordinates,
-            color: Warna.hijau.withOpacity(0.80),
-            onCompleted: (isRouteAvailable) {
-              log(isRouteAvailable.toString());
-            },
-            controller: _directionController,
-          ),
-          MarkerLayer(
-              markers: buildingData.map((building) {
-            return Marker(
-              point: LatLng(building['latitude'], building['longitude']),
-              child: InkWell(
-                onTap: () {
-                  log(building['name'].toString());
-                  log(building['floor'].toString());
-                  log(building['floor'][0]['rooms'].toString());
-                  showMyCustomDialog(
-                    context,
-                    barrierDismissible: true,
-                    text: building['name'].toString(),
-                    content: buildingMenu(
-                      floorData: building['floor'],
-                      buildingItem: building,
-                    ),
-                    customActions: [],
-                  );
-                },
-                child: Container(
-                  // padding: EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(100),
-                  ),
-                  child: Icon(
-                    // Icons.location_city_rounded,
-                    UIcons.solidRounded.building,
-                    color: Warna.hijau,
-                    size: 20,
-                  ),
-                ),
+      body: dataOrder == []
+          ? Container()
+          : FlutterMap(
+              mapController: _mapController,
+              options: const MapOptions(
+                initialCenter:
+                    LatLng(-6.871451, 107.572846), // Koordinat default
+                initialZoom: 17.0,
               ),
-            );
-          }).toList()),
-          MarkerLayer(
-            markers: dataOrder.map((coord) {
-              return Marker(
-                width: 80.0,
-                height: 80.0,
-                point: coord['lokasi'],
-                child: InkWell(
-                  onTap: () {
-                    log(coord['type']);
-                  },
-                  child: coord['type'] == 'pembeli'
-                      ? Icon(
-                          Icons.person_pin_circle_rounded,
-                          color: Warna.like,
-                          size: 28,
-                        )
-                      : coord['type'] == 'penjual'
-                          ? Icon(
-                              Icons.store_mall_directory_rounded,
-                              color: Warna.kuning,
-                              size: 28,
-                            )
-                          : coord['type'] == 'kurir'
-                              ? Icon(
-                                  Icons.directions_bike_rounded,
-                                  color: Warna.like,
-                                  size: 28,
-                                )
-                              : Icon(
-                                  Icons.directions_bike_rounded,
-                                  color: Warna.biru,
-                                  size: 28,
-                                ),
-                ),
-                // builder: (ctx) => Icon(Icons.location_on, color: Colors.red),
-              );
-            }).toList(),
-          ),
-          // MarkerLayer(
-          //   markers: coordinates.map((coord) {
-          //     return Marker(
-          //       width: 80.0,
-          //       height: 80.0,
-          //       point: coord,
-          //       child: Icon(Icons.location_on, color: Warna.like),
-          //       // builder: (ctx) => Icon(Icons.location_on, color: Colors.red),
-          //     );
-          //   }).toList(),
-          // ),
+              children: [
+                TileLayer(
+                  urlTemplate:
+                      "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                  subdomains: const ['a', 'b', 'c'],
 
-          // ),
-        ],
-      ),
+                  // attributionBuilder: (_) {
+                  //   return Text("© OpenStreetMap contributors");
+                  // },
+                ),
+                // DirectionsLayer(
+                //   coordinates: _coordinates,
+                //   color: Warna.hijau.withOpacity(0.80),
+                //   onCompleted: (isRouteAvailable) {
+                //     log(isRouteAvailable.toString());
+                //   },
+                //   controller: _directionController,
+                // ),
+                MarkerLayer(
+                    markers: buildingData.map((building) {
+                  return Marker(
+                    point: LatLng(building['latitude'], building['longitude']),
+                    child: InkWell(
+                      onTap: () {
+                        log(building['name'].toString());
+                        log(building['floor'].toString());
+                        log(building['floor'][0]['rooms'].toString());
+
+                        setState(() {
+                          // selectedRoom = room['room_id'];
+                          widget.newDataLocation?.addAll(building);
+
+                          if (widget.onLocationChanged != null) {
+                            widget.onLocationChanged!(widget.newDataLocation!);
+                          }
+                        });
+
+                        log(widget.newDataLocation.toString());
+                        // showMyCustomDialog(
+                        //   context,
+                        //   barrierDismissible: true,
+                        //   text: building['name'].toString(),
+                        //   content: buildingMenu(
+                        //     floorData: building['floor'],
+                        //     buildingItem: building,
+                        //   ),
+                        //   customActions: [],
+                        // );
+                      },
+                      child: Container(
+                        // padding: EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(100),
+                        ),
+                        child: Icon(
+                          // Icons.location_city_rounded,
+                          UIcons.solidRounded.building,
+                          color: Warna.hijau,
+                          size: 20,
+                        ),
+                      ),
+                    ),
+                  );
+                }).toList()),
+                // MarkerLayer(markers: [
+                //   Marker(
+                //     width: 80.0,
+                //     height: 80.0,
+                //     point: UserLocation.DATA['lokasi'],
+                //     child: Stack(
+                //       alignment: Alignment.topCenter,
+                //       children: [
+                //         Icon(
+                //           // Icons.person_pin_circle_rounded,
+                //           UIcons.solidRounded.marker,
+                //           color: Warna.biru,
+                //           size: 40,
+                //         ),
+                //         Padding(
+                //           padding: const EdgeInsets.only(top: 6),
+                //           child: Container(
+                //             height: 23,
+                //             width: 23,
+                //             decoration: BoxDecoration(
+                //               color: Colors.white,
+                //               borderRadius: BorderRadius.circular(100),
+                //             ),
+                //             child: ClipRRect(
+                //               borderRadius: BorderRadius.circular(100),
+                //               child: Image.network(
+                //                 widget.custtomerImage != null
+                //                     ? '${widget.custtomerImage}'
+                //                     // '${AppConfig.URL_PHOTO_PROFILE}}'
+                //                     : 'https://i.pinimg.com/originals/d9/d8/8e/d9d88e3d1f74e2b8ced3df051cecb81d.jpg',
+                //                 fit: BoxFit.cover,
+                //                 errorBuilder: (context, error, stackTrace) {
+                //                   return Container(
+                //                     height: 23,
+                //                     width: 23,
+                //                     decoration: BoxDecoration(
+                //                       borderRadius: BorderRadius.circular(100),
+                //                       color: Warna.abu,
+                //                     ),
+                //                   );
+                //                 },
+                //               ),
+                //             ),
+                //           ),
+                //         ),
+                //       ],
+                //     ),
+                //   ),
+                // ]),
+                MarkerLayer(
+                        markers: dataOrder.map((coord) {
+                          // markers: widget.userLocation!.map((coord) {
+                          return Marker(
+                            width: 80.0,
+                            height: 80.0,
+                            point: dataOrder == [] ? const LatLng(-6.869821, 107.572844) : coord['lokasi'],
+                            child: InkWell(
+                              onTap: () {
+                                log(coord['type']);
+                              },
+                              child: coord['type'] == 'pembeli'
+                                  ? Stack(
+                                      alignment: Alignment.topCenter,
+                                      children: [
+                                        Icon(
+                                          // Icons.person_pin_circle_rounded,
+                                          UIcons.solidRounded.marker,
+                                          color: Warna.biru,
+                                          size: 40,
+                                        ),
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(top: 6),
+                                          child: Container(
+                                            height: 23,
+                                            width: 23,
+                                            decoration: BoxDecoration(
+                                              color: Colors.white,
+                                              borderRadius:
+                                                  BorderRadius.circular(100),
+                                            ),
+                                            child: ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(100),
+                                              child: Image.network(
+                                                widget.custtomerImage != null
+                                                    ? '${widget.custtomerImage}'
+                                                    // '${AppConfig.URL_PHOTO_PROFILE}}'
+                                                    : 'https://i.pinimg.com/originals/d9/d8/8e/d9d88e3d1f74e2b8ced3df051cecb81d.jpg',
+                                                fit: BoxFit.cover,
+                                                errorBuilder: (context, error,
+                                                    stackTrace) {
+                                                  return Container(
+                                                    height: 23,
+                                                    width: 23,
+                                                    decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              100),
+                                                      color: Warna.abu,
+                                                    ),
+                                                  );
+                                                },
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    )
+                                  : coord['type'] == 'penjual'
+                                      ? Icon(
+                                          Icons.store_mall_directory_rounded,
+                                          color: Warna.kuning,
+                                          size: 28,
+                                        )
+                                      : coord['type'] == 'kurir'
+                                          ? Icon(
+                                              Icons.directions_bike_rounded,
+                                              color: Warna.like,
+                                              size: 28,
+                                            )
+                                          : Icon(
+                                              Icons.directions_bike_rounded,
+                                              color: Warna.biru,
+                                              size: 28,
+                                            ),
+                            ),
+                            // builder: (ctx) => Icon(Icons.location_on, color: Colors.red),
+                          );
+                        }).toList(),
+                      ),
+                // MarkerLayer(
+                //   markers: coordinates.map((coord) {
+                //     return Marker(
+                //       width: 80.0,
+                //       height: 80.0,
+                //       point: coord,
+                //       child: Icon(Icons.location_on, color: Warna.like),
+                //       // builder: (ctx) => Icon(Icons.location_on, color: Colors.red),
+                //     );
+                //   }).toList(),
+                // ),
+
+                // ),
+              ],
+            ),
     );
   }
 
@@ -447,7 +559,8 @@ class _MapsScreenState extends State<MapsScreen> {
                     var room = floorData[index]['rooms'][indexRoom];
                     var selectedRoom = 0;
                     return ListTile(
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 30),
+                      contentPadding:
+                          const EdgeInsets.symmetric(horizontal: 30),
                       // tileColor: selectedRoom == room['room_id']
                       //     ? Warna.kuning
                       //     : Colors.transparent,

@@ -166,6 +166,9 @@ class _SignUpDanusScreenState extends State<SignUpDanusScreen> {
                 controller: organizationController,
                 onChanged: (p0) {
                   getOrganizations(context, name: p0);
+                   setState(() {
+                      organizationSuggestion = !organizationSuggestion;
+                    });
                 },
                 suffixIcon: IconButton(
                   icon: Icon(organizationSuggestion &&
@@ -188,33 +191,33 @@ class _SignUpDanusScreenState extends State<SignUpDanusScreen> {
               const SizedBox(
                 height: 20,
               ),
-              RichText(
-                text: TextSpan(
-                  text: '',
-                  style: TextStyle(color: Colors.grey.shade900, fontSize: 15),
-                  children: [
-                    TextSpan(
-                      text: 'Tambah Organisasi',
-                      style: TextStyle(color: Warna.biru, fontSize: 15),
-                      recognizer: TapGestureRecognizer()
-                        ..onTap = () {
-                          log('go to add Organization');
-                          navigateTo(
-                              context,
-                              OrganizationAddScreen(
-                                campusId: widget.campusId!,
-                              )).then((result) {
-                            if (result == 'load org') {
-                              getOrganizations(context);
-                            }
-                          });
-                          // context.pushReplacementNamed('register');
-                          // navigateToRep(context, );
-                        },
-                    ),
-                  ],
-                ),
-              ),
+              // RichText(
+              //   text: TextSpan(
+              //     text: '',
+              //     style: TextStyle(color: Colors.grey.shade900, fontSize: 15),
+              //     children: [
+              //       TextSpan(
+              //         text: 'Tambah Organisasi',
+              //         style: TextStyle(color: Warna.biru, fontSize: 15),
+              //         recognizer: TapGestureRecognizer()
+              //           ..onTap = () {
+              //             log('go to add Organization');
+              //             navigateTo(
+              //                 context,
+              //                 OrganizationAddScreen(
+              //                   campusId: widget.campusId!,
+              //                 )).then((result) {
+              //               if (result == 'load org') {
+              //                 getOrganizations(context);
+              //               }
+              //             });
+              //             // context.pushReplacementNamed('register');
+              //             // navigateToRep(context, );
+              //           },
+              //       ),
+              //     ],
+              //   ),
+              // ),
               const SizedBox(
                 height: 20,
               ),
@@ -224,6 +227,9 @@ class _SignUpDanusScreenState extends State<SignUpDanusScreen> {
                 controller: programController,
                 onChanged: (p0) {
                   _activityItenmsFilter();
+                  // setState(() {
+                  //     showProgramSuggestion = !showProgramSuggestion;
+                  //   });
                   // getActivity(context, id: selectedActivityId);
                 },
                 suffixIcon: IconButton(
@@ -246,29 +252,29 @@ class _SignUpDanusScreenState extends State<SignUpDanusScreen> {
               const SizedBox(
                 height: 20,
               ),
-              RichText(
-                text: TextSpan(
-                  text: '',
-                  style: TextStyle(color: Colors.grey.shade900, fontSize: 15),
-                  children: [
-                    TextSpan(
-                      text: 'Tambah Kegiatan',
-                      style: TextStyle(color: Warna.biru, fontSize: 15),
-                      recognizer: TapGestureRecognizer()
-                        ..onTap = () {
-                          log('go to add Kegiatan');
-                          // context.pushReplacementNamed('register');
+              // RichText(
+              //   text: TextSpan(
+              //     text: '',
+              //     style: TextStyle(color: Colors.grey.shade900, fontSize: 15),
+              //     children: [
+              //       TextSpan(
+              //         text: 'Tambah Kegiatan',
+              //         style: TextStyle(color: Warna.biru, fontSize: 15),
+              //         recognizer: TapGestureRecognizer()
+              //           ..onTap = () {
+              //             log('go to add Kegiatan');
+              //             // context.pushReplacementNamed('register');
 
-                          navigateTo(
-                              context,
-                              ActivityAddScreen(
-                                campusId: widget.campusId!,
-                              ));
-                        },
-                    ),
-                  ],
-                ),
-              ),
+              //             navigateTo(
+              //                 context,
+              //                 ActivityAddScreen(
+              //                   campusId: widget.campusId!,
+              //                 ));
+              //           },
+              //       ),
+              //     ],
+              //   ),
+              // ),
               const SizedBox(
                 height: 40,
               ),

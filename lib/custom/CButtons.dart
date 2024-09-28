@@ -143,6 +143,7 @@ class _DynamicColorButtonState extends State<DynamicColorButton> {
               children: [
                 widget.icon!,
                 const SizedBox(width: 8.0),
+                widget.text == '' ? Container() :
                 Text(
                   widget.text,
                   style: widget.textStyle ?? TextStyle(

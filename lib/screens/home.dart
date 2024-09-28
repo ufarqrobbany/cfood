@@ -616,7 +616,7 @@ class _HomeScreenState extends State<HomeScreen> {
         // ),
 
         // SUMBANGAN DANA BANtu Usaha
-        Padding(
+        dataOrganizations?.organizations == null ? Container() :Padding(
           padding: const EdgeInsets.symmetric(horizontal: 25),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -639,7 +639,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
 
-        SizedBox(
+        dataOrganizations?.organizations == null ? Container() : SizedBox(
           height: dataOrganizations?.organizations == null ? 200 : 224,
           child: dataOrganizations?.organizations == null
               ? SizedBox(

@@ -4,16 +4,20 @@ import 'package:cfood/custom/CButtons.dart';
 import 'package:cfood/custom/CPageMover.dart';
 import 'package:cfood/custom/CTextField.dart';
 import 'package:cfood/custom/reload_indicator.dart';
+import 'package:cfood/model/voucher_response.dart';
 import 'package:cfood/repository/fetch_controller.dart';
 import 'package:cfood/screens/order_detail.dart';
 import 'package:cfood/model/confirm_cart_response.dart';
 import 'package:cfood/screens/payment_method.dart';
+import 'package:cfood/screens/voucher_detail.dart';
+import 'package:cfood/screens/vouchers.dart';
 import 'package:cfood/style.dart';
 import 'package:cfood/utils/common.dart';
 import 'package:cfood/utils/constant.dart';
 import 'package:community_material_icon/community_material_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:uicons/uicons.dart';
 
 String getVariantDescription(List<dynamic> variants) {
   if (variants.isEmpty) {
@@ -49,6 +53,8 @@ class _OrderConfirmScreenState extends State<OrderConfirmScreen> {
   DataConfirmCart? dataConfirmCart;
   String selectedPaymentMethod = '';
   String selectedPaymentMethodName = '';
+  Voucher? selectedVoucher;
+  int totalCostBefore = 0;
 
   @override
   void initState() {
@@ -123,6 +129,35 @@ class _OrderConfirmScreenState extends State<OrderConfirmScreen> {
     int totalCost = subtotal! + shipping! + service!;
 
     return totalCost;
+  }
+
+  void calculateCost() {
+    if (totalCostBefore == 0) {
+      setState(() {
+        totalCostBefore = dataConfirmCart!.totalPrice;
+      });
+      if (selectedVoucher!.voucherPriceType == 'PERCENT') {
+        // Hitung diskon berbasis persentase
+        final discount =
+            (dataConfirmCart!.totalPrice * selectedVoucher!.voucherPrice) / 100;
+
+        // Kurangi total price dengan diskon, pastikan konversi ke int jika totalPrice adalah int
+        dataConfirmCart!.totalPrice =
+            (dataConfirmCart!.totalPrice - discount).toInt();
+
+        // Debug print untuk memastikan diskon sudah benar
+        log('Diskon PERCENT: $discount');
+        log('Total Price setelah diskon: ${dataConfirmCart!.totalPrice}');
+      } else if (selectedVoucher!.voucherPriceType == 'FLAT') {
+        setState(() {
+          dataConfirmCart!.totalPrice -= selectedVoucher!.voucherPrice;
+        });
+      }
+    } else {
+      setState(() {
+        dataConfirmCart!.totalPrice = totalCostBefore;
+      });
+    }
   }
 
   String getCurrentDateTime() {
@@ -225,6 +260,10 @@ class _OrderConfirmScreenState extends State<OrderConfirmScreen> {
                       const SizedBox(
                         height: 20,
                       ),
+                      voucherBox(),
+                      const SizedBox(
+                        height: 20,
+                      ),
                       CTextField(
                         controller: noteController,
                         labelText: 'Catatan',
@@ -233,32 +272,34 @@ class _OrderConfirmScreenState extends State<OrderConfirmScreen> {
                       const SizedBox(
                         height: 20,
                       ),
-                      selectedPaymentMethod == '' ? Container() :
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Metode Pembayaran',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.normal,
-                              color: Warna.regulerFontColor,
+                      selectedPaymentMethod == ''
+                          ? Container()
+                          : Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  'Metode Pembayaran',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.normal,
+                                    color: Warna.regulerFontColor,
+                                  ),
+                                ),
+                                Text(
+                                  selectedPaymentMethodName,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.normal,
+                                    color: Warna.biru,
+                                  ),
+                                )
+                              ],
                             ),
-                          ),
-                          Text(
-                            selectedPaymentMethodName,
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.normal,
-                              color: Warna.biru,
+                      selectedPaymentMethod == ''
+                          ? Container()
+                          : const SizedBox(
+                              height: 20,
                             ),
-                          )
-                        ],
-                      ),
-                      selectedPaymentMethod == '' ? Container() :
-                      const SizedBox(
-                        height: 20,
-                      ),
                       SizedBox(
                         height: 50,
                         width: double.infinity,
@@ -582,6 +623,38 @@ class _OrderConfirmScreenState extends State<OrderConfirmScreen> {
               )
             ],
           ),
+          selectedVoucher != null
+              ? Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Voucher Diskon',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.normal,
+                        color: Warna.regulerFontColor,
+                      ),
+                    ),
+                    selectedVoucher!.voucherPriceType == 'PERCENT'
+                        ? Text(
+                            "-${selectedVoucher!.voucherPrice}%",
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.normal,
+                              color: Warna.biru,
+                            ),
+                          )
+                        : Text(
+                            "-${Constant.currencyCode}${formatNumberWithThousandsSeparator(selectedVoucher!.voucherPrice)}",
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.normal,
+                              color: Warna.biru,
+                            ),
+                          )
+                  ],
+                )
+              : Container(),
           const SizedBox(
             height: 20,
           ),
@@ -610,6 +683,130 @@ class _OrderConfirmScreenState extends State<OrderConfirmScreen> {
             ],
           )
         ],
+      ),
+    );
+  }
+
+  Widget voucherBox() {
+    return ListTile(
+      leading: selectedVoucher != null
+          ? Container(
+              height: 35,
+              width: 35,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Image.asset(
+                'assets/logo_box.png',
+                fit: BoxFit.cover,
+              ),
+            )
+          : Icon(
+              Icons.confirmation_num_outlined,
+              color: Warna.biru,
+              size: 35,
+            ),
+      title: Text(
+        selectedVoucher != null
+            ? selectedVoucher!.voucherName
+            : 'Voucher tidak terpasang',
+      ),
+      titleTextStyle: TextStyle(
+        color: selectedVoucher != null ? Colors.white : Warna.biru,
+        fontWeight: FontWeight.w500,
+      ),
+      trailing: selectedVoucher != null
+          ? Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(
+                  width: 74,
+                  height: 35,
+                  child: CBlueButton(
+                    onPressed: () {
+                      // navigateTo(context, VoucherDetail());
+                      navigateTo(
+                          context,
+                          VouchersScreen(
+                            totalPurchasePrice:
+                                dataConfirmCart!.totalPrice.toString(),
+                          )).then((value) {
+                        setState(() {
+                          selectedVoucher = value;
+                        });
+                        calculateCost();
+                        log('voucher selected : ${selectedVoucher!.voucherId}');
+                      });
+                    },
+                    text: 'Ganti',
+                    borderRadius: 5,
+                    fontSize: 13,
+                    textColor: Warna.biru,
+                    backgroundColor: Colors.white,
+                    padding: const EdgeInsets.all(5),
+                  ),
+                ),
+                const SizedBox(
+                  width: 15,
+                ),
+                SizedBox(
+                  height: 35,
+                  width: 35,
+                  child: IconButton(
+                    onPressed: () {
+                      // navigateTo(context, VoucherDetail());
+                      setState(() {
+                        selectedVoucher = null;
+                      });
+                      calculateCost();
+                    },
+                    icon: Icon(
+                      UIcons.solidRounded.trash,
+                      color: Colors.white,
+                      size: 15,
+                    ),
+                    padding: const EdgeInsets.all(0),
+                    style: IconButton.styleFrom(
+                        backgroundColor: Warna.like,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(6),
+                        )),
+                  ),
+                ),
+              ],
+            )
+          : SizedBox(
+              width: 74,
+              height: 35,
+              child: CBlueButton(
+                onPressed: () {
+                  // navigateTo(context, VoucherDetail());
+                  navigateTo(
+                      context,
+                      VouchersScreen(
+                        totalPurchasePrice:
+                            dataConfirmCart!.totalPrice.toString(),
+                      )).then((value) {
+                    setState(() {
+                      selectedVoucher = value;
+                    });
+                    calculateCost();
+                    log('voucher selected : ${selectedVoucher!.voucherId}');
+                  });
+                },
+                text: 'Pilih',
+                borderRadius: 5,
+                fontSize: 13,
+                padding: EdgeInsets.all(5),
+              ),
+            ),
+      enabled: true,
+      tileColor: selectedVoucher != null ? Warna.biru : Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: Warna.abu3, width: 1.5),
       ),
     );
   }

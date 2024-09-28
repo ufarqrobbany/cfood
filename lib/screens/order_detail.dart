@@ -1,8 +1,12 @@
+import 'dart:developer';
+
 import 'package:cfood/custom/CButtons.dart';
 import 'package:cfood/custom/CPageMover.dart';
 import 'package:cfood/model/confirm_cart_response.dart';
 import 'package:cfood/repository/fetch_controller.dart';
+import 'package:cfood/repository/routing_navigation/direction_controller.dart';
 import 'package:cfood/screens/chat.dart';
+import 'package:cfood/screens/maps.dart';
 import 'package:cfood/screens/order_confirm.dart';
 import 'package:cfood/screens/rate_screen.dart';
 import 'package:cfood/style.dart';
@@ -10,6 +14,10 @@ import 'package:cfood/utils/common.dart';
 import 'package:cfood/utils/constant.dart';
 import 'package:community_material_icon/community_material_icon.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:latlong2/latlong.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:uicons/uicons.dart';
 
 class OrderDetailScreen extends StatefulWidget {
@@ -101,6 +109,41 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     ],
   };
 
+  Map<String, dynamic> newDataLocation = {
+    'id': 0,
+    'name': '',
+    'latitude': 0,
+    'longitude': 0,
+    'floor_count': 0,
+    'floor': [
+      {
+        'floor': 0,
+        'room_count': 0,
+        'rooms': [
+          {
+            'room_id': 0,
+            'room_name': '',
+          }
+        ],
+      },
+    ],
+  };
+
+  List<Map<String, dynamic>> dataOrder = [
+  ];
+  List<LatLng> coordinates = [
+    const LatLng(-6.869821, 107.572844),
+    const LatLng(-6.870937, 107.572546),
+  ];
+  final List<DirectionCoordinate> _coordinates = [
+    DirectionCoordinate(-6.869821, 107.572844),
+    DirectionCoordinate(-6.870937, 107.572546)
+  ];
+  Map<String, LatLng> nodes = {};
+  List<List<String>> ways = [];
+  final MapController _mapController = MapController();
+  final DirectionController _directionController = DirectionController();
+
   @override
   void initState() {
     super.initState();
@@ -178,6 +221,88 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     return totalCost;
   }
 
+  Future<void> loadUserLocation() async {
+    if (await Permission.location.isGranted) {
+      try {
+        Position userPosition = await _determinePosition();
+        log("lokasi user : $userPosition");
+
+        if (userPosition.latitude.abs() <= 90.0 &&
+            userPosition.longitude.abs() <= 180.0) {
+          dataOrder.add(
+            {
+              "id": 1,
+              "type": 'pembeli',
+              "name": "kurir",
+              "menu": "roti bakar",
+              "harga": "10000",
+              "lokasi": LatLng(userPosition.latitude, userPosition.longitude),
+            },
+          );
+          log('Data order added: $dataOrder');
+          _loadNewRoute();
+        } else {
+          log('Invalid location coordinates: ${userPosition.latitude}, ${userPosition.longitude}');
+        }
+      } catch (e) {
+        log('Failed to determine position: $e');
+      }
+    } else {
+      log('Location permission denied or not granted yet');
+    }
+  }
+
+  void _loadNewRoute() async {
+    log(dataOrder.toString());
+    // Menambahkan semua lokasi dari dataOrder ke dalam _coordinates
+    _coordinates.addAll(
+      dataOrder.map((order) {
+        final lokasi = order['lokasi'] as LatLng;
+        return DirectionCoordinate(lokasi.latitude, lokasi.longitude);
+      }).toList(),
+    );
+
+    // Membuat bounds untuk menyesuaikan peta dengan koordinat yang baru
+    final bounds = LatLngBounds.fromPoints(
+      _coordinates
+          .map((location) => LatLng(location.latitude, location.longitude))
+          .toList(),
+    );
+
+    // Menyesuaikan peta dengan batas koordinat
+    _mapController.fitCamera(
+      CameraFit.bounds(bounds: bounds, padding: const EdgeInsets.all(50)),
+    );
+
+    // Mengupdate rute di controller
+    _directionController
+        .updateDirection(_coordinates.cast<DirectionCoordinate>());
+
+    // Logging untuk debug
+    log(_directionController.toString());
+  }
+
+  Future<Position> _determinePosition() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      return Future.error('Location Service are disabled');
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      return Future.error('Location Persmission Denied');
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      return Future.error('Location Permission Are Permanently Denied');
+    }
+
+    return await Geolocator.getCurrentPosition();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -193,7 +318,41 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
         scrolledUnderElevation: 0,
       ),
       backgroundColor: Colors.white,
-      body: SingleChildScrollView(
+      body: Stack(
+        children: [
+           MapsScreen(
+            showAppbar: false,
+            newDataLocation: newDataLocation,
+            userLocation: dataOrder,
+            onLocationChanged: (updatedLocation) {
+              setState(() {
+                newDataLocation = updatedLocation;
+              });
+              log('Data Lokasi Terupdate: $newDataLocation');
+            },
+          ),
+
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Container(
+              width: double.infinity,
+              height: MediaQuery.of(context).size.height * 0.50,
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.vertical(
+                  top: Radius.circular(20),
+                ),
+              ),
+              child: bodyContainer(),
+            ),
+          )
+        ],
+      )
+    );
+  }
+
+  Widget bodyContainer() {
+    return SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
         child: dataConfirmCart == null
             ? Container()
@@ -203,6 +362,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                   mainAxisSize: MainAxisSize.max,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
+                    const SizedBox(height: 20,),
                     currentStatus == 'pesanan dibuat'
                         ? const Center(
                             child: Text(
@@ -434,8 +594,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                   ],
                 ),
               ),
-      ),
-    );
+      );
   }
 
   Widget orderItemBox({

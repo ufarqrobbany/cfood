@@ -8,7 +8,7 @@ class Constant {
 
   static String appName = "C-Food";
 
-  static String appVersion = "1.0.1";
+  static String appVersion = "1.0.2";
 
   static String googleKey = "";
 
@@ -25,7 +25,7 @@ class Constant {
 class AppConfig {
   static const String BASE_URL = "https://cfood.id/api/";
 
-  static const String APPLINK_DOMAIN = "https://campusfood.id/";
+  static const String APPLINK_DOMAIN = "https://campusfood.id/to/";
 
   static int USER_ID = 0;
 

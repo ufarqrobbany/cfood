@@ -32,6 +32,7 @@ class GetDetailOrganizationResponse {
 class DataDetailOrganization {
   int? organizationId;
   String? organizationName;
+  String? organizationShortname;
   String? organizationLogo;
   int? totalActivity;
   int? totalWirausaha;
@@ -42,6 +43,7 @@ class DataDetailOrganization {
   DataDetailOrganization(
       {this.organizationId,
       this.organizationName,
+      this.organizationShortname,
       this.organizationLogo,
       this.totalActivity,
       this.totalWirausaha,
@@ -52,6 +54,7 @@ class DataDetailOrganization {
   DataDetailOrganization.fromJson(Map<String, dynamic> json) {
     organizationId = json['organizationId'];
     organizationName = json['organizationName'];
+    organizationShortname = json['organizationShortname'];
     organizationLogo = json['organizationLogo'];
     totalActivity = json['totalActivity'];
     totalWirausaha = json['totalWirausaha'];
@@ -69,6 +72,7 @@ class DataDetailOrganization {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['organizationId'] = organizationId;
     data['organizationName'] = organizationName;
+    data['organizationShortname'] = organizationShortname;
     data['organizationLogo'] = organizationLogo;
     data['totalActivity'] = totalActivity;
     data['totalWirausaha'] = totalWirausaha;

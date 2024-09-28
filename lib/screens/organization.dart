@@ -242,12 +242,20 @@ class _OrganizationScreenState extends State<OrganizationScreen>
               ),
               dataOrganization == null ? shimmerBox(enabled: true, height: 20, width: 180, radius: 8) :
               Text(
-                '${dataOrganization?.organizationName}',
+                '${dataOrganization?.organizationShortname}',
                 style: AppTextStyles.title,
                 maxLines: 2,
               ),
             ],
           ),
+          const SizedBox(
+            height: 8,
+          ),
+          Text(
+                '${dataOrganization?.organizationName}',
+                style: AppTextStyles.subTitle,
+                maxLines: 2,
+              ),
           const SizedBox(
             height: 12,
           ),
