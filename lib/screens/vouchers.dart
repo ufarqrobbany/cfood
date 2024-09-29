@@ -158,11 +158,11 @@ class _VouchersScreenState extends State<VouchersScreen> {
                       subtitle: RichText(
                           text: TextSpan(
                         text:
-                            'Min. Belanja Rp${formatNumberWithThousandsSeparator(voucher.voucherMinimumPurchasePrice)}\nBerlaku hingga tgl. $formatedDatTime\nSisa ${voucher.voucherQuantity} ',
+                            'Min. Belanja Rp${formatNumberWithThousandsSeparator(voucher.voucherMinimumPurchasePrice)}\nBerlaku s.d. $formatedDatTime\nSisa ${voucher.voucherQuantity} ',
                         style: TextStyle(
                             fontWeight: FontWeight.normal,
-                            color: Warna.regulerFontColor,
-                            fontSize: 14),
+                            color: Warna.abu6,
+                            fontSize: 12),
                         children: [
                           TextSpan(
                             text: ' S&K',

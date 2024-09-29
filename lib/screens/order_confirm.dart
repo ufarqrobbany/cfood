@@ -637,7 +637,7 @@ class _OrderConfirmScreenState extends State<OrderConfirmScreen> {
                     ),
                     selectedVoucher!.voucherPriceType == 'PERCENT'
                         ? Text(
-                            "-${Constant.currencyCode}${formatNumberWithThousandsSeparator(dataConfirmCart!.cartInformation.subTotalPrice - (dataConfirmCart!.cartInformation.subTotalPrice * (selectedVoucher!.voucherPrice / 100)).toInt())}",
+                            "-${Constant.currencyCode}${formatNumberWithThousandsSeparator((dataConfirmCart!.cartInformation.subTotalPrice * (selectedVoucher!.voucherPrice / 100)).toInt())}",
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.normal,
@@ -673,11 +673,14 @@ class _OrderConfirmScreenState extends State<OrderConfirmScreen> {
               Text(
                 Constant.currencyCode +
                     formatNumberWithThousandsSeparator(selectedVoucher != null
-                        ? (dataConfirmCart!.cartInformation.subTotalPrice -
-                                (dataConfirmCart!
-                                        .cartInformation.subTotalPrice *
-                                    (selectedVoucher!.voucherPrice / 100)))
-                            .toInt()
+                        ? selectedVoucher!.voucherPriceType == 'PERCENT'
+                            ? (dataConfirmCart!.cartInformation.subTotalPrice -
+                                    (dataConfirmCart!
+                                            .cartInformation.subTotalPrice *
+                                        (selectedVoucher!.voucherPrice / 100)))
+                                .toInt()
+                            : dataConfirmCart!.cartInformation.subTotalPrice -
+                                selectedVoucher!.voucherPrice
                         : dataConfirmCart!.totalPrice),
                 style: TextStyle(
                   fontSize: 18,
@@ -695,18 +698,19 @@ class _OrderConfirmScreenState extends State<OrderConfirmScreen> {
   Widget voucherBox() {
     return ListTile(
       leading: selectedVoucher != null
-          ? Container(
-              height: 35,
-              width: 35,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(6),
-              ),
-              child: Image.asset(
-                'assets/logo.png',
-                fit: BoxFit.cover,
-              ),
-            )
+          // ? Container(
+          //     height: 35,
+          //     width: 35,
+          //     decoration: BoxDecoration(
+          //       color: Colors.white,
+          //       borderRadius: BorderRadius.circular(6),
+          //     ),
+          //     child: Image.asset(
+          //       'assets/logo.png',
+          //       fit: BoxFit.cover,
+          //     ),
+          //   )
+          ? Container()
           : Icon(
               Icons.confirmation_num_outlined,
               color: Warna.biru,
