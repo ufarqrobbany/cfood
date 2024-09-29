@@ -37,6 +37,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as path;
 import 'package:http_parser/http_parser.dart';
 import 'package:dio/dio.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ProfileScreen extends StatefulWidget {
   String? userType;
@@ -326,7 +327,45 @@ class _ProfileScreenState extends State<ProfileScreen> {
               sectionMenuBox(
                 title: 'Info Lainnya',
                 items: [
+                  
                   menuItemContainer(
+                    icons: UIcons.solidRounded.map_marker,
+                    showBorder: true,
+                    text: 'Atribusi Data',
+                    onTap: () {
+                      navigateTo(
+                        context,
+                        const AppSettingsInformation(
+                          type: 'Atribusi Data',
+                          title: 'Atribusi Data',
+                        ),
+                      );
+                    },
+                  ),
+                  menuItemContainer(
+                    // icons: UIcons.solidRounded.,
+                    icons: Icons.help_center_rounded,
+                    showBorder: true,
+                    text: 'Bantuan',
+                    onTap: () {
+                      navigateTo(
+                        context,
+                        const AppSettingsInformation(
+                          type: 'Bantuan',
+                          title: 'Bantuan',
+                        ),
+                      );
+                    },
+                  ),
+                  menuItemContainer(
+                    icons: UIcons.solidRounded.star,
+                    showBorder: true,
+                    text: 'Beri Bintang',
+                    onTap: () {
+                      showToast('Not Availalble');
+                    },
+                  ),
+                   menuItemContainer(
                     icons: UIcons.solidRounded.shield,
                     showBorder: true,
                     text: 'Kebijakan Privasi',
@@ -355,25 +394,35 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     },
                   ),
                   menuItemContainer(
-                    icons: UIcons.solidRounded.map_marker,
+                    // icons: UIcons.solidRounded.,
+                    icons: Icons.question_answer_rounded,
                     showBorder: true,
-                    text: 'Atribusi Data',
-                    onTap: () {
-                      navigateTo(
-                        context,
-                        const AppSettingsInformation(
-                          type: 'Atribusi Data',
-                          title: 'Atribusi Data',
-                        ),
-                      );
+                    text: 'Kirim Pertanyaan',
+                    onTap: () async {
+                      log('open url');
+                      final Uri url =
+                          Uri.parse('https://forms.gle/fR8rkpwRkYuJY2T5A');
+                      if (!await launchUrl(url)) {
+                        throw Exception('Could not launch $url');
+                      }
                     },
                   ),
                   menuItemContainer(
-                    icons: UIcons.solidRounded.star,
+                    // icons: UIcons.solidRounded.,
+                    icons: Icons.settings_suggest_rounded,
                     showBorder: false,
-                    text: 'Beri Bintang',
-                    onTap: () {},
+                    text: 'Kritik dan Saran',
+                    onTap: () async {
+                       log('open url');
+                      final Uri url =
+                          Uri.parse('https://forms.gle/RfsccR6ouf5htV3U7');
+                      if (!await launchUrl(url)) {
+                        throw Exception('Could not launch $url');
+                      }
+                    },
                   ),
+                  
+                 
                 ],
               ),
               // sectionMenuBox(

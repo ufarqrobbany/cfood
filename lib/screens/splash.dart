@@ -285,10 +285,9 @@ class _SplashScreenState extends State<SplashScreen> {
             yesText: "Update Sekarang", onTapYes: () async {
           // openUrl(Uri.parse('https://campusfood.id'));
           log('open url');
-          final Uri url = Uri(scheme: 'https', host: 'www.campusfood.id');
+          final Uri url = Uri.parse('www.campusfood.id');
           if (!await launchUrl(url)) {
-            throw Exception(
-                'Could not launch $url');
+            throw Exception('Could not launch $url');
           }
         });
       }

@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:cfood/custom/CButtons.dart';
 import 'package:cfood/custom/CPageMover.dart';
+import 'package:cfood/custom/CTextField.dart';
 import 'package:cfood/custom/CToast.dart';
 import 'package:cfood/model/otp_check_response.dart';
 import 'package:cfood/model/reponse_handler.dart';
@@ -12,6 +13,7 @@ import 'package:cfood/screens/signup.dart';
 import 'package:cfood/style.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:otp_text_field/otp_field.dart';
 import 'package:otp_text_field/otp_field_style.dart';
 import 'package:otp_text_field/style.dart';
@@ -30,10 +32,12 @@ class VerificationScreen extends StatefulWidget {
 }
 
 class _VerificationScreenState extends State<VerificationScreen> {
-  final OtpFieldController otpController = OtpFieldController();
+  // final OtpFieldController otpController = OtpFieldController();
+  final TextEditingController otpController = TextEditingController();
   bool loadState = false;
   int otpCode = 0;
   int userId = 0;
+  bool passDisable = false;
 
   @override
   void initState() {
@@ -221,33 +225,59 @@ class _VerificationScreenState extends State<VerificationScreen> {
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 25),
-              child: OTPTextField(
-                  controller: otpController,
-                  length: 6,
-                  width: MediaQuery.of(context).size.width,
-                  textFieldAlignment: MainAxisAlignment.spaceAround,
-                  fieldWidth: 45,
-                  fieldStyle: FieldStyle.box,
-                  outlineBorderRadius: 15,
-                  style: const TextStyle(fontSize: 17),
-                  obscureText: false,
-                  otpFieldStyle: OtpFieldStyle(
-                      focusBorderColor: Warna.kuning,
-                      borderColor: Warna.biru,
-                      enabledBorderColor: Warna.biru,
-                      disabledBorderColor: Warna.abu3),
+              child: CTextField(
+                  // controller: otpController,
+                  // length: 6,
+                  // width: MediaQuery.of(context).size.width,
+                  // textFieldAlignment: MainAxisAlignment.spaceAround,
+                  // fieldWidth: 45,
+                  // fieldStyle: FieldStyle.box,
+                  // outlineBorderRadius: 15,
+                  // style: const TextStyle(fontSize: 17),
+                  // obscureText: false,
+                  // otpFieldStyle: OtpFieldStyle(
+                  //     focusBorderColor: Warna.kuning,
+                  //     borderColor: Warna.biru,
+                  //     enabledBorderColor: Warna.biru,
+                  //     disabledBorderColor: Warna.abu3),
+                  obscureText: passDisable,
+                  maxLines: 1,
                   onChanged: (pin) {
                     log("Changed: $pin");
                     setState(() {
                       otpCode = int.parse(pin);
                     });
                   },
-                  onCompleted: (pin) {
-                    log("Completed: $pin");
-                    setState(() {
-                      otpCode = int.parse(pin);
-                    });
-                  }),
+                  hintText: 'Masukkan kode OTP',
+                  suffixIcon: Padding(
+                  padding: const EdgeInsets.only(right: 10),
+                  child: IconButton(
+                    onPressed: () {
+                      if (passDisable) {
+                        setState(() {
+                          passDisable = false;
+                        });
+                      } else {
+                        setState(() {
+                          passDisable = true;
+                        });
+                      }
+                    },
+                    icon: FaIcon(
+                      passDisable
+                          ? FontAwesomeIcons.eye
+                          : FontAwesomeIcons.eyeSlash,
+                      size: 20,
+                    ),
+                  ),
+                ),
+                  // onCompleted: (pin) {
+                  //   log("Completed: $pin");
+                  //   setState(() {
+                  //     otpCode = int.parse(pin);
+                  //   });
+                  // },
+                  ),
             ),
             const SizedBox(
               height: 50,

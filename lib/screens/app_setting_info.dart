@@ -42,7 +42,12 @@ class _AppSettingsInformationState extends State<AppSettingsInformation> {
       setState(() {
         webPath = Uri.parse('https://campusfood.id/attribution#app');
       });
-    }
+    } else if(widget.type == 'Bantuan') {
+      log(widget.type.toString());
+      setState(() {
+        webPath = Uri.parse('https://campusfood.id/help-center#app');
+      });
+    } 
 
      webController = WebViewController()
     ..setJavaScriptMode(JavaScriptMode.unrestricted)

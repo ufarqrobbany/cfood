@@ -10,6 +10,7 @@ import 'package:cfood/model/check_email_response.dart';
 import 'package:cfood/model/check_verify_email_response.dart';
 import 'package:cfood/model/validate_email_student_reponse.dart';
 import 'package:cfood/repository/register_repository.dart';
+import 'package:cfood/screens/create_password.dart';
 import 'package:cfood/screens/login.dart';
 import 'package:cfood/screens/signup_student.dart';
 import 'package:cfood/screens/verification.dart';
@@ -300,47 +301,47 @@ class _SignupScreenState extends State<SignupScreen> {
         });
       } else {
         // Check if the email is available
-        // checkEmail(emailController.text, context).then((emailAvailable) {
-        //   if (emailAvailable != null && emailAvailable) {
-        //     setState(() {
-        //       loadButton = false;
-        //     });
-        //     navigateTo(
-        //         context,
-        //         CreatePasswordScreen(
-        //           email: emailController.text,
-        //           name: nameController.text,
-        //           campusId: selectedCampusesId,
-        //           isStudent: false,
-        //         ));
-        //     return;
-        //   } else {
-        //     // Check if the email is verified
-        //     checkVerifyEmail(emailController.text, context)
-        //         .then((emailVerified) {
-        //       if (emailVerified != null && emailVerified) {
-        //         // checked = false;
-        //         setState(() {
-        //           loadButton = false;
-        //         });
-        //         emptyField = 'Email sudah terdaftar dan terverifikasi';
-        //         showToast(emptyField);
-        //         log(emptyField);
-        //         navigateToRep(context, const LoginScreen());
-        //       } else {
-        //         setState(() {
-        //           loadButton = false;
-        //         });
-        //         navigateTo(
-        //             context,
-        //             VerificationScreen(
-        //               forgotPass: false,
-        //               email: emailController.text,
-        //             ));
-        //       }
-        //     });
-        //   }
-        // });
+        checkEmail(emailController.text, context).then((emailAvailable) {
+          if (emailAvailable != null && emailAvailable) {
+            setState(() {
+              loadButton = false;
+            });
+            navigateTo(
+                context,
+                CreatePasswordScreen(
+                  email: emailController.text,
+                  name: nameController.text,
+                  campusId: selectedCampusesId,
+                  isStudent: false,
+                ));
+            return;
+          } else {
+            // Check if the email is verified
+            checkVerifyEmail(emailController.text, context)
+                .then((emailVerified) {
+              if (emailVerified != null && emailVerified == true) {
+                // checked = false;
+                setState(() {
+                  loadButton = false;
+                });
+                emptyField = 'Email sudah terdaftar dan terverifikasi';
+                showToast(emptyField);
+                log(emptyField);
+                navigateToRep(context, const LoginScreen());
+              } else {
+                setState(() {
+                  loadButton = false;
+                });
+                navigateTo(
+                    context,
+                    VerificationScreen(
+                      forgotPass: false,
+                      email: emailController.text,
+                    ));
+              }
+            });
+          }
+        });
       }
     } on Exception catch (e) {
       setState(() {
@@ -454,7 +455,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 child: CBlueButton(
                     isLoading: loadButton,
                     onPressed: () {
-                      // dataCheck(context);
+                      dataCheck(context);
                       // Sign up button logic
                       // if (dataCheck(context)) {
                       //   if (_selectedOption == 'ya') {

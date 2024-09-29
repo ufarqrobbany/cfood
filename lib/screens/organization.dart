@@ -253,7 +253,11 @@ class _OrganizationScreenState extends State<OrganizationScreen>
           ),
           Text(
                 '${dataOrganization?.organizationName}',
-                style: AppTextStyles.subTitle,
+                style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF353535),
+                      ),
                 maxLines: 2,
               ),
           const SizedBox(
