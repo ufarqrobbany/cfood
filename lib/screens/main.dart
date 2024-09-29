@@ -146,7 +146,7 @@ class _MainScreenState extends State<MainScreen> {
       lastPressed = DateTime.now();
       // final snackBar = SnackBar(content: Text('Tekan sekali lagi untuk keluar'));
       // ScaffoldMessenger.of(context).showSnackBar(snackBar);
-      showToast('Sekali lagi agar kamu bisa keluar hehe',
+      showToast('Sekali lagi agar kamu bisa keluar',
           duration: Toast.lengthShort);
       setState(() {
         canPopNow = false;

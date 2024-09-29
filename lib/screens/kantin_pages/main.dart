@@ -18,8 +18,12 @@ class MainScreenCanteen extends StatefulWidget {
 List<dynamic> _pageMenuCanteen = [
   const OrderCanteenScreen(),
   const TransactionScreen(),
-  const CanteenScreen(isOwner: true,),
-  ProfileScreen(userType: 'kantin',),
+  const CanteenScreen(
+    isOwner: true,
+  ),
+  ProfileScreen(
+    userType: 'kantin',
+  ),
 ];
 
 List<String> _pageMenuNameCanteen = [
@@ -28,7 +32,6 @@ List<String> _pageMenuNameCanteen = [
   'kantin',
   'Opsi',
 ];
-
 
 class _MainScreenCanteenState extends State<MainScreenCanteen> {
   var selectedScreen = _pageMenuCanteen[0];
@@ -48,26 +51,25 @@ class _MainScreenCanteenState extends State<MainScreenCanteen> {
 
   void invokePopScope(bool diPop) {
     final now = DateTime.now();
-        final backButtonHasNotBeenPressedOrSnackbarHasBeenClosed =
-            lastPressed == null || now.difference(lastPressed!) > const Duration(seconds: 2);
+    final backButtonHasNotBeenPressedOrSnackbarHasBeenClosed =
+        lastPressed == null ||
+            now.difference(lastPressed!) > const Duration(seconds: 2);
 
-        if (backButtonHasNotBeenPressedOrSnackbarHasBeenClosed) {
-          lastPressed = DateTime.now();
-          // final snackBar = SnackBar(content: Text('Tekan sekali lagi untuk keluar'));
-          // ScaffoldMessenger.of(context).showSnackBar(snackBar);
-          showToast('Sekali lagi agar kamu bisa keluar hehe', duration: Toast.lengthShort);
-          setState(() {
-            canPopNow = false;
-          });
-        } else {
-          setState(() {
-            canPopNow = true;
-          });
-        }
-
+    if (backButtonHasNotBeenPressedOrSnackbarHasBeenClosed) {
+      lastPressed = DateTime.now();
+      // final snackBar = SnackBar(content: Text('Tekan sekali lagi untuk keluar'));
+      // ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      showToast('Sekali lagi agar kamu bisa keluar',
+          duration: Toast.lengthShort);
+      setState(() {
+        canPopNow = false;
+      });
+    } else {
+      setState(() {
+        canPopNow = true;
+      });
+    }
   }
-
-  
 
   @override
   Widget build(BuildContext context) {
@@ -86,21 +88,16 @@ class _MainScreenCanteenState extends State<MainScreenCanteen> {
           height: 80,
           width: MediaQuery.of(context).size.width,
           padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            boxShadow: [
-               BoxShadow(
+          decoration: BoxDecoration(color: Colors.white, boxShadow: [
+            BoxShadow(
                 blurRadius: 20,
                 spreadRadius: 0,
                 color: Warna.shadow.withOpacity(0.10),
-                offset: const Offset(0, 0)
-              )
-            ]
-          ),
+                offset: const Offset(0, 0))
+          ]),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-             
               buttonMenu(
                 page: _pageMenuCanteen[0],
                 pageName: _pageMenuNameCanteen[0],
@@ -108,11 +105,10 @@ class _MainScreenCanteenState extends State<MainScreenCanteen> {
                 iconsOff: UIcons.regularRounded.home,
               ),
               buttonMenu(
-                page: _pageMenuCanteen[1],
-                pageName: _pageMenuNameCanteen[1],
-                iconsON: UIcons.solidRounded.shopping_cart,
-                iconsOff: UIcons.regularRounded.shopping_cart
-              ),
+                  page: _pageMenuCanteen[1],
+                  pageName: _pageMenuNameCanteen[1],
+                  iconsON: UIcons.solidRounded.shopping_cart,
+                  iconsOff: UIcons.regularRounded.shopping_cart),
               buttonMenu(
                 page: _pageMenuCanteen[2],
                 pageName: _pageMenuNameCanteen[2],
@@ -125,7 +121,6 @@ class _MainScreenCanteenState extends State<MainScreenCanteen> {
                 iconsON: UIcons.solidRounded.user,
                 iconsOff: UIcons.regularRounded.user,
               ),
-              
             ],
           ),
         ),
@@ -133,38 +128,40 @@ class _MainScreenCanteenState extends State<MainScreenCanteen> {
     );
   }
 
-  Widget buttonMenu({Widget? page, IconData? iconsON, IconData? iconsOff, String? pageName}) {
-    return  Expanded(
-              child: Container(
-                padding: const EdgeInsets.only(top: 6, bottom: 6),
-                // decoration: BoxDecoration(
-                //   color: page == selectedScreen ? Warna.abu2.withOpacity(0.20) : Colors.white,
-                //   border:  page == selectedScreen ? Border(top: BorderSide(color: Warna.biru, width: 4)) : null,
-                // ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    IconButton(
-                      onPressed: () => selectScreen(page), 
-                      padding: EdgeInsets.zero,
-                      icon: Icon(
-                        page == selectedScreen ? iconsON : iconsOff,),
-                      color: page == selectedScreen ? Warna.kuning : Warna.biru,
-                      iconSize: 24,
-                      ),
-                    Text(
-                      pageName!,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: page == selectedScreen ? Warna.kuning : Warna.biru,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 13,
-                      ),
-                    )
-                  ],
-                ),
+  Widget buttonMenu(
+      {Widget? page, IconData? iconsON, IconData? iconsOff, String? pageName}) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.only(top: 6, bottom: 6),
+        // decoration: BoxDecoration(
+        //   color: page == selectedScreen ? Warna.abu2.withOpacity(0.20) : Colors.white,
+        //   border:  page == selectedScreen ? Border(top: BorderSide(color: Warna.biru, width: 4)) : null,
+        // ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            IconButton(
+              onPressed: () => selectScreen(page),
+              padding: EdgeInsets.zero,
+              icon: Icon(
+                page == selectedScreen ? iconsON : iconsOff,
               ),
-            );
+              color: page == selectedScreen ? Warna.kuning : Warna.biru,
+              iconSize: 24,
+            ),
+            Text(
+              pageName!,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: page == selectedScreen ? Warna.kuning : Warna.biru,
+                fontWeight: FontWeight.w700,
+                fontSize: 13,
+              ),
+            )
+          ],
+        ),
+      ),
+    );
   }
 }

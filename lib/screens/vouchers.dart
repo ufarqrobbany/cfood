@@ -97,9 +97,9 @@ class _VouchersScreenState extends State<VouchersScreen> {
 
     // Combine all vouchers into sections for display
     final sections = [
-      {'title': 'Discount', 'vouchers': voucherDataResponse!.discount},
+      {'title': 'Diskon', 'vouchers': voucherDataResponse!.discount},
       {'title': 'Cashback', 'vouchers': voucherDataResponse!.cashback},
-      {'title': 'Free Shipping', 'vouchers': voucherDataResponse!.freeShipping},
+      {'title': 'Gratis Ongkir', 'vouchers': voucherDataResponse!.freeShipping},
     ];
     return ListView.builder(
       itemCount: sections.length,
@@ -158,10 +158,11 @@ class _VouchersScreenState extends State<VouchersScreen> {
                       subtitle: RichText(
                           text: TextSpan(
                         text:
-                            'Min. Belanja Rp${formatNumberWithThousandsSeparator(voucher.voucherMinimumPurchasePrice)}\nBerlaku hingga tgl $formatedDatTime\n Sisa ${voucher.voucherQuantity} ',
+                            'Min. Belanja Rp${formatNumberWithThousandsSeparator(voucher.voucherMinimumPurchasePrice)}\nBerlaku hingga tgl. $formatedDatTime\nSisa ${voucher.voucherQuantity} ',
                         style: TextStyle(
-                          color: Warna.abu6,
-                        ),
+                            fontWeight: FontWeight.normal,
+                            color: Warna.regulerFontColor,
+                            fontSize: 14),
                         children: [
                           TextSpan(
                             text: ' S&K',
@@ -173,12 +174,12 @@ class _VouchersScreenState extends State<VouchersScreen> {
                               ..onTap = () {
                                 // context.pushReplacementNamed('register');
                                 navigateTo(
-                                  context,
-                                  const AppSettingsInformation(
-                                    type: 'Ketentuan Layanan',
-                                    title: 'Ketentuan Layanan',
-                                  ),
-                                );
+                                    context,
+                                    VoucherDetail(
+                                      type: section['title'].toString(),
+                                      dataVoucher: voucher,
+                                    ));
+                                // edit disini
                               },
                           ),
                         ],
@@ -187,9 +188,14 @@ class _VouchersScreenState extends State<VouchersScreen> {
                         width: 77,
                         height: 35,
                         child: CBlueButton(
+                          backgroundColor: (voucher.voucherQuantity > 0)
+                              ? Warna.biru
+                              : Colors.grey.shade200,
                           onPressed: () {
                             log('gunakan: $voucher');
-                            navigateBack(context, result: voucher);
+                            if (voucher.voucherQuantity > 0) {
+                              navigateBack(context, result: voucher);
+                            }
                           },
                           text: 'Gunakan',
                           borderRadius: 6,
@@ -197,14 +203,6 @@ class _VouchersScreenState extends State<VouchersScreen> {
                           padding: EdgeInsets.all(5),
                         ),
                       ),
-                      onTap: () {
-                        navigateTo(
-                            context,
-                            VoucherDetail(
-                              type: section['title'].toString(),
-                              dataVoucher: voucher,
-                            ));
-                      },
                     ),
                   ),
                 );

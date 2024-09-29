@@ -117,7 +117,7 @@ class _VoucherDetailState extends State<VoucherDetail> {
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
-                'VOUCHER ${widget.type!.toUpperCase()}',
+                'VOUCHER ${widget.type!.toUpperCase() == "DISCOUNT" ? "DISKON" : "CASHBACK"}',
                 style: TextStyle(
                     fontSize: 12,
                     color: Warna.biru,
@@ -131,7 +131,8 @@ class _VoucherDetailState extends State<VoucherDetail> {
   }
 
   Widget detailInfo() {
-    String formatedDateTime = formatDateTime(widget.dataVoucher!.expiryDate.toString());
+    String formatedDateTime =
+        formatDateTime(widget.dataVoucher!.expiryDate.toString());
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 24),
       child: Column(
@@ -139,7 +140,7 @@ class _VoucherDetailState extends State<VoucherDetail> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "Diskon Rp${formatNumberWithThousandsSeparator(widget.dataVoucher!.voucherPrice)}",
+            widget.dataVoucher!.voucherName,
             style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w700,
@@ -152,21 +153,21 @@ class _VoucherDetailState extends State<VoucherDetail> {
             'Minimal Belanja: Rp${formatNumberWithThousandsSeparator(widget.dataVoucher!.voucherMinimumPurchasePrice).toString()}',
             style: const TextStyle(
               fontSize: 15,
-              fontWeight: FontWeight.w700,
+              fontWeight: FontWeight.w600,
             ),
           ),
           Text(
             'Berlaku hingga: $formatedDateTime',
             style: const TextStyle(
               fontSize: 15,
-              fontWeight: FontWeight.w700,
+              fontWeight: FontWeight.w600,
             ),
           ),
           Text(
             'Kuantitas: ${widget.dataVoucher!.voucherQuantity}',
             style: const TextStyle(
               fontSize: 15,
-              fontWeight: FontWeight.w700,
+              fontWeight: FontWeight.w600,
             ),
           ),
           const SizedBox(
@@ -182,9 +183,9 @@ class _VoucherDetailState extends State<VoucherDetail> {
           Text(
             widget.dataVoucher!.voucherDescription.toString(),
             style: TextStyle(
-              color: Warna.abu6,
-              fontSize: 13,
-              fontWeight: FontWeight.w500,
+              color: Warna.regulerFontColor,
+              fontSize: 14,
+              fontWeight: FontWeight.normal,
             ),
           ),
         ],

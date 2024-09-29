@@ -637,7 +637,7 @@ class _OrderConfirmScreenState extends State<OrderConfirmScreen> {
                     ),
                     selectedVoucher!.voucherPriceType == 'PERCENT'
                         ? Text(
-                            "-${selectedVoucher!.voucherPrice}%",
+                            "-${Constant.currencyCode}${formatNumberWithThousandsSeparator(dataConfirmCart!.cartInformation.subTotalPrice - (dataConfirmCart!.cartInformation.subTotalPrice * (selectedVoucher!.voucherPrice / 100)).toInt())}",
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.normal,
@@ -672,8 +672,13 @@ class _OrderConfirmScreenState extends State<OrderConfirmScreen> {
               const Spacer(),
               Text(
                 Constant.currencyCode +
-                    formatNumberWithThousandsSeparator(
-                        dataConfirmCart!.totalPrice),
+                    formatNumberWithThousandsSeparator(selectedVoucher != null
+                        ? (dataConfirmCart!.cartInformation.subTotalPrice -
+                                (dataConfirmCart!
+                                        .cartInformation.subTotalPrice *
+                                    (selectedVoucher!.voucherPrice / 100)))
+                            .toInt()
+                        : dataConfirmCart!.totalPrice),
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w800,
@@ -698,14 +703,14 @@ class _OrderConfirmScreenState extends State<OrderConfirmScreen> {
                 borderRadius: BorderRadius.circular(6),
               ),
               child: Image.asset(
-                'assets/logo_box.png',
+                'assets/logo.png',
                 fit: BoxFit.cover,
               ),
             )
           : Icon(
               Icons.confirmation_num_outlined,
               color: Warna.biru,
-              size: 35,
+              size: 25,
             ),
       title: Text(
         selectedVoucher != null
@@ -714,7 +719,7 @@ class _OrderConfirmScreenState extends State<OrderConfirmScreen> {
       ),
       titleTextStyle: TextStyle(
         color: selectedVoucher != null ? Colors.white : Warna.biru,
-        fontWeight: FontWeight.w500,
+        fontWeight: FontWeight.w400,
       ),
       trailing: selectedVoucher != null
           ? Row(
