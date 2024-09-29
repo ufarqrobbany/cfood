@@ -609,6 +609,7 @@ class _CartScreenState extends State<CartScreen> {
                                     price: menuItem.totalPriceItem *
                                         menuItem.quantity,
                                     count: menuItem.quantity.toString(),
+                                    isDanus: menuItem.detailMenu.isDanus!,
                                     onTapAdd: () {
                                       if (menuItem.totalQuantity <
                                           menuItem.stock) {

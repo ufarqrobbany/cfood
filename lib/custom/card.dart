@@ -344,6 +344,7 @@ class ProductCardBoxHorizontal extends StatelessWidget {
   final bool isCustom;
   final bool hideBorder;
   final bool isOwner;
+  final bool isDanus;
   const ProductCardBoxHorizontal({
     super.key,
     this.productId,
@@ -363,6 +364,7 @@ class ProductCardBoxHorizontal extends StatelessWidget {
     this.isCustom = false,
     this.hideBorder = false,
     this.isOwner = false,
+    this.isDanus = false,
   });
 
   @override
@@ -438,6 +440,29 @@ class ProductCardBoxHorizontal extends StatelessWidget {
                                     },
                                   )),
                         ),
+                        if (isDanus ??
+                      false) // Conditionally show the "Produk Danus" text
+                    Positioned(
+                      top: 0,
+                      left: 0,
+                      child: Container(
+                        padding: const EdgeInsets.all(4.0),
+                        decoration: BoxDecoration(
+                          color: Warna.like.withAlpha(200),
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(8),
+                            bottomRight: Radius.circular(8),
+                          ),
+                        ),
+                        child: const Text(
+                          'Produk Danus',
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 10),
+                        ),
+                      ),
+                    ),
                         Align(
                           alignment: Alignment.bottomCenter,
                           child: Container(
@@ -460,43 +485,70 @@ class ProductCardBoxHorizontal extends StatelessWidget {
                       ],
                     ),
                   )
-                : Container(
-                    // width: double.infinity,
-                    height: innerContentSize ?? 120,
-                    constraints: BoxConstraints(
-                      minWidth: innerContentSize ?? 120,
-                      maxWidth: innerContentSize ?? 120,
-                    ),
-                    decoration: BoxDecoration(
-                        color: Warna.abu, borderRadius: BorderRadius.circular(8)
-                        // borderRadius: const BorderRadius.only(topLeft: Radius.circular(8), topRight: Radius.circular(8)),
+                : Stack(
+                  children: [
+                    Container(
+                        // width: double.infinity,
+                        height: innerContentSize ?? 120,
+                        constraints: BoxConstraints(
+                          minWidth: innerContentSize ?? 120,
+                          maxWidth: innerContentSize ?? 120,
                         ),
-                    child: imgUrl == null
-                        ? const Center(
-                            child: Icon(Icons.image),
-                          )
-                        : ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
-                            child: Image.network(
-                              imgUrl!,
-                              fit: BoxFit.cover,
-                              loadingBuilder:
-                                  (context, child, loadingProgress) {
-                                bool shimmerEnabled =
-                                    loadingProgress != null ? true : false;
-                                if (loadingProgress == null) {
-                                  return child;
-                                } else {
-                                  return shimmerBox(
-                                    enabled: shimmerEnabled,
-                                    height: innerContentSize ?? 133,
-                                    width: double.infinity,
-                                    radius: 8,
-                                  );
-                                }
-                              },
-                            )),
-                  ),
+                        decoration: BoxDecoration(
+                            color: Warna.abu, borderRadius: BorderRadius.circular(8)
+                            // borderRadius: const BorderRadius.only(topLeft: Radius.circular(8), topRight: Radius.circular(8)),
+                            ),
+                        child: imgUrl == null
+                            ? const Center(
+                                child: Icon(Icons.image),
+                              )
+                            : ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: Image.network(
+                                  imgUrl!,
+                                  fit: BoxFit.cover,
+                                  loadingBuilder:
+                                      (context, child, loadingProgress) {
+                                    bool shimmerEnabled =
+                                        loadingProgress != null ? true : false;
+                                    if (loadingProgress == null) {
+                                      return child;
+                                    } else {
+                                      return shimmerBox(
+                                        enabled: shimmerEnabled,
+                                        height: innerContentSize ?? 133,
+                                        width: double.infinity,
+                                        radius: 8,
+                                      );
+                                    }
+                                  },
+                                )),
+                      ),
+                      if (isDanus ??
+                            false) // Conditionally show the "Produk Danus" text
+                          Positioned(
+                            top: 0,
+                            left: 0,
+                            child: Container(
+                              padding: const EdgeInsets.all(4.0),
+                              decoration: BoxDecoration(
+                                color: Warna.like.withAlpha(200),
+                                borderRadius: const BorderRadius.only(
+                                  topLeft: Radius.circular(8),
+                                  bottomRight: Radius.circular(8),
+                                ),
+                              ),
+                              child: const Text(
+                                'Produk Danus',
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 10),
+                              ),
+                            ),
+                          ),
+                  ],
+                ),
             Expanded(
               child: Container(
                 height: innerContentSize ?? 120,
