@@ -130,7 +130,7 @@ class _SplashScreenState extends State<SplashScreen> {
       );
     } else {
       log('goto mainscreen');
-      navigateToRep(context, const MainScreen());
+      navigateToRep(context, MainScreen());
     }
   }
 
@@ -246,7 +246,7 @@ class _SplashScreenState extends State<SplashScreen> {
           } else {
             if (AppConfig.USER_TYPE == 'reguler') {
               log('go to homepages');
-              navigateToRep(context, const MainScreen());
+              navigateToRep(context, MainScreen());
             } else if (AppConfig.USER_TYPE == 'kantin') {
               log('go to kantin pages');
             } else if (AppConfig.USER_TYPE == 'wirausaha') {
@@ -262,12 +262,12 @@ class _SplashScreenState extends State<SplashScreen> {
                   log('go as wirausahawan');
                   navigateToRep(context, const MainScreenMerchant());
                 } else {
-                  navigateToRep(context, const MainScreen());
+                  navigateToRep(context,  MainScreen());
                 }
               } catch (e) {
                 log(e.toString());
                 log('go to homepages');
-                navigateToRep(context, const MainScreen());
+                navigateToRep(context,  MainScreen());
               }
             } else if (AppConfig.USER_TYPE == 'kurir') {
               log('go to kurir pages');

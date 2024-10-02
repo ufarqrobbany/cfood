@@ -65,20 +65,20 @@ class _TransactionWirausahaScreenState
           notifIconButton(
             icons: UIcons.solidRounded.bell,
             onPressed: () {},
-            iconColor: Warna.regulerFontColor,
+            iconColor: Warna.biru,
             notifCount: '7',
           ),
-          const SizedBox(
-            width: 20,
-          ),
+          // const SizedBox(
+          //   width: 10,
+          // ),
           notifIconButton(
             icons: UIcons.solidRounded.comment,
             onPressed: () {},
-            iconColor: Warna.regulerFontColor,
+            iconColor: Warna.biru,
             notifCount: '7',
           ),
           const SizedBox(
-            width: 20,
+            width: 10,
           ),
         ],
         // TAB BUtton
@@ -454,7 +454,7 @@ class _TransactionWirausahaScreenState
               height: 45,
               child: DynamicColorButton(
                 onPressed: () {},
-                text: 'Pesanan SIap',
+                text: 'Pesanan Siap',
                 backgroundColor: Warna.biru,
                 borderRadius: 14,
               ),

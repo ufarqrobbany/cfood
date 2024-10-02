@@ -210,7 +210,7 @@ class _MyAppState extends State<MyApp> {
           case '/':
             return MaterialPageRoute(
               settings: settings,
-              builder: (context) => const MainScreen(),
+              builder: (context) => MainScreen(),
             );
           case '/home':
             return MaterialPageRoute(
@@ -314,7 +314,7 @@ class _MyAppState extends State<MyApp> {
         '/verification-success': (context) => VerificationSuccess(),
         '/create-pass': (context) => CreatePasswordScreen(),
         '/forgot-pass': (context) => const ForgotPasswordScreen(),
-        '/': (context) => const MainScreen(),
+        '/': (context) => MainScreen(),
         '/home': (context) => const HomeScreen(),
         '/cart': (context) => const CartScreen(),
         '/order': (context) => const OrderScreen(),

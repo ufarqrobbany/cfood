@@ -634,7 +634,9 @@ class _CanteenScreenState extends State<CanteenScreen>
           context,
           OrderConfirmScreen(
             merchantId: dataMerchant!.merchantId,
-          ));
+          )).then((onValue) {
+            fetchDetailDataMerchant();
+          });
     } else {
       showToast('Stok pada menu yang dipilih tidak mencukupi');
     }
@@ -652,7 +654,7 @@ class _CanteenScreenState extends State<CanteenScreen>
                 context: context,
                 customTap: () {
                   if (AppConfig.FROM_LINK) {
-                    navigateToRep(context, const MainScreen());
+                    navigateToRep(context, MainScreen());
                     setState(() {
                       AppConfig.FROM_LINK = false;
                     });

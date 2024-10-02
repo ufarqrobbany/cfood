@@ -15,7 +15,8 @@ import 'package:toast/toast.dart';
 import 'package:uicons/uicons.dart';
 
 class MainScreen extends StatefulWidget {
-  const MainScreen({super.key});
+  int firstIndexScreen;
+  MainScreen({super.key, this.firstIndexScreen = 0});
 
   @override
   State<MainScreen> createState() => _MainScreenState();
@@ -38,7 +39,7 @@ List<String> _pageMenuName = [
 ];
 
 class _MainScreenState extends State<MainScreen> {
-  var selectedScreen = _pageMenu[0];
+  var selectedScreen;
   DateTime? lastPressed;
   bool canPopNow = false;
 
@@ -51,6 +52,9 @@ class _MainScreenState extends State<MainScreen> {
   @override
   void initState() {
     super.initState();
+    setState(() {
+      selectedScreen = _pageMenu[widget.firstIndexScreen];
+    });
 
     if (dataUser == null) {
       log(AppConfig.USER_ID.toString());

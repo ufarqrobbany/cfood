@@ -359,7 +359,9 @@ class _CartScreenState extends State<CartScreen> {
           context,
           OrderConfirmScreen(
             cartId: selectCartId,
-          ));
+          )).then((value) {
+            getAllCarts();
+          });
     } else {
       showToast('stok pada menu yg dipilih tidak mencukupi!!');
     }
@@ -392,11 +394,11 @@ class _CartScreenState extends State<CartScreen> {
           notifIconButton(
             icons: UIcons.solidRounded.comment,
             onPressed: () {},
-            iconColor: Warna.regulerFontColor,
+            iconColor: Warna.biru,
             notifCount: '7',
           ),
           const SizedBox(
-            width: 20,
+            width: 10,
           ),
         ],
       ),

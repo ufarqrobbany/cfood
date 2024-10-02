@@ -235,9 +235,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         // );
                       },
                     ),
-                    const SizedBox(
-                      width: 10,
-                    ),
+                    // const SizedBox(
+                    //   width: 10,
+                    // ),
                     notifIconButton(
                       icons: UIcons.solidRounded.comment,
                       notifCount: '5',

@@ -174,9 +174,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
             iconColor: Warna.biru,
             notifCount: '22',
           ),
-          const SizedBox(
-            width: 10,
-          ),
+          // const SizedBox(
+          //   width: 10,
+          // ),
           notifIconButton(
             icons: UIcons.solidRounded.comment,
             notifCount: '5',
@@ -870,6 +870,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 driverItemsMenu(
                   onTap: () {
                     // navigateTo(context, const OrderAvailableScreen());
+                    AuthHelper().setToDashboard(dashboard: 'yes');
+                    setState(() {
+                      AppConfig.ON_DASHBOARD = true;
+                    });
+                    navigateToRep(
+                        context,
+                        const MainScreenMerchant(
+                          firstIndexScreen: 0,
+                        ));
                   },
                   icons: Icons.move_to_inbox,
                   text: 'Pesanan Masuk',
@@ -878,6 +887,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 driverItemsMenu(
                   onTap: () {
                     // navigateTo(context, const DeliveryInfoScreen());
+                    AuthHelper().setToDashboard(dashboard: 'yes');
+                    setState(() {
+                      AppConfig.ON_DASHBOARD = true;
+                    });
+                    navigateToRep(
+                        context,
+                        const MainScreenMerchant(
+                          firstIndexScreen: 1,
+                        ));
                   },
                   icons: UIcons.regularRounded.receipt,
                   text: 'Transaksi',
@@ -926,7 +944,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       AuthHelper().setToDashboard(dashboard: 'no');
                       AppConfig.ON_DASHBOARD = false;
                     });
-                    navigateToRep(context, const MainScreen());
+                    navigateToRep(context, MainScreen());
                   },
                   icon: const Icon(Icons.arrow_forward_ios_rounded),
                   iconSize: 10,

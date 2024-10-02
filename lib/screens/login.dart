@@ -123,7 +123,7 @@ class _LoginScreenState extends State<LoginScreen> {
           });
           log('go to homepage');
           // context.pushReplacementNamed('main');
-          navigateToRep(context, const MainScreen());
+          navigateToRep(context, MainScreen());
         }
       }
     } catch (e) {

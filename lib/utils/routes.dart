@@ -199,7 +199,7 @@ import 'package:go_router/go_router.dart';
         // builder: (context, state) => const MainScreen(),
          pageBuilder: (context, state) {
           return CustomTransitionPage(
-            child: const MainScreen(), 
+            child: MainScreen(), 
             transitionDuration: const Duration(milliseconds: 200),
             transitionsBuilder: (context, animation, secondaryAnimation, child) {
               return FadeTransition(
@@ -543,7 +543,7 @@ class AppRoutes{
       case '/forgot-pass':
         return _buildRoute(const ForgotPasswordScreen(), settings);
       case '/':
-        return _buildRoute(const MainScreen(), settings);
+        return _buildRoute( MainScreen(), settings);
       case '/home':
         return _buildRoute(const HomeScreen(), settings);
       case '/cart':

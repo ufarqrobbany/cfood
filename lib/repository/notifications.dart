@@ -224,7 +224,7 @@ class NotificationController {
     } else {
       MyApp.navigatorKey.currentState?.pushAndRemoveUntil(
           MaterialPageRoute(
-            builder: (context) => const MainScreen(),
+            builder: (context) => MainScreen(),
           ),
           (route) => route.isFirst);
     }

@@ -3,7 +3,10 @@ import 'dart:developer';
 import 'package:cfood/custom/CButtons.dart';
 import 'package:cfood/custom/CPageMover.dart';
 import 'package:cfood/custom/CTextField.dart';
+import 'package:cfood/custom/CToast.dart';
 import 'package:cfood/custom/reload_indicator.dart';
+import 'package:cfood/model/create_order_response.dart';
+import 'package:cfood/model/reponse_handler.dart';
 import 'package:cfood/model/voucher_response.dart';
 import 'package:cfood/repository/fetch_controller.dart';
 import 'package:cfood/screens/order_detail.dart';
@@ -50,6 +53,7 @@ class _OrderConfirmScreenState extends State<OrderConfirmScreen> {
   bool buttonLoad = false;
 
   ConfirmCartResponse? confirmCartResponse;
+  CreateOrderResponse? createOrderResponse;
   DataConfirmCart? dataConfirmCart;
   String selectedPaymentMethod = '';
   String selectedPaymentMethodName = '';
@@ -91,6 +95,68 @@ class _OrderConfirmScreenState extends State<OrderConfirmScreen> {
     setState(() {
       dataConfirmCart = confirmCartResponse?.data;
     });
+  }
+
+  Future<void> createOrder(BuildContext context) async {
+    String orderStatus = '';
+    if (selectedPaymentMethod == '') {
+      showToast('Pilih Metode Pembayaran');
+      return;
+    }
+
+    if (selectedPaymentMethod == 'cash') {
+      setState(() {
+        orderStatus = 'MENUNGGU_KONFIRM_PENJUAL';
+      });
+    } else {
+      setState(() {
+        orderStatus = 'BELUM_DIBAYAR';
+      });
+    }
+    setState(() {
+      buttonLoad = true;
+    });
+    try {
+      createOrderResponse = await FetchController(
+        endpoint: 'orders/',
+        fromJson: (json) => CreateOrderResponse.fromJson(json),
+      ).postData({
+        'cartId': dataConfirmCart!.cartInformation.cartId,
+        'voucherId': selectedVoucher?.voucherId,
+        'paymentMethod': selectedPaymentMethod,
+        'orderStatus': orderStatus,
+        'note': noteController.text,
+      });
+      log(createOrderResponse.toString());
+      if (createOrderResponse!.statusCode == 200) {
+        log('create order');
+        var currentTime = getCurrentDateTime();
+        log(currentTime);
+        setState(() {
+          buttonLoad = false;
+        });
+        log('go to detail');
+        navigateTo(
+          context,
+          OrderDetailScreen(
+            cartId: widget.cartId,
+            merchantId: widget.merchantId,
+            noteOrder: noteController.text,
+            orderNumber: '65987879867576',
+            orderTime: currentTime.toString(),
+            paymentMethod: selectedPaymentMethod,
+            dataOrder: createOrderResponse?.data,
+            status:
+                'pesanan dibuat', // pesanan dibuat, pesanan dikonfirmasi, pesanan sudah sampai
+          ),
+        );
+      }
+    } on Exception catch (e) {
+      setState(() {
+        buttonLoad = false;
+      });
+      showToast('Gagal Membuat Pesanan ERROR: $e');
+    }
   }
 
   Future<void> refreshPage() async {
@@ -304,9 +370,9 @@ class _OrderConfirmScreenState extends State<OrderConfirmScreen> {
                         height: 50,
                         width: double.infinity,
                         child: CBlueButton(
-                            isLoading: buttonLoad,
+                            // isLoading: buttonLoad,
                             borderRadius: 60,
-                            onPressed: () {
+                            onPressed: buttonLoad ? () {} : () {
                               navigateTo(context, const PaymentMethodScreen())
                                   .then((value) {
                                 setState(() {
@@ -330,22 +396,20 @@ class _OrderConfirmScreenState extends State<OrderConfirmScreen> {
                               width: double.infinity,
                               child: CBlueButton(
                                 onPressed: () {
-                                  log('create order');
-                                  var currentTime = getCurrentDateTime();
-                                  log(currentTime);
-                                  navigateTo(
-                                    context,
-                                    OrderDetailScreen(
-                                      cartId: widget.cartId,
-                                      merchantId: widget.merchantId,
-                                      noteOrder: noteController.text,
-                                      orderNumber: '65987879867576',
-                                      orderTime: currentTime.toString(),
-                                      paymentMethod: selectedPaymentMethod,
-                                      status:
-                                          'pesanan dibuat', // pesanan dibuat, pesanan dikonfirmasi, pesanan sudah sampai
-                                    ),
-                                  );
+                                  createOrder(context);
+                                  // navigateTo(
+                                  //   context,
+                                  //   OrderDetailScreen(
+                                  //     cartId: widget.cartId,
+                                  //     merchantId: widget.merchantId,
+                                  //     noteOrder: noteController.text,
+                                  //     orderNumber: '65987879867576',
+                                  //     orderTime: currentTime.toString(),
+                                  //     paymentMethod: selectedPaymentMethod,
+                                  //     status:
+                                  //         'pesanan dibuat', // pesanan dibuat, pesanan dikonfirmasi, pesanan sudah sampai
+                                  //   ),
+                                  // );
                                 },
                                 isLoading: buttonLoad,
                                 borderRadius: 60,
@@ -697,25 +761,11 @@ class _OrderConfirmScreenState extends State<OrderConfirmScreen> {
 
   Widget voucherBox() {
     return ListTile(
-      leading: selectedVoucher != null
-          // ? Container(
-          //     height: 35,
-          //     width: 35,
-          //     decoration: BoxDecoration(
-          //       color: Colors.white,
-          //       borderRadius: BorderRadius.circular(6),
-          //     ),
-          //     child: Image.asset(
-          //       'assets/logo.png',
-          //       fit: BoxFit.cover,
-          //     ),
-          //   )
-          ? Container()
-          : Icon(
-              Icons.confirmation_num_outlined,
-              color: Warna.biru,
-              size: 25,
-            ),
+      leading: Icon(
+        Icons.confirmation_number_outlined,
+        color: selectedVoucher != null ? Warna.kuning : Warna.biru,
+        size: 28,
+      ),
       title: Text(
         selectedVoucher != null
             ? selectedVoucher!.voucherName

@@ -39,6 +39,7 @@ class _OrganizationScreenState extends State<OrganizationScreen>
   GetDetailOrganizationResponse? organizationDataResponse;
   DataDetailOrganization? dataOrganization;
   String? logoOrganization;
+  bool problem = false;
 
   @override
   void initState() {
@@ -60,25 +61,32 @@ class _OrganizationScreenState extends State<OrganizationScreen>
   }
 
   Future<void> fetchDetailDataOrganization() async {
-    organizationDataResponse = await FetchController(
-      endpoint: 'organizations/${widget.id}',
-      fromJson: (json) => GetDetailOrganizationResponse.fromJson(json),
-    ).getData();
+    try {
+      organizationDataResponse = await FetchController(
+        endpoint: 'organizations/${widget.id}',
+        fromJson: (json) => GetDetailOrganizationResponse.fromJson(json),
+      ).getData();
 
-    setState(() {
-      dataOrganization = organizationDataResponse!.data;
-      logoOrganization = AppConfig.URL_IMAGES_PATH +
-          organizationDataResponse!.data!.organizationLogo!;
-    });
+      setState(() {
+        dataOrganization = organizationDataResponse!.data;
+        logoOrganization = AppConfig.URL_IMAGES_PATH +
+            organizationDataResponse!.data!.organizationLogo!;
+      });
 
-    organizationMaps = {
-      for (var activity in organizationDataResponse!.data!.activities!)
-        activity.activityName!: activity.merchants!,
-    };
-    if (organizationMaps.isNotEmpty) {
-      selectedTab = organizationMaps.keys.first;
+      organizationMaps = {
+        for (var activity in organizationDataResponse!.data!.activities!)
+          activity.activityName!: activity.merchants!,
+      };
+      if (organizationMaps.isNotEmpty) {
+        selectedTab = organizationMaps.keys.first;
+      }
+      log("$dataOrganization");
+    } on Exception catch (e) {
+      // TODO
+      setState(() {
+        problem = true;
+      });
     }
-    log("$dataOrganization");
   }
 
   @override
@@ -90,7 +98,7 @@ class _OrganizationScreenState extends State<OrganizationScreen>
             context: context,
             customTap: () {
               if (AppConfig.FROM_LINK) {
-                navigateToRep(context, const MainScreen());
+                navigateToRep(context, MainScreen());
                 setState(() {
                   AppConfig.FROM_LINK = false;
                 });
@@ -122,102 +130,111 @@ class _OrganizationScreenState extends State<OrganizationScreen>
         ],
       ),
       backgroundColor: Colors.white,
-      body: ReloadIndicatorType1(
-        onRefresh: refreshPage,
-        child: SizedBox(
-          width: double.infinity,
-          height: double.infinity,
-          child: CustomScrollView(
-            physics: const BouncingScrollPhysics(
-              parent: AlwaysScrollableScrollPhysics(),
-            ),
-            slivers: [
-              // SliverAppBar(
-              //   pinned: true,
+      body: organizationDataResponse == null && problem == true
+          ? itemsEmptyBody(
+              context,
+              text: 'Terjadi Masalah',
+              icons: UIcons.solidRounded.bug,
+              iconsColor: Warna.like,
+            )
+          : ReloadIndicatorType1(
+              onRefresh: refreshPage,
+              child: SizedBox(
+                width: double.infinity,
+                height: double.infinity,
+                child: CustomScrollView(
+                  physics: const BouncingScrollPhysics(
+                    parent: AlwaysScrollableScrollPhysics(),
+                  ),
+                  slivers: [
+                    // SliverAppBar(
+                    //   pinned: true,
 
-              // ),
-              SliverList(
-                  delegate: SliverChildListDelegate([
-                dataOrganization == null
-                    ? Center(
-                      child: Padding(
-                        padding: const EdgeInsets.only(bottom: 25),
-                        child: shimmerBox(
-                            enabled: true,
-                            height: 150,
-                            width: 150,
-                            radius: 150,
-                          ),
-                      ),
-                    )
-                    : Container(
-                        width: double.infinity,
-                        height: 170,
-                        padding: const EdgeInsets.only(bottom: 25),
-                        child: Center(
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(150),
-                            child: SizedBox(
-                              height: 150,
-                              width: 150,
-                              child: Image.network(
-                                logoOrganization ?? './jpg',
-                                fit: BoxFit.cover,
-                                loadingBuilder:
-                                    (context, child, loadingProgress) {
-                                  if (loadingProgress == null) {
-                                    // Jika loadingProgress null, itu berarti gambar sudah selesai dimuat
-                                    return child;
-                                  } else {
-                                    // Tampilkan loading indicator selama gambar belum selesai dimuat
-                                    return Container(
-                                      height: 200,
-                                      width: double.infinity,
-                                      color: Warna.abu2,
-                                      child: Center(
-                                        child: SizedBox(
-                                          width: 50,
-                                          child: LoadingAnimationWidget
-                                              .staggeredDotsWave(
-                                                  color: Warna.biru, size: 30),
-                                        ),
+                    // ),
+                    SliverList(
+                        delegate: SliverChildListDelegate([
+                      dataOrganization == null
+                          ? Center(
+                              child: Padding(
+                                padding: const EdgeInsets.only(bottom: 25),
+                                child: shimmerBox(
+                                  enabled: true,
+                                  height: 150,
+                                  width: 150,
+                                  radius: 150,
+                                ),
+                              ),
+                            )
+                          : Container(
+                              width: double.infinity,
+                              height: 170,
+                              padding: const EdgeInsets.only(bottom: 25),
+                              child: Center(
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(150),
+                                  child: SizedBox(
+                                    height: 150,
+                                    width: 150,
+                                    child: Image.network(
+                                      logoOrganization ?? './jpg',
+                                      fit: BoxFit.cover,
+                                      loadingBuilder:
+                                          (context, child, loadingProgress) {
+                                        if (loadingProgress == null) {
+                                          // Jika loadingProgress null, itu berarti gambar sudah selesai dimuat
+                                          return child;
+                                        } else {
+                                          // Tampilkan loading indicator selama gambar belum selesai dimuat
+                                          return Container(
+                                            height: 200,
+                                            width: double.infinity,
+                                            color: Warna.abu2,
+                                            child: Center(
+                                              child: SizedBox(
+                                                width: 50,
+                                                child: LoadingAnimationWidget
+                                                    .staggeredDotsWave(
+                                                        color: Warna.biru,
+                                                        size: 30),
+                                              ),
+                                            ),
+                                          );
+                                        }
+                                      },
+                                      errorBuilder:
+                                          (context, error, stackTrace) =>
+                                              Container(
+                                        height: 200,
+                                        width: double.infinity,
+                                        color: Warna.abu2,
                                       ),
-                                    );
-                                  }
-                                },
-                                errorBuilder: (context, error, stackTrace) =>
-                                    Container(
-                                  height: 200,
-                                  width: double.infinity,
-                                  color: Warna.abu2,
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),
+                    ])),
+                    SliverList(
+                      delegate: SliverChildListDelegate(
+                        [
+                          bodyOrganizationInfo(),
+                          const SizedBox(
+                            height: 25,
                           ),
-                        ),
+                        ],
                       ),
-              ])),
-              SliverList(
-                delegate: SliverChildListDelegate(
-                  [
-                    bodyOrganizationInfo(),
-                    const SizedBox(
-                      height: 25,
                     ),
+                    SliverList(
+                      delegate: SliverChildListDelegate(
+                        [
+                          bodyWirausahaList(),
+                        ],
+                      ),
+                    )
                   ],
                 ),
               ),
-              SliverList(
-                delegate: SliverChildListDelegate(
-                  [
-                    bodyWirausahaList(),
-                  ],
-                ),
-              )
-            ],
-          ),
-        ),
-      ),
+            ),
     );
   }
 
@@ -240,99 +257,104 @@ class _OrganizationScreenState extends State<OrganizationScreen>
               const SizedBox(
                 width: 15,
               ),
-              dataOrganization == null ? shimmerBox(enabled: true, height: 20, width: 180, radius: 8) :
-              Text(
-                '${dataOrganization?.organizationShortname}',
-                style: AppTextStyles.title,
-                maxLines: 2,
-              ),
+              dataOrganization == null
+                  ? shimmerBox(enabled: true, height: 20, width: 180, radius: 8)
+                  : Text(
+                      '${dataOrganization?.organizationShortname}',
+                      style: AppTextStyles.title,
+                      maxLines: 2,
+                    ),
             ],
           ),
           const SizedBox(
             height: 8,
           ),
           Text(
-                '${dataOrganization?.organizationName}',
-                style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFF353535),
-                      ),
-                maxLines: 2,
-              ),
+            '${dataOrganization?.organizationName}',
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF353535),
+            ),
+            maxLines: 2,
+          ),
           const SizedBox(
             height: 12,
           ),
-          dataOrganization == null ? shimmerBox(enabled: true, height: 15, width: 100, radius: 8) :
-          Text(
-            '${dataOrganization?.totalActivity} Kegiatan',
-            style: AppTextStyles.textRegular,
-          ),
+          dataOrganization == null
+              ? shimmerBox(enabled: true, height: 15, width: 100, radius: 8)
+              : Text(
+                  '${dataOrganization?.totalActivity} Kegiatan',
+                  style: AppTextStyles.textRegular,
+                ),
           const SizedBox(
             height: 16,
           ),
-          dataOrganization == null ? Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              shimmerBox(enabled: true, height: 20, width: 80, radius: 8),
-              const SizedBox(
-                width: 8,
-              ),
-              shimmerBox(enabled: true, height: 20, width: 80, radius: 8),
-            ],
-          ) :
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(4),
-                  border: Border.all(color: Warna.kuning, width: 1),
-                  color: Warna.kuning.withOpacity(0.10),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+          dataOrganization == null
+              ? Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.max,
                   children: [
-                    Icon(
-                      CommunityMaterialIcons.handshake,
-                      size: 15,
-                      color: Warna.kuning,
+                    shimmerBox(enabled: true, height: 20, width: 80, radius: 8),
+                    const SizedBox(
+                      width: 8,
                     ),
-                    Text(
-                      ' ${dataOrganization?.totalWirausaha.toString()} Wirausaha',
-                      style: const TextStyle(fontSize: 12),
+                    shimmerBox(enabled: true, height: 20, width: 80, radius: 8),
+                  ],
+                )
+              : Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 6, vertical: 1),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(4),
+                        border: Border.all(color: Warna.kuning, width: 1),
+                        color: Warna.kuning.withOpacity(0.10),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            CommunityMaterialIcons.handshake,
+                            size: 15,
+                            color: Warna.kuning,
+                          ),
+                          Text(
+                            ' ${dataOrganization?.totalWirausaha.toString()} Wirausaha',
+                            style: const TextStyle(fontSize: 12),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 8,
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 6, vertical: 1),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(4),
+                        border: Border.all(color: Warna.oranye1, width: 1),
+                        color: Warna.oranye1.withOpacity(0.10),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.fastfood_rounded,
+                            size: 15,
+                            color: Warna.oranye1,
+                          ),
+                          Text(
+                            ' ${dataOrganization?.totalMenu.toString()} Menu',
+                            style: const TextStyle(fontSize: 12),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
-                ),
-              ),
-              const SizedBox(
-                width: 8,
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(4),
-                  border: Border.all(color: Warna.oranye1, width: 1),
-                  color: Warna.oranye1.withOpacity(0.10),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.fastfood_rounded,
-                      size: 15,
-                      color: Warna.oranye1,
-                    ),
-                    Text(
-                      ' ${dataOrganization?.totalMenu.toString()} Menu',
-                      style: const TextStyle(fontSize: 12),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          )
+                )
         ],
       ),
     );
