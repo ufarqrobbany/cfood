@@ -117,7 +117,7 @@ class _VoucherDetailState extends State<VoucherDetail> {
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
-                'VOUCHER ${widget.type!.toUpperCase() == "DISCOUNT" ? "DISKON" : "CASHBACK"}',
+                'VOUCHER ${widget.type!.toUpperCase() == "DISCOUNT" ? "DISKON" : "DISKON"}',
                 style: TextStyle(
                     fontSize: 12,
                     color: Warna.biru,

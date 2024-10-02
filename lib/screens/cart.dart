@@ -427,7 +427,7 @@ class _CartScreenState extends State<CartScreen> {
                 bgcolors: Colors.white,
                 icons: UIcons.solidRounded.shopping_cart,
                 iconsColor: Warna.kuning,
-                text: 'Keranjang Kamu masih kosong\nayo tambah yang buanyak!')
+                text: 'Keranjang Kamu masih kosong\nayo tambah yang banyak!')
             : ReloadIndicatorType1(
                 onRefresh: refreshPage,
                 child: SingleChildScrollView(
