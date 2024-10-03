@@ -359,32 +359,33 @@ class _OrderWirausahaScreenState extends State<OrderWirausahaScreen> {
 
   Widget orderListBody() {
     return orderDataResponse == null
-            ? pageOnLoading(context)
-            : orderList!.isEmpty
-                ? itemsEmptyBody(context,
-                    bgcolors: Colors.white,
-                    icons: UIcons.solidRounded.shopping_cart,
-                    iconsColor: Warna.kuning,
-                    text: 'Tidak ada Pesanan')
-                : ListView.builder(
-      itemCount: orderList?.length,
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      padding: const EdgeInsets.fromLTRB(25, 10, 25, 15),
-      itemBuilder: (context, index) {
-        return Padding(
-          padding: index == orderList!.length - 1
-              ? const EdgeInsets.fromLTRB(0, 10, 0, 100)
-              : const EdgeInsets.symmetric(vertical: 10),
-          child: orderItemBox(
-            storeListIndex: index,
-            storeItem: orderList,
-            menuItems:
-                orderList![index].orderInformation?.orderItemInformations,
-          ),
-        );
-      },
-    );
+        ? pageOnLoading(context)
+        : orderList!.isEmpty
+            ? itemsEmptyBody(context,
+                bgcolors: Warna.pageBackgroundColor,
+                icons: UIcons.solidRounded.shopping_cart,
+                iconsColor: Warna.kuning,
+                text: 'Tidak ada Pesanan')
+            : ListView.builder(
+                itemCount: orderList?.length,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                padding: const EdgeInsets.fromLTRB(25, 10, 25, 15),
+                itemBuilder: (context, index) {
+                  return Padding(
+                    padding: index == orderList!.length - 1
+                        ? const EdgeInsets.fromLTRB(0, 10, 0, 100)
+                        : const EdgeInsets.symmetric(vertical: 10),
+                    child: orderItemBox(
+                      storeListIndex: index,
+                      storeItem: orderList,
+                      menuItems: orderList![index]
+                          .orderInformation
+                          ?.orderItemInformations,
+                    ),
+                  );
+                },
+              );
   }
 
   Widget orderItemBox({
@@ -462,7 +463,8 @@ class _OrderWirausahaScreenState extends State<OrderWirausahaScreen> {
                             // padding: const EdgeInsets.symmetric(vertical: 20),
                             decoration: BoxDecoration(
                               border: Border(
-                                bottom: BorderSide(color: Warna.abu5, width: 1.5),
+                                bottom:
+                                    BorderSide(color: Warna.abu5, width: 1.5),
                               ),
                             ),
                             child: Padding(
