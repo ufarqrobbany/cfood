@@ -37,13 +37,24 @@ class DataOrder {
   String? orderDate;
   String? status;
   OrderInformation? orderInformation;
+  String? paymentMethod;
+  int? serviceCost;
+  int? shippingCost;
+  int? voucherCost;
+  int? totalPrice;
 
   DataOrder(
       {this.id,
       this.orderNumber,
       this.orderDate,
       this.status,
-      this.orderInformation});
+      this.orderInformation,
+      this.paymentMethod,
+      this.serviceCost,
+      this.shippingCost,
+      this.totalPrice,
+      this.voucherCost,
+      });
 
   DataOrder.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -53,6 +64,11 @@ class DataOrder {
     orderInformation = json['orderInformation'] != null
         ? new OrderInformation.fromJson(json['orderInformation'])
         : null;
+     paymentMethod = json['paymentMethod'];
+    serviceCost = json['serviceCost'];
+    shippingCost = json['shippingCost'];
+    voucherCost = json['voucherCost'];
+    totalPrice = json['totalPrice'];
   }
 
   Map<String, dynamic> toJson() {

@@ -3,10 +3,12 @@ import 'dart:developer';
 import 'package:cfood/custom/CButtons.dart';
 import 'package:cfood/custom/CPageMover.dart';
 import 'package:cfood/custom/page_item_void.dart';
+import 'package:cfood/custom/popup_dialog.dart';
 import 'package:cfood/custom/reload_indicator.dart';
 import 'package:cfood/model/add_merchants_response.dart';
+import 'package:cfood/model/cancel_order_response.dart';
 // import 'package:cfood/model/get_all_order_list_response.dart';
-import 'package:cfood/model/get_merchant_order_response.dart';
+import 'package:cfood/model/get_merchant_order_response.dart' as merchant;
 import 'package:cfood/model/open_close_store_response.dart';
 import 'package:cfood/repository/fetch_controller.dart';
 import 'package:cfood/screens/inbox.dart';
@@ -29,8 +31,8 @@ class OrderWirausahaScreen extends StatefulWidget {
 class _OrderWirausahaScreenState extends State<OrderWirausahaScreen> {
   bool isOpen = false;
   AddMerchantResponse? merchantDataResponse;
-  MerchantOrderResponse? orderDataResponse;
-  List<DataOrder>? orderList;
+  merchant.MerchantOrderResponse? orderDataResponse;
+  List<merchant.DataOrder>? orderList;
   List<Map<String, dynamic>> orderStatusMap = [
     {
       'status': 'Belum Bayar',
@@ -111,9 +113,10 @@ class _OrderWirausahaScreenState extends State<OrderWirausahaScreen> {
   }
 
   Future<void> fetchData() async {
-    MerchantOrderResponse response = await FetchController(
-        endpoint: 'orders/incoming/${AppConfig.MERCHANT_ID}',
-        fromJson: (json) => MerchantOrderResponse.fromJson(json)).getData();
+    merchant.MerchantOrderResponse response = await FetchController(
+            endpoint: 'orders/incoming/${AppConfig.MERCHANT_ID}',
+            fromJson: (json) => merchant.MerchantOrderResponse.fromJson(json))
+        .getData();
 
     if (response.statusCode == 200) {
       setState(() {
@@ -123,6 +126,52 @@ class _OrderWirausahaScreenState extends State<OrderWirausahaScreen> {
         log(orderDataResponse.toString());
       });
     }
+  }
+
+  void confirmOrder(
+    BuildContext context, {
+    int orderId = 0,
+    String currentStatus = '',
+    Function(String currentStatus)? onStatusChanged,
+  }) async {
+    CancelOrderResponse response = await FetchController(
+        endpoint: 'orders/confirm-merchant?orderId=$orderId',
+        fromJson: (json) => CancelOrderResponse.fromJson(json)).putData({});
+
+    setState(() {
+      currentStatus = response.data!.status!;
+      onStatusChanged!(currentStatus);
+      log(currentStatus);
+    });
+    removeOrderById(orderId);
+  }
+
+  void rejectOrder(
+    BuildContext context, {
+    int orderId = 0,
+    String currentStatus = '',
+    Function(String currentStatus)? onStatusChanged,
+  }) {
+    showMyCustomDialog(context,
+        text: 'Apakah Anda yakin untuk menolak pesanan?',
+        noText: 'Tidak',
+        yesText: 'Ya',
+        colorYes: Warna.like,
+        colorNO: Warna.abu, onTapYes: () async {
+      CancelOrderResponse response = await FetchController(
+          endpoint: 'orders/reject?orderId=$orderId',
+          fromJson: (json) => CancelOrderResponse.fromJson(json)).putData({});
+
+      setState(() {
+        currentStatus = response.data!.status!;
+        onStatusChanged!(currentStatus);
+        log(currentStatus);
+      });
+      removeOrderById(orderId);
+      navigateBack(context);
+    }, onTapNo: () {
+      navigateBack(context);
+    });
   }
 
   Future<void> merchantStatusOpen(bool value) async {
@@ -166,6 +215,12 @@ class _OrderWirausahaScreenState extends State<OrderWirausahaScreen> {
   }
 
   bool isConfirm = false;
+
+  void removeOrderById(int id) {
+    setState(() {
+      orderList?.removeWhere((order) => order.id == id);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -359,44 +414,55 @@ class _OrderWirausahaScreenState extends State<OrderWirausahaScreen> {
 
   Widget orderListBody() {
     return orderDataResponse == null
-            ? pageOnLoading(context)
-            : orderList!.isEmpty
-                ? itemsEmptyBody(context,
-                    bgcolors: Colors.white,
-                    icons: UIcons.solidRounded.shopping_cart,
-                    iconsColor: Warna.kuning,
-                    text: 'Tidak ada Pesanan')
-                : ListView.builder(
-      itemCount: orderList?.length,
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      padding: const EdgeInsets.fromLTRB(25, 10, 25, 15),
-      itemBuilder: (context, index) {
-        return Padding(
-          padding: index == orderList!.length - 1
-              ? const EdgeInsets.fromLTRB(0, 10, 0, 100)
-              : const EdgeInsets.symmetric(vertical: 10),
-          child: orderItemBox(
-            storeListIndex: index,
-            storeItem: orderList,
-            menuItems:
-                orderList![index].orderInformation?.orderItemInformations,
-          ),
-        );
-      },
-    );
+        ? SizedBox(
+          width: double.infinity,
+          height: 200,
+          child: Center(child: pageOnLoading(context, bgColor: Colors.transparent)))
+        : orderList!.isEmpty
+            ? itemsEmptyBody(context,
+                bgcolors: Colors.white,
+                icons: UIcons.solidRounded.shopping_cart,
+                iconsColor: Warna.kuning,
+                text: 'Tidak ada Pesanan')
+            : ListView.builder(
+                itemCount: orderList?.length,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                padding: const EdgeInsets.fromLTRB(25, 10, 25, 15),
+                itemBuilder: (context, index) {
+                  return Padding(
+                    padding: index == orderList!.length - 1
+                        ? const EdgeInsets.fromLTRB(0, 10, 0, 100)
+                        : const EdgeInsets.symmetric(vertical: 10),
+                    child: orderItemBox(
+                      storeListIndex: index,
+                      storeItem: orderList,
+                      menuItems: orderList![index]
+                          .orderInformation
+                          ?.orderItemInformations,
+                    ),
+                  );
+                },
+              );
+  }
+
+  int calculateTotalPrice(List<merchant.OrderItemInformations> menuItems) {
+    return menuItems.fold(0, (sum, item) => sum + item.totalPriceItem!);
   }
 
   Widget orderItemBox({
     // String? imgUrl,
     int storeListIndex = 0,
-    List<DataOrder>? storeItem,
-    List<OrderItemInformations>? menuItems,
+    List<merchant.DataOrder>? storeItem,
+    List<merchant.OrderItemInformations>? menuItems,
   }) {
     bool highlightStatus =
         storeItem?[storeListIndex].status == 'MENUNGGU_KONFIRM_PENJUAL' ||
             storeItem?[storeListIndex].status == 'MENUNGGU_PEMBAYARAN' ||
             storeItem?[storeListIndex].status == 'PESANAN_DIANTARKAN';
+
+    storeItem![storeListIndex].totalPrice =
+        calculateTotalPrice(menuItems ?? []);
 
     return isConfirm == true
         ? Container()
@@ -462,7 +528,8 @@ class _OrderWirausahaScreenState extends State<OrderWirausahaScreen> {
                             // padding: const EdgeInsets.symmetric(vertical: 20),
                             decoration: BoxDecoration(
                               border: Border(
-                                bottom: BorderSide(color: Warna.abu5, width: 1.5),
+                                bottom:
+                                    BorderSide(color: Warna.abu5, width: 1.5),
                               ),
                             ),
                             child: Padding(
@@ -572,7 +639,7 @@ class _OrderWirausahaScreenState extends State<OrderWirausahaScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Expanded(
-                          flex: 6,
+                          flex: 9,
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -587,23 +654,46 @@ class _OrderWirausahaScreenState extends State<OrderWirausahaScreen> {
                                     borderRadius: BorderRadius.circular(40),
                                     color: Warna.abu,
                                   ),
-                                  child: Image.network(
-                                    '/.jpg',
-                                    errorBuilder:
-                                        (context, error, stackTrace) =>
-                                            Container(
-                                      height: 40,
-                                      width: 40,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(40),
-                                        color: Warna.abu,
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(40),
+                                    child: Image.network(
+                                      '${AppConfig.URL_IMAGES_PATH}${storeItem[storeListIndex].orderInformation!.userInformation!.userPhoto}',
+                                      fit: BoxFit.cover,
+                                      errorBuilder:
+                                          (context, error, stackTrace) =>
+                                              Container(
+                                        height: 40,
+                                        width: 40,
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(40),
+                                          color: Warna.abu,
+                                        ),
                                       ),
                                     ),
                                   ),
                                 ),
-                                title: const Text(
-                                  'Nobby Dharma Khaulid',
-                                  style: TextStyle(
+                                title: Text(
+                                  storeItem[storeListIndex]
+                                      .orderInformation!
+                                      .userInformation!
+                                      .userName
+                                      .toString(),
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                subtitle: storeItem[storeListIndex]
+                                      .orderInformation!
+                                      .userInformation!
+                                      .studentInformation == null ? null : Text(
+                                  storeItem[storeListIndex]
+                                      .orderInformation!
+                                      .userInformation!
+                                      .studentInformation!.studyProgramInformation!.studyProgramName
+                                      .toString(),
+                                  style: const TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w500,
                                   ),
@@ -625,8 +715,12 @@ class _OrderWirausahaScreenState extends State<OrderWirausahaScreen> {
                                   style: AppTextStyles.textRegular,
                                 ),
                                 Text(
-                                  '${Constant.currencyCode}10.000',
-                                  style: AppTextStyles.productPrice,
+                                  '${Constant.currencyCode}${formatNumberWithThousandsSeparator(storeItem[storeListIndex].totalPrice!)}',
+                                  style: const TextStyle(
+                                    fontSize: 17,
+                                    fontWeight: FontWeight.w800,
+                                    color: Color(0xFF0C356D),
+                                  ),
                                 )
                               ],
                             ))
@@ -641,7 +735,23 @@ class _OrderWirausahaScreenState extends State<OrderWirausahaScreen> {
                       children: [
                         Expanded(
                           child: DynamicColorButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              rejectOrder(
+                                context,
+                                orderId: storeItem[storeListIndex].id!,
+                                currentStatus:
+                                    storeItem[storeListIndex].status!,
+                                onStatusChanged: (currentStatus) {
+                                  setState(() {
+                                    storeItem[storeListIndex].status =
+                                        currentStatus;
+                                    log(storeItem[storeListIndex]
+                                        .status
+                                        .toString());
+                                  });
+                                },
+                              );
+                            },
                             text: 'Tolak',
                             textColor: Warna.regulerFontColor,
                             backgroundColor: Warna.like.withOpacity(0.05),
@@ -659,9 +769,21 @@ class _OrderWirausahaScreenState extends State<OrderWirausahaScreen> {
                         Expanded(
                           child: DynamicColorButton(
                             onPressed: () {
-                              setState(() {
-                                isConfirm = true;
-                              });
+                              confirmOrder(
+                                context,
+                                orderId: storeItem[storeListIndex].id!,
+                                currentStatus:
+                                    storeItem[storeListIndex].status!,
+                                onStatusChanged: (currentStatus) {
+                                  setState(() {
+                                    storeItem[storeListIndex].status =
+                                        currentStatus;
+                                    log(storeItem[storeListIndex]
+                                        .status
+                                        .toString());
+                                  });
+                                },
+                              );
                             },
                             text: 'Konfirmasi',
                             backgroundColor: Warna.hijau,

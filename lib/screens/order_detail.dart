@@ -200,28 +200,86 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
   }
 
   void cancelOrder(BuildContext context) {
-    showMyCustomDialog(
-      context,
-      text: 'Apakah Anda yakin untuk membatalkan pesanan?',
-      noText: 'Tidak',
-      yesText: 'Ya',
-      colorYes: Warna.like,
-      colorNO: Warna.abu,
-      onTapYes: () async {
-        CancelOrderResponse response = await FetchController(
-            endpoint: 'orders/cancel?orderId=${widget.orderId}',
-            fromJson: (json) => CancelOrderResponse.fromJson(json)).putData({});
+    int orderId = 0;
+    if (widget.orderId == null) {
+      setState(() {
+        orderId = dataOrderResponse!.id!;
+      });
+    } else {
+      setState(() {
+        orderId = widget.orderId!;
+      });
+    }
+    showMyCustomDialog(context,
+        text: 'Apakah Anda yakin untuk membatalkan pesanan?',
+        noText: 'Tidak',
+        yesText: 'Ya',
+        colorYes: Warna.like,
+        colorNO: Warna.abu, onTapYes: () async {
+      CancelOrderResponse response = await FetchController(
+          endpoint: 'orders/cancel?orderId=$orderId',
+          fromJson: (json) => CancelOrderResponse.fromJson(json)).putData({});
 
-        setState(() {
-          currentStatus = response.data!.status!;
-          log(currentStatus);
-        });
-        navigateBack(context);
-      },
-      onTapNo: () {
-        navigateBack(context);
-      }
-    );
+      setState(() {
+        currentStatus = response.data!.status!;
+        log(currentStatus);
+      });
+      navigateBack(context);
+    }, onTapNo: () {
+      navigateBack(context);
+    });
+  }
+
+  void confirmOrder(BuildContext context) async {
+    int orderId = 0;
+    if (widget.orderId == null) {
+      setState(() {
+        orderId = dataOrderResponse!.id!;
+      });
+    } else {
+      setState(() {
+        orderId = widget.orderId!;
+      });
+    }
+    CancelOrderResponse response = await FetchController(
+        endpoint: 'orders/confirm-merchant?orderId=$orderId',
+        fromJson: (json) => CancelOrderResponse.fromJson(json)).putData({});
+
+    setState(() {
+      currentStatus = response.data!.status!;
+      log(currentStatus);
+    });
+  }
+
+  void rejectOrder(BuildContext context) {
+    int orderId = 0;
+    if (widget.orderId == null) {
+      setState(() {
+        orderId = dataOrderResponse!.id!;
+      });
+    } else {
+      setState(() {
+        orderId = widget.orderId!;
+      });
+    }
+    showMyCustomDialog(context,
+        text: 'Apakah Anda yakin untuk menolak pesanan?',
+        noText: 'Tidak',
+        yesText: 'Ya',
+        colorYes: Warna.like,
+        colorNO: Warna.abu, onTapYes: () async {
+      CancelOrderResponse response = await FetchController(
+          endpoint: 'orders/reject?orderId=$orderId',
+          fromJson: (json) => CancelOrderResponse.fromJson(json)).putData({});
+
+      setState(() {
+        currentStatus = response.data!.status!;
+        log(currentStatus);
+      });
+      navigateBack(context);
+    }, onTapNo: () {
+      navigateBack(context);
+    });
   }
 
   Future<void> refreshPage() async {
@@ -344,7 +402,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
   }
 
   void goBack(BuildContext context) {
-    if(widget.isOwner) {
+    if (widget.isOwner) {
       log('to order list');
       setState(() {
         isPop = false;
@@ -356,29 +414,28 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
           ));
     } else {
       if (widget.fromConfirm) {
-      log('to order list');
-      setState(() {
-        isPop = false;
-      });
-      navigateToRep(
-          context,
-          MainScreen(
-            firstIndexScreen: 2,
-          ));
-    } else {
-      log('back');
-      setState(() {
-        isPop = false;
-      });
-      // navigateBack(context);
-      navigateToRep(
-          context,
-          MainScreen(
-            firstIndexScreen: 2,
-          ));
+        log('to order list');
+        setState(() {
+          isPop = false;
+        });
+        navigateToRep(
+            context,
+            MainScreen(
+              firstIndexScreen: 2,
+            ));
+      } else {
+        log('back');
+        setState(() {
+          isPop = false;
+        });
+        // navigateBack(context);
+        navigateToRep(
+            context,
+            MainScreen(
+              firstIndexScreen: 2,
+            ));
+      }
     }
-    }
-    
   }
 
   @override
@@ -455,8 +512,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                   const SizedBox(
                     height: 20,
                   ),
-                  widget.isOwner ? statusContainerSeller() :
-                  statusContainer(),
+                  widget.isOwner ? statusContainerSeller() : statusContainer(),
                   // Container(
                   //   height: 130,
                   //   margin: const EdgeInsets.symmetric(vertical: 10),
@@ -549,71 +605,73 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                   //   ),
                   // ),
                   // currentStatus == 'pesanan dibuat' ?
-                  widget.isOwner ? Container(
-                    height: 50,
-                    width: double.infinity,
-                    margin: const EdgeInsets.symmetric(vertical: 10),
-                    child: DynamicColorButton(
-                      onPressed: () {
-                        navigateTo(
-                          context,
-                          ChatScreen(
-                            isMerchant: true,
-                            merchantId: 1,
-                            userId: 1,
-                          ),
-                        );
-                      },
-                      icon: Icon(
-                        UIcons.solidRounded.comment,
-                        color: Colors.white,
-                      ),
-                      text: 'Chat Pembeli',
-                      backgroundColor: Warna.kuning,
-                      borderRadius: 54,
-                    ),
-                  ) :
-                  Container(
-                    height: 50,
-                    width: double.infinity,
-                    margin: const EdgeInsets.symmetric(vertical: 10),
-                    child: DynamicColorButton(
-                      onPressed: () {
-                        navigateTo(
-                          context,
-                          ChatScreen(
-                            isMerchant: true,
-                            merchantId: 1,
-                            userId: 1,
-                          ),
-                        );
-                      },
-                      icon: Icon(
-                        UIcons.solidRounded.comment,
-                        color: Colors.white,
-                      ),
-                      text: 'Chat Penjual',
-                      backgroundColor: Warna.kuning,
-                      borderRadius: 54,
-                    ),
-                  ),
-
-                  widget.isOwner ? Container() :
-                  currentStatus == 'pesanan sudah sampai'
+                  widget.isOwner
                       ? Container(
                           height: 50,
                           width: double.infinity,
                           margin: const EdgeInsets.symmetric(vertical: 10),
                           child: DynamicColorButton(
                             onPressed: () {
-                              navigateTo(context, const RateScreen());
+                              navigateTo(
+                                context,
+                                ChatScreen(
+                                  isMerchant: true,
+                                  merchantId: 1,
+                                  userId: 1,
+                                ),
+                              );
                             },
-                            text: 'Beri Penilaian',
+                            icon: Icon(
+                              UIcons.solidRounded.comment,
+                              color: Colors.white,
+                            ),
+                            text: 'Chat Pembeli',
                             backgroundColor: Warna.kuning,
                             borderRadius: 54,
                           ),
                         )
-                      : Container(),
+                      : Container(
+                          height: 50,
+                          width: double.infinity,
+                          margin: const EdgeInsets.symmetric(vertical: 10),
+                          child: DynamicColorButton(
+                            onPressed: () {
+                              navigateTo(
+                                context,
+                                ChatScreen(
+                                  isMerchant: true,
+                                  merchantId: 1,
+                                  userId: 1,
+                                ),
+                              );
+                            },
+                            icon: Icon(
+                              UIcons.solidRounded.comment,
+                              color: Colors.white,
+                            ),
+                            text: 'Chat Penjual',
+                            backgroundColor: Warna.kuning,
+                            borderRadius: 54,
+                          ),
+                        ),
+
+                  widget.isOwner
+                      ? Container()
+                      : currentStatus == 'pesanan sudah sampai'
+                          ? Container(
+                              height: 50,
+                              width: double.infinity,
+                              margin: const EdgeInsets.symmetric(vertical: 10),
+                              child: DynamicColorButton(
+                                onPressed: () {
+                                  navigateTo(context, const RateScreen());
+                                },
+                                text: 'Beri Penilaian',
+                                backgroundColor: Warna.kuning,
+                                borderRadius: 54,
+                              ),
+                            )
+                          : Container(),
 
                   // Container(
                   //   height: 50,
@@ -820,7 +878,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                                 child: Padding(
                                   padding: const EdgeInsets.only(bottom: 20),
                                   child: Text(
-                                    'Ditolak Telah Penjual',
+                                    'Ditolak Oleh Penjual',
                                     style: TextStyle(
                                         color: Warna.like,
                                         fontSize: 20,
@@ -856,33 +914,80 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                     ),
                   )
                 : currentStatus == 'MENUNGGU_KONFIRM_PENJUAL'
-                    ? Container(
-                        height: 50,
-                        width: double.infinity,
-                        margin: const EdgeInsets.symmetric(vertical: 20),
-                        child: DynamicColorButton(
-                          onPressed: () {
-                            cancelOrder(context);
-                          },
-                          text: 'Konfirmasi Pesanan',
-                          backgroundColor: Warna.hijau,
-                          borderRadius: 54,
-                        ),
+                    ? Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            height: 45,
+                            width: MediaQuery.of(context).size.width * 0.40,
+                            margin: const EdgeInsets.symmetric(vertical: 20),
+                            child: DynamicColorButton(
+                              onPressed: () {
+                                // cancelOrder(context);
+                                rejectOrder(context);
+                              },
+                              text: 'Tolak',
+                              textColor: Warna.like,
+                              backgroundColor: Warna.like.withOpacity(0.05),
+                              border: BorderSide(
+                                color: Warna.like,
+                                width: 1.5,
+                              ),
+                              borderRadius: 54,
+                            ),
+                          ),
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          Container(
+                            height: 45,
+                            width: MediaQuery.of(context).size.width * 0.40,
+                            margin: const EdgeInsets.symmetric(vertical: 20),
+                            child: DynamicColorButton(
+                              onPressed: () {
+                                // cancelOrder(context);
+                                confirmOrder(context);
+                              },
+                              text: 'Konfirmasi',
+                              backgroundColor: Warna.hijau,
+                              borderRadius: 54,
+                            ),
+                          ),
+                        ],
                       )
                     : currentStatus == 'DIPROSES_PENJUAL'
-                        ? Container(
-                            height: 50,
-                            width: double.infinity,
-                            margin: const EdgeInsets.symmetric(vertical: 20),
-                            child: Text(
-                              'Buat kesepakatan dengan penjual dan tunggu pesananmu diantarakan',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Warna.abu4,
-                                fontWeight: FontWeight.w500,
+                        ? Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                  height: 50,
+                                  width: double.infinity,
+                                  margin:
+                                      const EdgeInsets.fromLTRB(0, 20, 0, 10),
+                                  child: Text(
+                                    'Buat kesepakatan dengan pembali dan antarkan pesanan.',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: Warna.abu4,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  )),
+                              Container(
+                                height: 45,
+                                width: double.infinity,
+                                margin: const EdgeInsets.fromLTRB(0, 10, 0, 20),
+                                child: DynamicColorButton(
+                                  onPressed: () {
+                                    // cancelOrder(context);
+                                  },
+                                  text: 'Pesanan sudah diantarkan',
+                                  backgroundColor: Warna.hijau,
+                                  borderRadius: 54,
+                                ),
                               ),
-                            ))
+                            ],
+                          )
                         : currentStatus == 'PESANAN_SAMPAI'
                             ? Container(
                                 height: 50,
