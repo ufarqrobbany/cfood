@@ -64,14 +64,14 @@ class _OrderScreenState extends State<OrderScreen> {
       'color': Warna.kuning,
       'highlight': true,
     },
-     {
+    {
       'status': 'Pesanan Disiapkan',
       'code': 'DIPROSES_PENJUAL',
       'icon': UIcons.solidRounded.hat_chef,
       'color': Warna.kuning,
       'highlight': true,
     },
-     {
+    {
       'status': 'Menunggu Konfirmasi Kurir',
       'code': 'MENUNGGU_KONFIRM_KURIR',
       'icon': UIcons.solidRounded.hat_chef,
@@ -92,7 +92,7 @@ class _OrderScreenState extends State<OrderScreen> {
       'color': Warna.hijau,
       'highlight': false,
     },
-     {
+    {
       'status': 'Konfirmasi sudah Sampai',
       'code': 'KONFIRM_SAMPAI',
       'icon': Icons.check_circle_outline_rounded,
@@ -242,7 +242,7 @@ class _OrderScreenState extends State<OrderScreen> {
     if (status != null) {
       result = statusMap?.firstWhere((element) => element['code'] == status,
           orElse: () => {});
-    } 
+    }
     // else if (statusCode != null) {
     //   result = statusMap?.firstWhere((element) => element['code'] == statusCode,
     //       orElse: () => {});
@@ -372,7 +372,7 @@ class _OrderScreenState extends State<OrderScreen> {
             ? pageOnLoading(context)
             : orderList!.isEmpty
                 ? itemsEmptyBody(context,
-                    bgcolors: Colors.white,
+                    bgcolors: Warna.pageBackgroundColor, // perbaiki ini
                     icons: UIcons.solidRounded.shopping_cart,
                     iconsColor: Warna.kuning,
                     text: 'Tidak ada pesanan dengan status $selectedTabName')
@@ -448,13 +448,17 @@ class _OrderScreenState extends State<OrderScreen> {
               //   color: Warna.biru,
               //   size: 20,
               // ),
-               Icon(
-                storeItem![storeListIndex].orderInformation!.merchantInformation!
+              Icon(
+                storeItem![storeListIndex]
+                            .orderInformation!
+                            .merchantInformation!
                             .merchantType ==
                         "WIRAUSAHA"
                     ? CommunityMaterialIcons.handshake
                     : Icons.store,
-                color: storeItem[storeListIndex].orderInformation!.merchantInformation!
+                color: storeItem[storeListIndex]
+                            .orderInformation!
+                            .merchantInformation!
                             .merchantType ==
                         "WIRAUSAHA"
                     ? Warna.kuning
@@ -536,13 +540,13 @@ class _OrderScreenState extends State<OrderScreen> {
                                 child: Icon(Icons.image),
                               )
                             : ClipRRect(
-                              borderRadius: BorderRadius.circular(8),
-                              child: Image.network(
+                                borderRadius: BorderRadius.circular(8),
+                                child: Image.network(
                                   AppConfig.URL_IMAGES_PATH +
                                       menuItems[menuIdx]
                                           .menuInformation!
                                           .menuPhoto!,
-                                          fit: BoxFit.cover,
+                                  fit: BoxFit.cover,
                                   errorBuilder: (context, error, stackTrace) {
                                     return Container(
                                       width: 60,
@@ -554,7 +558,7 @@ class _OrderScreenState extends State<OrderScreen> {
                                     );
                                   },
                                 ),
-                            ),
+                              ),
                       ),
                       title: Row(
                         mainAxisSize: MainAxisSize.max,
@@ -582,10 +586,12 @@ class _OrderScreenState extends State<OrderScreen> {
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text( menuItems[menuIdx].orderVariantInformations!.isEmpty
-                            ? ''
-                            : getVariantDescription(
-                                 menuItems[menuIdx].orderVariantInformations!)),
+                          Text(menuItems[menuIdx]
+                                  .orderVariantInformations!
+                                  .isEmpty
+                              ? ''
+                              : getVariantDescription(menuItems[menuIdx]
+                                  .orderVariantInformations!)),
                           // menuItems[menuIdx]
                           //         .orderVariantInformations != null ?
                           // SizedBox(
@@ -616,8 +622,9 @@ class _OrderScreenState extends State<OrderScreen> {
                             children: [
                               Text(
                                 Constant.currencyCode +
-                                    formatNumberWithThousandsSeparator(menuItems[menuIdx]
-                                        .totalPriceItem!).toString(),
+                                    formatNumberWithThousandsSeparator(
+                                            menuItems[menuIdx].totalPriceItem!)
+                                        .toString(),
                                 style: AppTextStyles.productPrice,
                               )
                             ],
@@ -678,8 +685,7 @@ class _OrderScreenState extends State<OrderScreen> {
               child: const CircularProgressIndicator(),
             ),
           );
-        } 
-        else if (snapshot.hasError) {
+        } else if (snapshot.hasError) {
           return SizedBox(
             height: 36,
             width: double.infinity,
@@ -702,8 +708,7 @@ class _OrderScreenState extends State<OrderScreen> {
               ),
             ),
           );
-        } 
-        else if (snapshot.hasData) {
+        } else if (snapshot.hasData) {
           final statusData = snapshot.data!;
           return SizedBox(
             height: 36,
