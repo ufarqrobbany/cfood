@@ -200,28 +200,24 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
   }
 
   void cancelOrder(BuildContext context) {
-    showMyCustomDialog(
-      context,
-      text: 'Apakah Anda yakin untuk membatalkan pesanan?',
-      noText: 'Tidak',
-      yesText: 'Ya',
-      colorYes: Warna.like,
-      colorNO: Warna.abu,
-      onTapYes: () async {
-        CancelOrderResponse response = await FetchController(
-            endpoint: 'orders/cancel?orderId=${widget.orderId}',
-            fromJson: (json) => CancelOrderResponse.fromJson(json)).putData({});
+    showMyCustomDialog(context,
+        text: 'Apakah Anda yakin untuk membatalkan pesanan?',
+        noText: 'Tidak',
+        yesText: 'Ya',
+        colorYes: Warna.like,
+        colorNO: Warna.abu, onTapYes: () async {
+      CancelOrderResponse response = await FetchController(
+          endpoint: 'orders/cancel?orderId=${widget.orderId}',
+          fromJson: (json) => CancelOrderResponse.fromJson(json)).putData({});
 
-        setState(() {
-          currentStatus = response.data!.status!;
-          log(currentStatus);
-        });
-        navigateBack(context);
-      },
-      onTapNo: () {
-        navigateBack(context);
-      }
-    );
+      setState(() {
+        currentStatus = response.data!.status!;
+        log(currentStatus);
+      });
+      navigateBack(context);
+    }, onTapNo: () {
+      navigateBack(context);
+    });
   }
 
   Future<void> refreshPage() async {
@@ -344,7 +340,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
   }
 
   void goBack(BuildContext context) {
-    if(widget.isOwner) {
+    if (widget.isOwner) {
       log('to order list');
       setState(() {
         isPop = false;
@@ -356,29 +352,28 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
           ));
     } else {
       if (widget.fromConfirm) {
-      log('to order list');
-      setState(() {
-        isPop = false;
-      });
-      navigateToRep(
-          context,
-          MainScreen(
-            firstIndexScreen: 2,
-          ));
-    } else {
-      log('back');
-      setState(() {
-        isPop = false;
-      });
-      // navigateBack(context);
-      navigateToRep(
-          context,
-          MainScreen(
-            firstIndexScreen: 2,
-          ));
+        log('to order list');
+        setState(() {
+          isPop = false;
+        });
+        navigateToRep(
+            context,
+            MainScreen(
+              firstIndexScreen: 2,
+            ));
+      } else {
+        log('back');
+        setState(() {
+          isPop = false;
+        });
+        // navigateBack(context);
+        navigateToRep(
+            context,
+            MainScreen(
+              firstIndexScreen: 2,
+            ));
+      }
     }
-    }
-    
   }
 
   @override
@@ -455,8 +450,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                   const SizedBox(
                     height: 20,
                   ),
-                  widget.isOwner ? statusContainerSeller() :
-                  statusContainer(),
+                  widget.isOwner ? statusContainerSeller() : statusContainer(),
                   // Container(
                   //   height: 130,
                   //   margin: const EdgeInsets.symmetric(vertical: 10),
@@ -549,71 +543,73 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                   //   ),
                   // ),
                   // currentStatus == 'pesanan dibuat' ?
-                  widget.isOwner ? Container(
-                    height: 50,
-                    width: double.infinity,
-                    margin: const EdgeInsets.symmetric(vertical: 10),
-                    child: DynamicColorButton(
-                      onPressed: () {
-                        navigateTo(
-                          context,
-                          ChatScreen(
-                            isMerchant: true,
-                            merchantId: 1,
-                            userId: 1,
-                          ),
-                        );
-                      },
-                      icon: Icon(
-                        UIcons.solidRounded.comment,
-                        color: Colors.white,
-                      ),
-                      text: 'Chat Pembeli',
-                      backgroundColor: Warna.kuning,
-                      borderRadius: 54,
-                    ),
-                  ) :
-                  Container(
-                    height: 50,
-                    width: double.infinity,
-                    margin: const EdgeInsets.symmetric(vertical: 10),
-                    child: DynamicColorButton(
-                      onPressed: () {
-                        navigateTo(
-                          context,
-                          ChatScreen(
-                            isMerchant: true,
-                            merchantId: 1,
-                            userId: 1,
-                          ),
-                        );
-                      },
-                      icon: Icon(
-                        UIcons.solidRounded.comment,
-                        color: Colors.white,
-                      ),
-                      text: 'Chat Penjual',
-                      backgroundColor: Warna.kuning,
-                      borderRadius: 54,
-                    ),
-                  ),
-
-                  widget.isOwner ? Container() :
-                  currentStatus == 'pesanan sudah sampai'
+                  widget.isOwner
                       ? Container(
                           height: 50,
                           width: double.infinity,
                           margin: const EdgeInsets.symmetric(vertical: 10),
                           child: DynamicColorButton(
                             onPressed: () {
-                              navigateTo(context, const RateScreen());
+                              navigateTo(
+                                context,
+                                ChatScreen(
+                                  isMerchant: true,
+                                  merchantId: 1,
+                                  userId: 1,
+                                ),
+                              );
                             },
-                            text: 'Beri Penilaian',
+                            icon: Icon(
+                              UIcons.solidRounded.comment,
+                              color: Colors.white,
+                            ),
+                            text: 'Chat Pembeli',
                             backgroundColor: Warna.kuning,
                             borderRadius: 54,
                           ),
                         )
-                      : Container(),
+                      : Container(
+                          height: 50,
+                          width: double.infinity,
+                          margin: const EdgeInsets.symmetric(vertical: 10),
+                          child: DynamicColorButton(
+                            onPressed: () {
+                              navigateTo(
+                                context,
+                                ChatScreen(
+                                  isMerchant: true,
+                                  merchantId: 1,
+                                  userId: 1,
+                                ),
+                              );
+                            },
+                            icon: Icon(
+                              UIcons.solidRounded.comment,
+                              color: Colors.white,
+                            ),
+                            text: 'Chat Penjual',
+                            backgroundColor: Warna.kuning,
+                            borderRadius: 54,
+                          ),
+                        ),
+
+                  widget.isOwner
+                      ? Container()
+                      : currentStatus == 'pesanan sudah sampai'
+                          ? Container(
+                              height: 50,
+                              width: double.infinity,
+                              margin: const EdgeInsets.symmetric(vertical: 10),
+                              child: DynamicColorButton(
+                                onPressed: () {
+                                  navigateTo(context, const RateScreen());
+                                },
+                                text: 'Beri Penilaian',
+                                backgroundColor: Warna.kuning,
+                                borderRadius: 54,
+                              ),
+                            )
+                          : Container(),
 
                   // Container(
                   //   height: 50,
@@ -657,11 +653,13 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                     ),
                   )
             : currentStatus == 'DIPROSES_PENJUAL'
-                ? const Center(
-                    child: Text(
-                      'Pesanan Dikonfirmasi',
-                      style: AppTextStyles.subTitle,
-                    ),
+                ? Center(
+                    child: Text('Pesanan Dikonfirmasi',
+                        // style: AppTextStyles.subTitle,
+                        style: TextStyle(
+                            fontSize: 26,
+                            fontWeight: FontWeight.w800,
+                            color: Warna.hijau)),
                   )
                 : currentStatus == 'PESANAN_SAMPAI'
                     ? const Center(
@@ -688,7 +686,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                                 child: Padding(
                                   padding: const EdgeInsets.only(bottom: 20),
                                   child: Text(
-                                    'Ditolak Penjual',
+                                    'Pesanan Ditolak Penjual',
                                     style: TextStyle(
                                         color: Warna.like,
                                         fontSize: 20,
@@ -743,7 +741,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                             width: double.infinity,
                             margin: const EdgeInsets.symmetric(vertical: 20),
                             child: Text(
-                              'Buat kesepakatan dengan penjual dan tunggu pesananmu diantarakan',
+                              'Buat kesepakatan dengan penjual dan tunggu pesananmu diantarkan',
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 fontSize: 16,
@@ -875,7 +873,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                             width: double.infinity,
                             margin: const EdgeInsets.symmetric(vertical: 20),
                             child: Text(
-                              'Buat kesepakatan dengan penjual dan tunggu pesananmu diantarakan',
+                              'Buat kesepakatan dengan penjual dan tunggu pesananmu diantarkan',
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 fontSize: 16,
