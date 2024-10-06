@@ -131,23 +131,20 @@ class ProductCardBox extends StatelessWidget {
                             fit: BoxFit.cover,
                             width: double.infinity,
                             height: double.infinity,
-                             loadingBuilder:
-                                        (context, child, loadingProgress) {
-                                      bool shimmerEnabled =
-                                          loadingProgress != null
-                                              ? true
-                                              : false;
-                                      if (loadingProgress == null) {
-                                        return child;
-                                      } else {
-                                        return shimmerBox(
-                                          enabled: shimmerEnabled,
-                                          height: double.infinity,
-                                          width: double.infinity,
-                                          // radius: 8,
-                                        );
-                                      }
-                                    },
+                            loadingBuilder: (context, child, loadingProgress) {
+                              bool shimmerEnabled =
+                                  loadingProgress != null ? true : false;
+                              if (loadingProgress == null) {
+                                return child;
+                              } else {
+                                return shimmerBox(
+                                  enabled: shimmerEnabled,
+                                  height: double.infinity,
+                                  width: double.infinity,
+                                  // radius: 8,
+                                );
+                              }
+                            },
                           ),
                   ),
                   if (isDanus ??
@@ -334,7 +331,7 @@ class ProductCardBoxHorizontal extends StatelessWidget {
   final String? rate;
   final String? likes;
   final String? count;
-  final int sold;
+  final int? sold;
   final VoidCallback? onPressed;
   final VoidCallback? onTapAdd;
   final VoidCallback? onTapRemove;
@@ -355,7 +352,7 @@ class ProductCardBoxHorizontal extends StatelessWidget {
     this.rate,
     this.likes,
     this.count,
-    this.sold = 0,
+    this.sold,
     this.onPressed,
     this.onTapAdd,
     this.onTapRemove,
@@ -441,28 +438,28 @@ class ProductCardBoxHorizontal extends StatelessWidget {
                                   )),
                         ),
                         if (isDanus ??
-                      false) // Conditionally show the "Produk Danus" text
-                    Positioned(
-                      top: 0,
-                      left: 0,
-                      child: Container(
-                        padding: const EdgeInsets.all(4.0),
-                        decoration: BoxDecoration(
-                          color: Warna.like.withAlpha(200),
-                          borderRadius: const BorderRadius.only(
-                            topLeft: Radius.circular(8),
-                            bottomRight: Radius.circular(8),
+                            false) // Conditionally show the "Produk Danus" text
+                          Positioned(
+                            top: 0,
+                            left: 0,
+                            child: Container(
+                              padding: const EdgeInsets.all(4.0),
+                              decoration: BoxDecoration(
+                                color: Warna.like.withAlpha(200),
+                                borderRadius: const BorderRadius.only(
+                                  topLeft: Radius.circular(8),
+                                  bottomRight: Radius.circular(8),
+                                ),
+                              ),
+                              child: const Text(
+                                'Produk Danus',
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 10),
+                              ),
+                            ),
                           ),
-                        ),
-                        child: const Text(
-                          'Produk Danus',
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 10),
-                        ),
-                      ),
-                    ),
                         Align(
                           alignment: Alignment.bottomCenter,
                           child: Container(
@@ -486,8 +483,8 @@ class ProductCardBoxHorizontal extends StatelessWidget {
                     ),
                   )
                 : Stack(
-                  children: [
-                    Container(
+                    children: [
+                      Container(
                         // width: double.infinity,
                         height: innerContentSize ?? 120,
                         constraints: BoxConstraints(
@@ -495,7 +492,8 @@ class ProductCardBoxHorizontal extends StatelessWidget {
                           maxWidth: innerContentSize ?? 120,
                         ),
                         decoration: BoxDecoration(
-                            color: Warna.abu, borderRadius: BorderRadius.circular(8)
+                            color: Warna.abu,
+                            borderRadius: BorderRadius.circular(8)
                             // borderRadius: const BorderRadius.only(topLeft: Radius.circular(8), topRight: Radius.circular(8)),
                             ),
                         child: imgUrl == null
@@ -525,30 +523,30 @@ class ProductCardBoxHorizontal extends StatelessWidget {
                                 )),
                       ),
                       if (isDanus ??
-                            false) // Conditionally show the "Produk Danus" text
-                          Positioned(
-                            top: 0,
-                            left: 0,
-                            child: Container(
-                              padding: const EdgeInsets.all(4.0),
-                              decoration: BoxDecoration(
-                                color: Warna.like.withAlpha(200),
-                                borderRadius: const BorderRadius.only(
-                                  topLeft: Radius.circular(8),
-                                  bottomRight: Radius.circular(8),
-                                ),
-                              ),
-                              child: const Text(
-                                'Produk Danus',
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 10),
+                          false) // Conditionally show the "Produk Danus" text
+                        Positioned(
+                          top: 0,
+                          left: 0,
+                          child: Container(
+                            padding: const EdgeInsets.all(4.0),
+                            decoration: BoxDecoration(
+                              color: Warna.like.withAlpha(200),
+                              borderRadius: const BorderRadius.only(
+                                topLeft: Radius.circular(8),
+                                bottomRight: Radius.circular(8),
                               ),
                             ),
+                            child: const Text(
+                              'Produk Danus',
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 10),
+                            ),
                           ),
-                  ],
-                ),
+                        ),
+                    ],
+                  ),
             Expanded(
               child: Container(
                 height: innerContentSize ?? 120,

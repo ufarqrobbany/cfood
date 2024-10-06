@@ -360,8 +360,8 @@ class _CartScreenState extends State<CartScreen> {
           OrderConfirmScreen(
             cartId: selectCartId,
           )).then((value) {
-            getAllCarts();
-          });
+        getAllCarts();
+      });
     } else {
       showToast('stok pada menu yg dipilih tidak mencukupi!!');
     }
@@ -604,6 +604,7 @@ class _CartScreenState extends State<CartScreen> {
                                     imgUrl:
                                         '${AppConfig.URL_IMAGES_PATH}${menuItem.detailMenu.menuPhoto}',
                                     productName: menuItem.detailMenu.menuName,
+                                    sold: menuItem.detailMenu.menuSolds,
                                     description: menuItem.cartVariants.isEmpty
                                         ? ''
                                         : getVariantDescription(

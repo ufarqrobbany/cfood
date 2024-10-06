@@ -635,8 +635,8 @@ class _CanteenScreenState extends State<CanteenScreen>
           OrderConfirmScreen(
             merchantId: dataMerchant!.merchantId,
           )).then((onValue) {
-            fetchDetailDataMerchant();
-          });
+        fetchDetailDataMerchant();
+      });
     } else {
       showToast('Stok pada menu yang dipilih tidak mencukupi');
     }
@@ -1383,6 +1383,7 @@ class _CanteenScreenState extends State<CanteenScreen>
                                   likes: item.menuLikes.toString(),
                                   rate: item.menuRate.toString(),
                                   count: item.menuStock.toString(),
+                                  sold: item.menuSolds,
                                   // isCustom: item.isDanus!,
                                   isCustom:
                                       item.variants!.isNotEmpty ? true : false,
