@@ -210,6 +210,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
         orderId = widget.orderId!;
       });
     }
+
     showMyCustomDialog(context,
         text: 'Apakah Anda yakin untuk membatalkan pesanan?',
         noText: 'Tidak',
@@ -715,11 +716,13 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                     ),
                   )
             : currentStatus == 'DIPROSES_PENJUAL'
-                ? const Center(
-                    child: Text(
-                      'Pesanan Dikonfirmasi',
-                      style: AppTextStyles.subTitle,
-                    ),
+                ? Center(
+                    child: Text('Pesanan Dikonfirmasi',
+                        // style: AppTextStyles.subTitle,
+                        style: TextStyle(
+                            fontSize: 26,
+                            fontWeight: FontWeight.w800,
+                            color: Warna.hijau)),
                   )
                 : currentStatus == 'PESANAN_SAMPAI'
                     ? const Center(
@@ -746,7 +749,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                                 child: Padding(
                                   padding: const EdgeInsets.only(bottom: 20),
                                   child: Text(
-                                    'Ditolak Penjual',
+                                    'Pesanan Ditolak Penjual',
                                     style: TextStyle(
                                         color: Warna.like,
                                         fontSize: 20,
@@ -801,7 +804,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                             width: double.infinity,
                             margin: const EdgeInsets.symmetric(vertical: 20),
                             child: Text(
-                              'Buat kesepakatan dengan penjual dan tunggu pesananmu diantarakan',
+                              'Buat kesepakatan dengan penjual dan tunggu pesananmu diantarkan',
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 fontSize: 16,
@@ -965,7 +968,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                                   margin:
                                       const EdgeInsets.fromLTRB(0, 20, 0, 10),
                                   child: Text(
-                                    'Buat kesepakatan dengan pembali dan antarkan pesanan.',
+                                    'Buat kesepakatan dengan pembeli dan antarkan pesanan.',
                                     textAlign: TextAlign.center,
                                     style: TextStyle(
                                       fontSize: 16,
