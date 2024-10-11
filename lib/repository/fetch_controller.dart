@@ -15,6 +15,7 @@ class FetchController {
   final String endpoint;
   final Map<String, String> headers;
   final Function fromJson;
+  bool enableToast;
 
   FetchController({
     this.baseUrl = AppConfig.BASE_URL,
@@ -24,6 +25,7 @@ class FetchController {
       "Accept": "*/*",
     },
     required this.fromJson,
+    this.enableToast = true,
   });
 
   Uri getUrl() {
@@ -93,12 +95,16 @@ class FetchController {
     if (response.statusCode <= 300) {
       dynamic data = fromJson(json.decode(response.body));
       log(response.body);
-      showToast(data.message!);
+      if (enableToast) {
+        showToast(data.message!);
+      }
       return fromJson(json.decode(response.body));
     } else if (response.statusCode <= 499) {
       ResponseHendler data = responseHendlerFromJson(response.body);
       log(response.body);
-      showToast(data.message!);
+      if (enableToast) {
+        showToast(data.message!);
+      }
       return responseHendlerFromJson(
           response.body); // Mengembalikan error tanpa melempar exception
     } else {
@@ -134,8 +140,9 @@ class FetchController {
   // Method to upload file and text data
   Future<dynamic> postMultipartData({
     required String dataKeyName,
-    required Map<String, dynamic> data,
-    required File file,
+    required Map<String, dynamic>? data,
+    // String? dataText,
+    required File? file,
     required String fileKeyName,
     bool customToJson = false,
     var dataFromCustomToJson,
@@ -144,17 +151,86 @@ class FetchController {
     try {
       Dio dio = Dio();
       Uri url = getUrl();
-
+      FormData? formData;
       log(json.encode(data));
+      // log("text :$dataText");
 
       // FormData creation
-      FormData formData = FormData.fromMap({
+      formData = FormData.fromMap({
         // dataKeyName: json.encode(data),
         dataKeyName: MultipartFile.fromString(
           customToJson ? dataFromCustomToJson : json.encode(data),
           contentType: MediaType.parse('application/json'),
         ),
         fileKeyName: await MultipartFile.fromFile(
+          file!.path,
+          filename: path.basename(file.path),
+          contentType:
+              MediaType('image', path.extension(file.path).replaceAll('.', '')),
+        ),
+      });
+
+      log("Request URL: $url");
+      log("Request Headers: $headers");
+      log("FormData Fields: ${formData!.fields}");
+      log("FormData Files: ${formData.files}");
+
+      Response response = await dio.post(
+        url.toString(),
+        data: formData,
+        options: Options(
+          headers: headers,
+        ),
+      );
+
+      log("Response URI: ${response.statusCode}");
+      log("Response URI: ${response.realUri}");
+      log("Response data: ${response.data}");
+
+      if (response.statusCode! <= 499) {
+        log(response.data.toString());
+        return fromJson(response.data);
+      } else {
+        ErrorResponse data = errorResponseFromJson(response.data);
+        log(response.data.toString());
+        showToast(data.error!);
+        return {
+          'status': 'error',
+          'message': data.error
+        }; // Return error without throwing exception
+      }
+    } catch (e) {
+      log(e.toString());
+      showToast("An error occurred");
+      throw Exception("Failed to upload data");
+    }
+  }
+
+  // Method to upload file and text data
+  Future<dynamic> postMultipartDataMessage({
+    required String dataKeyName,
+    required Map<String, dynamic>? data,
+    String? dataText,
+    required File? file,
+    required String fileKeyName,
+    bool customToJson = false,
+    var dataFromCustomToJson,
+    // required List<MultipartFile> files,
+  }) async {
+    try {
+      Dio dio = Dio();
+      Uri url = getUrl();
+      FormData? formData;
+      // log(json.encode(data));
+      log("text :$dataText");
+
+      formData = FormData.fromMap({
+        // dataKeyName: json.encode(data),
+        dataKeyName: MultipartFile.fromString(
+          dataText!,
+          contentType: MediaType.parse('application/json'),
+        ),
+        fileKeyName: file == null ? null : await MultipartFile.fromFile(
           file.path,
           filename: path.basename(file.path),
           contentType:
@@ -164,7 +240,7 @@ class FetchController {
 
       log("Request URL: $url");
       log("Request Headers: $headers");
-      log("FormData Fields: ${formData.fields}");
+      log("FormData Fields: ${formData!.fields}");
       log("FormData Files: ${formData.files}");
 
       Response response = await dio.post(

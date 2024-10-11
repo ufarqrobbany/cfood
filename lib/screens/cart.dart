@@ -18,6 +18,7 @@ import 'package:cfood/repository/fetch_controller.dart';
 import 'package:cfood/model/post_menu_like_response.dart';
 import 'package:cfood/model/post_menu_unlike_response.dart';
 import 'package:cfood/screens/canteen.dart';
+import 'package:cfood/screens/inbox.dart';
 import 'package:cfood/screens/order_confirm.dart';
 import 'package:cfood/style.dart';
 import 'package:cfood/utils/common.dart';
@@ -368,7 +369,7 @@ class _CartScreenState extends State<CartScreen> {
   }
 
   Future<void> refreshPage() async {
-    await Future.delayed(const Duration(seconds: 3));
+    // await Future.delayed(const Duration(seconds: 3));
 
     print('reload...');
     getAllCarts();
@@ -393,9 +394,11 @@ class _CartScreenState extends State<CartScreen> {
         actions: [
           notifIconButton(
             icons: UIcons.solidRounded.comment,
-            onPressed: () {},
+            onPressed: () {
+              navigateTo(context, InboxScreen());
+            },
             iconColor: Warna.biru,
-            notifCount: '7',
+            notifCount: NotificationConfig.userChatNotification.toString(),
           ),
           const SizedBox(
             width: 10,
@@ -604,7 +607,7 @@ class _CartScreenState extends State<CartScreen> {
                                     imgUrl:
                                         '${AppConfig.URL_IMAGES_PATH}${menuItem.detailMenu.menuPhoto}',
                                     productName: menuItem.detailMenu.menuName,
-                                    sold: menuItem.detailMenu.menuSolds,
+                                    sold: menuItem.detailMenu.menuSolds ?? 0,
                                     description: menuItem.cartVariants.isEmpty
                                         ? ''
                                         : getVariantDescription(

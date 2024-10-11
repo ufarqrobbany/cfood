@@ -201,12 +201,7 @@ Future menuFrameSheet(
                             ReviewScreen(
                               menuId: menuId,
                               merchantId: merchantId,
-                              storeName: 'Nama Toko',
-                              likes: '100',
-                              rate: '4.4',
-                              imgUrl: '/.jpg',
-                              storeId: '000',
-                              type: 'Menu',
+                              type: 'MENU',
                             ),
                           );
                         },

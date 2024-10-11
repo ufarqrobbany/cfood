@@ -262,7 +262,7 @@ class Menu {
     menuPrice = json['menuPrice'];
     menuStock = json['menuStock'];
     menuLikes = json['menuLikes'];
-    menuSolds = json['menuSolds'];
+    menuSolds = json['menuSolds'] ?? 0;
     quantity = json['quantity'];
     menuRate = json['menuRate'];
     isDanus = json['isDanus'];

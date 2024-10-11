@@ -28,26 +28,29 @@ class ServiceLocation {
   }
 
   void onStart(ServiceInstance service) async {
-    if (service is AndroidServiceInstance) {
-      service.on('stopService').listen((event) {
-        service.stopSelf();
-      });
-    }
+    Timer.periodic(const Duration(seconds: 45), (timer) async {
+      if (service is AndroidServiceInstance) {
+        service.on('stopService').listen((event) {
+          service.stopSelf();
+        });
+      }
 
-    // Cek dan minta izin lokasi
-    if (await Permission.location.request().isGranted) {
-      // Timer untuk melakukan pembaruan lokasi setiap interval tertentu
-      service.on('updateLocation').listen((event) async {
-        await loadUserLocation();
-      });
+      // fetch notification
+      // Cek dan minta izin lokasi
+      if (await Permission.location.request().isGranted) {
+        // Timer untuk melakukan pembaruan lokasi setiap interval tertentu
+        service.on('updateLocation').listen((event) async {
+          await loadUserLocation();
+        });
 
-      // Mulai mendapatkan lokasi setiap 10 menit (600000 ms)
-      Timer.periodic(const Duration(milliseconds: 900), (timer) async {
-        service.invoke('updateLocation');
-      });
-    } else {
-      log('Location permission denied');
-    }
+        // Mulai mendapatkan lokasi setiap 10 menit (600000 ms)
+        Timer.periodic(const Duration(milliseconds: 900), (timer) async {
+          service.invoke('updateLocation');
+        });
+      } else {
+        log('Location permission denied');
+      }
+    });
   }
 
   Future<void> loadUserLocation() async {

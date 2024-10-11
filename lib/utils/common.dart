@@ -15,6 +15,10 @@ String generateRandomString(int length) {
   return List.generate(length, (index) => chars[random.nextInt(chars.length)]).join();
 }
 
+double roundToOneDecimal(double number) {
+  return double.parse(number.toStringAsFixed(1));
+}
+
 // Map<String, String> generateRandomMap() {
 //   return {
 //     'menu?': generateRandomString(3),

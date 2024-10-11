@@ -17,6 +17,7 @@ import 'package:cfood/screens/organization.dart';
 import 'package:cfood/screens/search.dart';
 import 'package:cfood/screens/seeAll.dart';
 import 'package:cfood/style.dart';
+import 'package:cfood/utils/common.dart';
 import 'package:cfood/utils/constant.dart';
 import 'package:community_material_icon/community_material_icon.dart';
 import 'package:flutter/material.dart';
@@ -210,7 +211,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   actions: [
                     notifIconButton(
                       icons: UIcons.solidRounded.bell,
-                      notifCount: '22',
+                      notifCount: NotificationConfig.userNotification.toString(),
                       onPressed: () {
                         navigateTo(context, const NotificationScreen());
                         // log(AppConfig.URL_PHOTO_PROFILE);
@@ -240,7 +241,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     // ),
                     notifIconButton(
                       icons: UIcons.solidRounded.comment,
-                      notifCount: '5',
+                      notifCount: NotificationConfig.userChatNotification.toString(),
                       onPressed: () => navigateTo(
                           context,
                           InboxScreen(
@@ -531,29 +532,30 @@ class _HomeScreenState extends State<HomeScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 15),
                   itemBuilder: (context, index) {
                     MenuItems? items = dataMenus?.content![index];
+                    double rating = roundToOneDecimal(items!.menuRating!);
                     return Container(
                       margin: const EdgeInsets.only(top: 24, bottom: 40),
                       padding: const EdgeInsets.symmetric(horizontal: 10),
                       child: ProductCardBox(
                           onPressed: () {
-                            log('${items?.menuId}');
+                            log('${items.menuId}');
                             navigateTo(
                               context,
                               CanteenScreen(
-                                  menuId: '${items?.menuId}',
-                                  merchantId: items?.merchants!.merchantId!,
+                                  menuId: '${items.menuId}',
+                                  merchantId: items.merchants!.merchantId!,
                                   merchantType:
-                                      items!.merchants!.merchantType!),
+                                      items.merchants!.merchantType!),
                             );
                           },
                           imgUrl:
-                              '${AppConfig.URL_IMAGES_PATH}${items?.menuPhoto}',
-                          productName: '${items?.menuName}',
-                          storeName: '${items?.merchants?.merchantName}',
-                          price: items?.menuPrice,
-                          likes: '${items?.menuLikes}',
-                          rate: '${items?.menuRating}',
-                          merchantType: '${items?.merchants?.merchantType}',
+                              '${AppConfig.URL_IMAGES_PATH}${items.menuPhoto}',
+                          productName: '${items.menuName}',
+                          storeName: '${items.merchants?.merchantName}',
+                          price: items.menuPrice,
+                          likes: '${items.menuLikes}',
+                          rate: '$rating',
+                          merchantType: '${items.merchants?.merchantType}',
                           isDanus: items?.menuIsDanus!),
                     );
                   },
@@ -708,19 +710,21 @@ class _HomeScreenState extends State<HomeScreen> {
                     padding: const EdgeInsets.fromLTRB(25, 15, 25, 0),
                     itemBuilder: (context, index) {
                       MerchantItems? items = dataMerchants?.merchants![index];
+                      double rating = roundToOneDecimal(items!.rating!);
                       return Container(
                         // margin: const EdgeInsets.only(top: 25, bottom: 10, left: 25, right: 25),
                         padding: const EdgeInsets.symmetric(vertical: 10),
                         child: CanteenCardBox(
                           imgUrl:
-                              '${AppConfig.URL_IMAGES_PATH}${items?.merchantPhoto}',
-                          canteenName: items?.merchantName,
+                              '${AppConfig.URL_IMAGES_PATH}${items.merchantPhoto}',
+                          canteenName: items.merchantName,
                           // menuList: 'kosong',
                           // likes: ' 0',
-                          likes: ' ${items?.followers}',
-                          rate: '${items?.rating}',
-                          type: items?.merchantType,
-                          open: items!.open!,
+                          likes: ' ${items.followers}',
+                          // rate: '${items.rating}',
+                          rate: '$rating',
+                          type: items.merchantType,
+                          open: items.open!,
                           danus: items.danus!,
                           onPressed: () => navigateTo(
                               context,

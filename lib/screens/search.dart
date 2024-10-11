@@ -14,6 +14,7 @@ import 'package:cfood/repository/fetch_controller.dart';
 import 'package:cfood/screens/canteen.dart';
 import 'package:cfood/screens/organization.dart';
 import 'package:cfood/style.dart';
+import 'package:cfood/utils/common.dart';
 import 'package:cfood/utils/constant.dart';
 import 'package:community_material_icon/community_material_icon.dart';
 import 'package:flutter/material.dart';
@@ -528,26 +529,27 @@ class _SearchScreenState extends State<SearchScreen> {
                           }
 
                           MenuItems? items = dataMenus?.content![index];
+                          double rating = roundToOneDecimal(items!.menuRating!);
                           return ProductCardBox(
                               onPressed: () {
                                 navigateTo(
                                   context,
                                   CanteenScreen(
-                                      menuId: '${items!.menuId}',
+                                      menuId: '${items.menuId}',
                                       merchantId: items.merchants?.merchantId,
                                       merchantType:
                                           items.merchants!.merchantType!),
                                 );
                               },
                               imgUrl:
-                                  '${AppConfig.URL_IMAGES_PATH}${items?.menuPhoto}',
-                              productName: '${items?.menuName}',
-                              storeName: '${items?.merchants?.merchantName}',
-                              price: items?.menuPrice,
-                              likes: '${items?.menuLikes}',
-                              rate: '${items?.menuRating}',
-                              merchantType: '${items?.merchants?.merchantType}',
-                              isDanus: items?.menuIsDanus!);
+                                  '${AppConfig.URL_IMAGES_PATH}${items.menuPhoto}',
+                              productName: '${items.menuName}',
+                              storeName: '${items.merchants?.merchantName}',
+                              price: items.menuPrice,
+                              likes: '${items.menuLikes}',
+                              rate: '$rating',
+                              merchantType: '${items.merchants?.merchantType}',
+                              isDanus: items.menuIsDanus!);
                         },
                       ),
                       isLoadingMore
@@ -620,18 +622,19 @@ class _SearchScreenState extends State<SearchScreen> {
                         itemBuilder: (context, index) {
                           MerchantItems? items =
                               dataMerchants?.merchants![index];
+                          double rating = roundToOneDecimal(items!.rating!);
                           return Padding(
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             child: CanteenCardBox(
                               imgUrl:
-                                  '${AppConfig.URL_IMAGES_PATH}${items?.merchantPhoto}',
-                              canteenName: items?.merchantName,
+                                  '${AppConfig.URL_IMAGES_PATH}${items.merchantPhoto}',
+                              canteenName: items.merchantName,
                               // menuList: 'kosong',
                               // likes: ' 0',
-                              likes: ' ${items?.followers}',
-                              rate: '${items?.rating}',
-                              type: items?.merchantType,
-                              open: items!.open!,
+                              likes: ' ${items.followers}',
+                              rate: '$rating',
+                              type: items.merchantType,
+                              open: items.open!,
                               danus: items.danus!,
                               onPressed: () => navigateTo(
                                   context,

@@ -12,6 +12,8 @@ import 'package:cfood/model/get_merchant_order_response.dart' as merchant;
 import 'package:cfood/model/open_close_store_response.dart';
 import 'package:cfood/repository/fetch_controller.dart';
 import 'package:cfood/screens/inbox.dart';
+import 'package:cfood/screens/kurir_pages/chat_seller.dart';
+import 'package:cfood/screens/notification.dart';
 import 'package:cfood/screens/order_confirm.dart';
 import 'package:cfood/screens/order_detail.dart';
 import 'package:cfood/style.dart';
@@ -256,19 +258,21 @@ class _OrderWirausahaScreenState extends State<OrderWirausahaScreen> {
                   actions: [
                     notifIconButton(
                       icons: UIcons.solidRounded.bell,
-                      notifCount: '22',
+                      notifCount: NotificationConfig.sellerNotification.toString(),
+                      onPressed: () {
+                        navigateTo(context, const NotificationScreen());
+                      }
                     ),
                     // const SizedBox(
                     //   width: 10,
                     // ),
                     notifIconButton(
                       icons: UIcons.solidRounded.comment,
-                      notifCount: '5',
+                      notifCount: NotificationConfig.sellerChatNotification.toString(),
                       onPressed: () => navigateTo(
                           context,
-                          InboxScreen(
-                            canBack: true,
-                          )),
+                          const ChatSellerScreen()
+                          ),
                     ),
                     const SizedBox(
                       width: 15,
@@ -420,7 +424,7 @@ class _OrderWirausahaScreenState extends State<OrderWirausahaScreen> {
           child: Center(child: pageOnLoading(context, bgColor: Colors.transparent)))
         : orderList!.isEmpty
             ? itemsEmptyBody(context,
-                bgcolors: Colors.white,
+                bgcolors: Colors.transparent,
                 icons: UIcons.solidRounded.shopping_cart,
                 iconsColor: Warna.kuning,
                 text: 'Tidak ada Pesanan')
@@ -456,10 +460,10 @@ class _OrderWirausahaScreenState extends State<OrderWirausahaScreen> {
     List<merchant.DataOrder>? storeItem,
     List<merchant.OrderItemInformations>? menuItems,
   }) {
-    bool highlightStatus =
-        storeItem?[storeListIndex].status == 'MENUNGGU_KONFIRM_PENJUAL' ||
-            storeItem?[storeListIndex].status == 'MENUNGGU_PEMBAYARAN' ||
-            storeItem?[storeListIndex].status == 'PESANAN_DIANTARKAN';
+    // bool highlightStatus =
+    //     storeItem?[storeListIndex].status == 'MENUNGGU_KONFIRM_PENJUAL' ||
+    //         storeItem?[storeListIndex].status == 'MENUNGGU_PEMBAYARAN' ||
+    //         storeItem?[storeListIndex].status == 'PESANAN_DIANTARKAN';
 
     storeItem![storeListIndex].totalPrice =
         calculateTotalPrice(menuItems ?? []);

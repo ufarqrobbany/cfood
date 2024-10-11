@@ -11,6 +11,7 @@ import 'package:cfood/model/get_detail_organization_response.dart';
 import 'package:cfood/screens/canteen.dart';
 import 'package:cfood/screens/main.dart';
 import 'package:cfood/style.dart';
+import 'package:cfood/utils/common.dart';
 import 'package:community_material_icon/community_material_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
@@ -411,6 +412,7 @@ class _OrganizationScreenState extends State<OrganizationScreen>
                     itemBuilder: (context, index) {
                       var merchants = organizationMaps[selectedTab]!;
                       var merchant = merchants[index];
+                      double rating = roundToOneDecimal(merchant!.rating!);
                       log('Merchant data: ${merchant.toString()}');
                       debugPrint('Merchant data: ${merchant.toString()}');
                       return Container(
@@ -426,7 +428,7 @@ class _OrganizationScreenState extends State<OrganizationScreen>
                                   '${AppConfig.URL_IMAGES_PATH}${merchant?.merchantPhoto}',
                               canteenName: merchant.merchantName,
                               likes: ' ${merchant?.followers}',
-                              rate: '${merchant?.rating}',
+                              rate: '$rating',
                               type: merchant?.merchantType,
                               open: merchant!.open!,
                               danus: merchant.danus!,

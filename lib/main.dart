@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:cfood/custom/CPageMover.dart';
 import 'package:cfood/repository/background/service_location.dart';
+import 'package:cfood/repository/background/service_notification.dart';
 import 'package:cfood/repository/notifications.dart';
 import 'package:cfood/screens/canteen.dart';
 import 'package:cfood/screens/cart.dart';
@@ -49,7 +50,8 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await NotificationController.initializeLocalNotifications();
   await NotificationController.initializeIsolateReceivePort();
-  ServiceLocation().initializeService();
+  // ServiceNotification().initializeService();
+  // ServiceLocation().initializeService();
   runApp(const MyApp());
 }
 

@@ -20,6 +20,7 @@ import 'package:cfood/screens/kurir_pages/order_available.dart';
 import 'package:cfood/screens/locations.dart';
 import 'package:cfood/screens/login.dart';
 import 'package:cfood/screens/main.dart';
+import 'package:cfood/screens/notification.dart';
 import 'package:cfood/screens/profile_image_update.dart';
 import 'package:cfood/screens/user_info.dart';
 import 'package:cfood/screens/wirausaha_pages/main.dart';
@@ -172,18 +173,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
           notifIconButton(
             icons: UIcons.solidRounded.bell,
             iconColor: Warna.biru,
-            notifCount: '22',
+            notifCount: NotificationConfig.userNotification.toString(),
+            onPressed: (){
+              navigateTo(context, const NotificationScreen());
+            }
           ),
           // const SizedBox(
           //   width: 10,
           // ),
           notifIconButton(
             icons: UIcons.solidRounded.comment,
-            notifCount: '5',
+            notifCount: NotificationConfig.userChatNotification.toString(),
             iconColor: Warna.biru,
             onPressed: () => navigateTo(
                 context,
-                InboxScreen(
+                AppConfig.ON_DASHBOARD == true ? const ChatSellerScreen() : InboxScreen(
                   canBack: true,
                 )),
           ),
@@ -882,7 +886,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   },
                   icons: Icons.move_to_inbox,
                   text: 'Pesanan Masuk',
-                  notifCount: 7,
+                  notifCount: merchantInformation!.totalIncomingOrders!,
                 ),
                 driverItemsMenu(
                   onTap: () {
@@ -895,11 +899,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         context,
                         const MainScreenMerchant(
                           firstIndexScreen: 1,
+                          transactionPageTabIndex: 1,
                         ));
                   },
-                  icons: UIcons.regularRounded.receipt,
-                  text: 'Transaksi',
-                  notifCount: 7,
+                  icons: UIcons.regularRounded.time_fast,
+                  text: 'Pesanan Diproses',
+                  notifCount: merchantInformation!.totalTransactions!,
                 ),
                 driverItemsMenu(
                   onTap: () {
@@ -907,7 +912,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   },
                   icons: UIcons.solidRounded.comment,
                   text: 'Chat Pembeli',
-                  notifCount: 7,
+                  notifCount: merchantInformation!.totalChats!,
                 ),
               ],
             )),
@@ -1001,9 +1006,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
               const SizedBox(
                 height: 5,
               ),
+              notifCount == 0 ? Container() :
               Container(
-                width: 15,
-                height: 15,
+                width: 18,
+                height: 18,
                 // padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 3),
                 decoration: BoxDecoration(
                   color: Warna.kuning,
@@ -1013,7 +1019,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   child: Text(
                     notifCount.toString(),
                     style: const TextStyle(
-                      fontSize: 8,
+                      fontSize: 12,
                       fontWeight: FontWeight.w900,
                     ),
                   ),

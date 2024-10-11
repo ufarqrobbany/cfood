@@ -13,6 +13,7 @@ import 'package:cfood/repository/fetch_controller.dart';
 import 'package:cfood/screens/canteen.dart';
 import 'package:cfood/screens/organization.dart';
 import 'package:cfood/style.dart';
+import 'package:cfood/utils/common.dart';
 import 'package:cfood/utils/constant.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
@@ -247,18 +248,19 @@ class _SeeAllItemsScreenState extends State<SeeAllItemsScreen> {
                     padding: const EdgeInsets.fromLTRB(25, 15, 25, 40),
                     itemBuilder: (context, index) {
                       MerchantItems? items = dataMerchants?.merchants![index];
+                      double rating = roundToOneDecimal(items!.rating!);
                       return Container(
                         // margin: const EdgeInsets.only(top: 25, bottom: 10, left: 25, right: 25),
                         padding: const EdgeInsets.symmetric(vertical: 10),
                         child: CanteenCardBox(
                           imgUrl:
-                              '${AppConfig.URL_IMAGES_PATH}${items?.merchantPhoto}',
-                          canteenName: items?.merchantName,
+                              '${AppConfig.URL_IMAGES_PATH}${items.merchantPhoto}',
+                          canteenName: items.merchantName,
                           // menuList: 'kosong',
-                          likes: ' ${items?.followers}',
-                          rate: '${items?.rating}',
-                          type: items?.merchantType,
-                          open: items!.open!,
+                          likes: ' ${items.followers}',
+                          rate: '$rating',
+                          type: items.merchantType,
+                          open: items.open!,
                           danus: items.danus!,
                           onPressed: () => navigateTo(
                               context,
@@ -303,18 +305,19 @@ class _SeeAllItemsScreenState extends State<SeeAllItemsScreen> {
                         itemBuilder: (context, index) {
                           MerchantItems? items =
                               dataMerchants?.merchants![index];
+                          double rating = roundToOneDecimal(items!.rating!);
                           return Container(
                             // margin: const EdgeInsets.only(top: 25, bottom: 10, left: 25, right: 25),
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             child: CanteenCardBox(
                               imgUrl:
-                                  '${AppConfig.URL_IMAGES_PATH}${items?.merchantPhoto}',
-                              canteenName: items?.merchantName,
+                                  '${AppConfig.URL_IMAGES_PATH}${items.merchantPhoto}',
+                              canteenName: items.merchantName,
                               // menuList: 'kosong',
-                              likes: ' ${items?.followers}',
-                              rate: '${items?.rating}',
-                              type: items?.merchantType,
-                              open: items!.open!,
+                              likes: ' ${items.followers}',
+                              rate: '$rating',
+                              type: items.merchantType,
+                              open: items.open!,
                               danus: items.danus!,
                               onPressed: () => navigateTo(
                                   context,

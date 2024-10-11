@@ -70,6 +70,7 @@ dependencies:
   geolocator: ^13.0.1
   permission_handler: ^11.3.1
   flutter_background_service: ^5.0.10
+  web_socket_channel: ^3.0.1
   # flutter_map_directions: ^0.0.7
   # flutter_open_street_map: ^0.0.4
 

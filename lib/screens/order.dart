@@ -6,6 +6,7 @@ import 'package:cfood/custom/page_item_void.dart';
 import 'package:cfood/custom/reload_indicator.dart';
 import 'package:cfood/model/get_all_order_list_response.dart';
 import 'package:cfood/repository/fetch_controller.dart';
+import 'package:cfood/screens/inbox.dart';
 import 'package:cfood/screens/order_confirm.dart';
 import 'package:cfood/screens/order_detail.dart';
 import 'package:cfood/style.dart';
@@ -13,6 +14,7 @@ import 'package:cfood/utils/common.dart';
 import 'package:cfood/utils/constant.dart';
 import 'package:community_material_icon/community_material_icon.dart';
 import 'package:flutter/material.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:uicons/uicons.dart';
 
 class OrderScreen extends StatefulWidget {
@@ -48,71 +50,6 @@ class _OrderScreenState extends State<OrderScreen> {
       'code': 'cancelled',
       'data': DataOrders().cancelled,
     }
-  ];
-  List<Map<String, dynamic>> orderStatusMap = [
-    {
-      'status': 'Belum Bayar',
-      'code': 'BELUM_BAYAR',
-      'icon': Icons.money,
-      'color': Warna.abu4,
-      'highlight': true,
-    },
-    {
-      'status': 'Menunggu Konfirmasi Penjual',
-      'code': 'MENUNGGU_KONFIRM_PENJUAL',
-      'icon': UIcons.solidRounded.hat_chef,
-      'color': Warna.kuning,
-      'highlight': true,
-    },
-    {
-      'status': 'Pesanan Disiapkan',
-      'code': 'DIPROSES_PENJUAL',
-      'icon': UIcons.solidRounded.hat_chef,
-      'color': Warna.kuning,
-      'highlight': true,
-    },
-    {
-      'status': 'Menunggu Konfirmasi Kurir',
-      'code': 'MENUNGGU_KONFIRM_KURIR',
-      'icon': UIcons.solidRounded.hat_chef,
-      'color': Warna.kuning,
-      'highlight': true,
-    },
-    {
-      'status': 'Pesanan Sedang Diantar',
-      'code': 'DIPROSES_KURIR',
-      'icon': Icons.directions_bike_rounded,
-      'color': Warna.oranye2,
-      'highlight': true,
-    },
-    {
-      'status': 'Pesanan Selesai',
-      'code': 'PESANAN_SAMPAI',
-      'icon': Icons.check_circle_outline_rounded,
-      'color': Warna.hijau,
-      'highlight': false,
-    },
-    {
-      'status': 'Konfirmasi sudah Sampai',
-      'code': 'KONFIRM_SAMPAI',
-      'icon': Icons.check_circle_outline_rounded,
-      'color': Warna.hijau,
-      'highlight': false,
-    },
-    {
-      'status': 'Pesanan Dibatalkan',
-      'code': 'DIBATALKAN',
-      'icon': UIcons.regularRounded.calendar_exclamation,
-      'color': Warna.like,
-      'highlight': false,
-    },
-    {
-      'status': 'Ditolak',
-      'code': 'DITOLAK',
-      'icon': UIcons.regularRounded.calendar_exclamation,
-      'color': Warna.like,
-      'highlight': false,
-    },
   ];
 
   List<Map<String, dynamic>> orderListItems = [
@@ -329,9 +266,9 @@ class _OrderScreenState extends State<OrderScreen> {
           actions: [
             notifIconButton(
               icons: UIcons.solidRounded.comment,
-              onPressed: () {},
+              onPressed: () {navigateTo(context, InboxScreen());},
               iconColor: Warna.biru,
-              notifCount: '7',
+              notifCount: NotificationConfig.userChatNotification.toString(),
             ),
             const SizedBox(
               width: 10,
@@ -412,247 +349,278 @@ class _OrderScreenState extends State<OrderScreen> {
     List<OrderItem>? storeItem,
     List<OrderItemInformations>? menuItems,
   }) {
-    bool highlightStatus =
-        storeItem?[storeListIndex].status == 'MENUNGGU_KONFIRM_PENJUAL' ||
-            storeItem?[storeListIndex].status == 'MENUNGGU_PEMBAYARAN' ||
-            storeItem?[storeListIndex].status == 'PESANAN_DIANTARKAN';
+    // bool highlightStatus =
+    //     storeItem?[storeListIndex].status == 'MENUNGGU_KONFIRM_PENJUAL' ||
+    //         storeItem?[storeListIndex].status == 'MENUNGGU_PEMBAYARAN' ||
+    //         storeItem?[storeListIndex].status == 'PESANAN_DIANTARKAN';
 
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        border: highlightStatus
-            ? Border.all(
-                color: Warna.kuning,
-                width: 1,
-              )
-            : null,
-        boxShadow: [
-          BoxShadow(
-              blurRadius: 20,
-              spreadRadius: 0,
-              color: Warna.shadow.withOpacity(0.12),
-              offset: const Offset(0, 0))
-        ],
-        color: Colors.white,
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              // Icon(
-              //   Icons.store,
-              //   color: Warna.biru,
-              //   size: 20,
-              // ),
-              Icon(
-                storeItem![storeListIndex]
-                            .orderInformation!
-                            .merchantInformation!
-                            .merchantType ==
-                        "WIRAUSAHA"
-                    ? CommunityMaterialIcons.handshake
-                    : Icons.store,
-                color: storeItem[storeListIndex]
-                            .orderInformation!
-                            .merchantInformation!
-                            .merchantType ==
-                        "WIRAUSAHA"
-                    ? Warna.kuning
-                    : Warna.biru,
-                size: 20,
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Row(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Text(
+                    storeItem![storeListIndex].orderDate.toString(),
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(
-                width: 5,
+                height: 8,
               ),
-              Expanded(
-                flex: 2,
-                child: Text(
-                  storeItem![storeListIndex]
-                      .orderInformation!
-                      .merchantInformation!
-                      .merchantName
-                      .toString(),
-                  // 'nama toko',
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-              // const Spacer(),
-              Expanded(
-                child: Text(
-                  storeItem[storeListIndex].orderDate.toString(),
-                  // style: AppTextStyles.textRegular,
-                  textAlign: TextAlign.end,
-                  style: const TextStyle(
-                    fontSize: 13,
-                  ),
-                ),
-              ),
+        Container(
+          padding: const EdgeInsets.only(top: 20),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(8),
+            // border: highlightStatus
+            //     ? Border.all(
+            //         color: Warna.kuning,
+            //         width: 1,
+            //       )
+            //     : null,
+            boxShadow: [
+              BoxShadow(
+                  blurRadius: 20,
+                  spreadRadius: 0,
+                  color: Warna.shadow.withOpacity(0.12),
+                  offset: const Offset(0, 0))
             ],
+            color: Colors.white,
           ),
-          ListView.builder(
-            itemCount: menuItems?.length,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemBuilder: (context, menuIdx) {
-              return InkWell(
-                onTap: () {
-                  navigateTo(
-                      context,
-                      OrderDetailScreen(
-                        status: storeItem[storeListIndex].status,
-                        fromConfirm: false,
-                        orderId: storeItem[storeListIndex].id,
-                      ));
-                },
-                child: Container(
-                  // height: 100,
-                  // padding: const EdgeInsets.symmetric(vertical: 20),
-                  decoration: BoxDecoration(
-                    border: Border(
-                      bottom: menuIdx == menuItems!.length - 1
-                          ? const BorderSide(
-                              color: Colors.transparent, width: 1.5)
-                          : BorderSide(color: Warna.abu5, width: 1.5),
-                    ),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 15),
-                    child: ListTile(
-                      contentPadding: EdgeInsets.zero,
-                      dense: false,
-                      leading: Container(
-                        width: 60,
-                        height: 60,
-                        decoration: BoxDecoration(
-                          color: Warna.abu,
-                          borderRadius: BorderRadius.circular(8),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        // Icon(
+                        //   Icons.store,
+                        //   color: Warna.biru,
+                        //   size: 20,
+                        // ),
+                        Icon(
+                          storeItem[storeListIndex]
+                                      .orderInformation!
+                                      .merchantInformation!
+                                      .merchantType ==
+                                  "WIRAUSAHA"
+                              ? CommunityMaterialIcons.handshake
+                              : Icons.store,
+                          color: storeItem[storeListIndex]
+                                      .orderInformation!
+                                      .merchantInformation!
+                                      .merchantType ==
+                                  "WIRAUSAHA"
+                              ? Warna.kuning
+                              : Warna.biru,
+                          size: 20,
                         ),
-                        child: menuItems[menuIdx].menuInformation!.menuPhoto ==
-                                null
-                            ? const Center(
-                                child: Icon(Icons.image),
-                              )
-                            : ClipRRect(
-                                borderRadius: BorderRadius.circular(8),
-                                child: Image.network(
-                                  AppConfig.URL_IMAGES_PATH +
-                                      menuItems[menuIdx]
-                                          .menuInformation!
-                                          .menuPhoto!,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return Container(
-                                      width: 60,
-                                      height: 60,
-                                      decoration: BoxDecoration(
-                                        color: Warna.abu,
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ),
-                      ),
-                      title: Row(
-                        mainAxisSize: MainAxisSize.max,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            flex: 2,
-                            child: Text(
-                              menuItems[menuIdx].menuInformation!.menuName!,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.w600),
+                        const SizedBox(
+                          width: 5,
+                        ),
+                        Expanded(
+                          flex: 2,
+                          child: Text(
+                            storeItem[storeListIndex]
+                                .orderInformation!
+                                .merchantInformation!
+                                .merchantName
+                                .toString(),
+                            // 'nama toko',
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
                             ),
                           ),
-                          Text(
-                            '${menuItems[menuIdx].quantity}x',
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          )
-                        ],
-                      ),
-                      subtitle: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(menuItems[menuIdx]
-                                  .orderVariantInformations!
-                                  .isEmpty
-                              ? ''
-                              : getVariantDescription(menuItems[menuIdx]
-                                  .orderVariantInformations!)),
-                          // menuItems[menuIdx]
-                          //         .orderVariantInformations != null ?
-                          // SizedBox(
-                          //   height: 15,
-                          //   width: MediaQuery.of(context).size.width * 0.60,
-                          //   child: ListView.builder(
-                          //     itemCount: menuItems[menuIdx]
-                          //         .orderVariantInformations!
-                          //         .length,
-                          //     shrinkWrap: true,
-                          //     physics: const NeverScrollableScrollPhysics(),
-                          //     scrollDirection: Axis.horizontal,
-                          //     itemBuilder: (context, variantIdx) {
-                          //       return Text(
-                          //         menuItems[menuIdx]
-                          //             .orderVariantInformations![variantIdx]
-                          //             .variantOptionInformations
-                          //             .toString()
-                          //             .replaceAll('[', '')
-                          //             .replaceAll(']', ''),
-                          //       );
-                          //     },
-                          //   ),
-                          // ) : const SizedBox(height: 10,),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            mainAxisSize: MainAxisSize.max,
-                            children: [
-                              Text(
-                                Constant.currencyCode +
-                                    formatNumberWithThousandsSeparator(
-                                            menuItems[menuIdx].totalPriceItem!)
-                                        .toString(),
-                                style: AppTextStyles.productPrice,
-                              )
-                            ],
-                          )
-                        ],
-                      ),
+                        ),
+                        // const Spacer(),
+                        // Expanded(
+                        //   child: Text(
+                        //     storeItem[storeListIndex].orderDate.toString(),
+                        //     // style: AppTextStyles.textRegular,
+                        //     textAlign: TextAlign.end,
+                        //     style: const TextStyle(
+                        //       fontSize: 13,
+                        //     ),
+                        //   ),
+                        // ),
+                      ],
                     ),
-                  ),
+                    ListView.builder(
+                      itemCount: menuItems?.length,
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemBuilder: (context, menuIdx) {
+                        return InkWell(
+                          onTap: () {
+                            navigateTo(
+                                context,
+                                OrderDetailScreen(
+                                  status: storeItem[storeListIndex].status,
+                                  fromConfirm: false,
+                                  orderId: storeItem[storeListIndex].id,
+                                ));
+                          },
+                          child: Container(
+                            // height: 100,
+                            // padding: const EdgeInsets.symmetric(vertical: 20),
+                            decoration: BoxDecoration(
+                              border: Border(
+                                bottom: menuIdx == menuItems!.length - 1
+                                    ? const BorderSide(
+                                        color: Colors.transparent, width: 1.5)
+                                    : BorderSide(color: Warna.abu5, width: 1.5),
+                              ),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 15),
+                              child: ListTile(
+                                contentPadding: EdgeInsets.zero,
+                                dense: false,
+                                leading: Container(
+                                  width: 60,
+                                  height: 60,
+                                  decoration: BoxDecoration(
+                                    color: Warna.abu,
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: menuItems[menuIdx].menuInformation!.menuPhoto ==
+                                          null
+                                      ? const Center(
+                                          child: Icon(Icons.image),
+                                        )
+                                      : ClipRRect(
+                                          borderRadius: BorderRadius.circular(8),
+                                          child: Image.network(
+                                            AppConfig.URL_IMAGES_PATH +
+                                                menuItems[menuIdx]
+                                                    .menuInformation!
+                                                    .menuPhoto!,
+                                            fit: BoxFit.cover,
+                                            errorBuilder: (context, error, stackTrace) {
+                                              return Container(
+                                                width: 60,
+                                                height: 60,
+                                                decoration: BoxDecoration(
+                                                  color: Warna.abu,
+                                                  borderRadius: BorderRadius.circular(8),
+                                                ),
+                                              );
+                                            },
+                                          ),
+                                        ),
+                                ),
+                                title: Row(
+                                  mainAxisSize: MainAxisSize.max,
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Expanded(
+                                      flex: 2,
+                                      child: Text(
+                                        menuItems[menuIdx].menuInformation!.menuName!,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(
+                                            fontSize: 18, fontWeight: FontWeight.w600),
+                                      ),
+                                    ),
+                                    Text(
+                                      '${menuItems[menuIdx].quantity}x',
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                    )
+                                  ],
+                                ),
+                                subtitle: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(menuItems[menuIdx]
+                                            .orderVariantInformations!
+                                            .isEmpty
+                                        ? ''
+                                        : getVariantDescription(menuItems[menuIdx]
+                                            .orderVariantInformations!)),
+                                    // menuItems[menuIdx]
+                                    //         .orderVariantInformations != null ?
+                                    // SizedBox(
+                                    //   height: 15,
+                                    //   width: MediaQuery.of(context).size.width * 0.60,
+                                    //   child: ListView.builder(
+                                    //     itemCount: menuItems[menuIdx]
+                                    //         .orderVariantInformations!
+                                    //         .length,
+                                    //     shrinkWrap: true,
+                                    //     physics: const NeverScrollableScrollPhysics(),
+                                    //     scrollDirection: Axis.horizontal,
+                                    //     itemBuilder: (context, variantIdx) {
+                                    //       return Text(
+                                    //         menuItems[menuIdx]
+                                    //             .orderVariantInformations![variantIdx]
+                                    //             .variantOptionInformations
+                                    //             .toString()
+                                    //             .replaceAll('[', '')
+                                    //             .replaceAll(']', ''),
+                                    //       );
+                                    //     },
+                                    //   ),
+                                    // ) : const SizedBox(height: 10,),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      mainAxisSize: MainAxisSize.max,
+                                      children: [
+                                        Text(
+                                          Constant.currencyCode +
+                                              formatNumberWithThousandsSeparator(
+                                                      menuItems[menuIdx].totalPriceItem!)
+                                                  .toString(),
+                                          style: AppTextStyles.productPrice,
+                                        )
+                                      ],
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                   
+                  ],
                 ),
-              );
-            },
+              ),
+               dynamicButtonStatusOrder(
+                      status: storeItem[storeListIndex].status!,
+                      onPressed: () {
+                        navigateTo(
+                            context,
+                            OrderDetailScreen(
+                              status: storeItem[storeListIndex].status,
+                              fromConfirm: false,
+                              orderId: storeItem[storeListIndex].id,
+                            ));
+                      },
+                      statusMap: orderStatusMap,
+                      text: storeItem[storeListIndex].status!,
+                    ),
+            ],
           ),
-          dynamicButtonStatusOrder(
-            status: storeItem[storeListIndex].status!,
-            onPressed: () {
-              navigateTo(
-                  context,
-                  OrderDetailScreen(
-                    status: storeItem[storeListIndex].status,
-                    fromConfirm: false,
-                    orderId: storeItem[storeListIndex].id,
-                  ));
-            },
-            statusMap: orderStatusMap,
-            text: storeItem[storeListIndex].status!,
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -678,11 +646,12 @@ class _OrderScreenState extends State<OrderScreen> {
               style: ElevatedButton.styleFrom(
                 elevation: 0,
                 backgroundColor: Colors.grey,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(34),
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.vertical(bottom: Radius.circular(8)),
                 ),
               ),
-              child: const CircularProgressIndicator(),
+              child: LoadingAnimationWidget.staggeredDotsWave(
+                  color: Warna.biru, size: 25),
             ),
           );
         } else if (snapshot.hasError) {
@@ -694,8 +663,8 @@ class _OrderScreenState extends State<OrderScreen> {
               style: ElevatedButton.styleFrom(
                 elevation: 0,
                 backgroundColor: Colors.red,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(34),
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.vertical(bottom: Radius.circular(8)),
                 ),
               ),
               child: const Text(
@@ -718,8 +687,8 @@ class _OrderScreenState extends State<OrderScreen> {
               style: ElevatedButton.styleFrom(
                 elevation: 0,
                 backgroundColor: statusData['color'],
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(34),
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.vertical(bottom: Radius.circular(8)),
                 ),
               ),
               child: Row(

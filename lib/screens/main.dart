@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:cfood/custom/CToast.dart';
 import 'package:cfood/model/get_user_response.dart';
+import 'package:cfood/repository/background/service_notification.dart';
 import 'package:cfood/repository/fetch_controller.dart';
 import 'package:cfood/screens/cart.dart';
 import 'package:cfood/screens/home.dart';
@@ -13,6 +14,8 @@ import 'package:cfood/utils/constant.dart';
 import 'package:flutter/material.dart';
 import 'package:toast/toast.dart';
 import 'package:uicons/uicons.dart';
+
+import '../repository/background/service_location.dart';
 
 class MainScreen extends StatefulWidget {
   int firstIndexScreen;
@@ -51,6 +54,8 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   void initState() {
+    // ServiceNotification().initializeService();
+    // ServiceLocation().initializeService();
     super.initState();
     setState(() {
       selectedScreen = _pageMenu[widget.firstIndexScreen];

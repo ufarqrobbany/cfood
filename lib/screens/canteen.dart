@@ -16,13 +16,16 @@ import 'package:cfood/custom/shimmer.dart';
 import 'package:cfood/model/add_cart_response.dart';
 import 'package:cfood/model/follow_merchant_response.dart';
 import 'package:cfood/model/get_calculate_cart_response.dart';
+import 'package:cfood/model/get_chat_message_response.dart';
 import 'package:cfood/model/get_detail_merchant_response.dart';
 import 'package:cfood/model/get_quantity_selected_menu_response.dart';
+import 'package:cfood/model/get_rooms_chat.dart';
 import 'package:cfood/model/get_specific_menu_response.dart';
 import 'package:cfood/model/post_menu_like_response.dart';
 import 'package:cfood/model/post_menu_unlike_response.dart';
 import 'package:cfood/model/reponse_handler.dart';
 import 'package:cfood/repository/fetch_controller.dart';
+import 'package:cfood/screens/chat.dart';
 import 'package:cfood/screens/main.dart';
 import 'package:cfood/screens/order_confirm.dart';
 import 'package:cfood/screens/organization.dart';
@@ -38,6 +41,7 @@ import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:toast/toast.dart';
 import 'package:uicons/uicons.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class CanteenScreen extends StatefulWidget {
   final int? merchantId;
@@ -85,6 +89,11 @@ class _CanteenScreenState extends State<CanteenScreen>
   List<DataQuantityMenu>? menuQuanList;
   List<Menu> menuItems = [];
   CalculateCartData? calculateCartData;
+
+  GetChatMessageResponse? roomResponse;
+  DataChat? dataRoomMerchant;
+  // GetChatRoomResponse? roomResponse;
+  // DataRoom? dataRoomMerchant;
 
   @override
   void initState() {
@@ -159,6 +168,8 @@ class _CanteenScreenState extends State<CanteenScreen>
       allMenuItems = menuMaps['Semua']!;
       filteredMenuItems = allMenuItems;
     });
+
+    fetcthMerchatRooms();
 
     if (menuMaps != []) {
       getQuantitySelctedMenu();
@@ -642,6 +653,19 @@ class _CanteenScreenState extends State<CanteenScreen>
     }
   }
 
+  Future<void> fetcthMerchatRooms() async {
+    roomResponse = await FetchController(
+      endpoint: 'chats/merchants/id?merchantId=${dataMerchant!.merchantId}&userId=${AppConfig.USER_ID}&page=1&size=10',
+        // endpoint: 'chats/merchants?userId=${AppConfig.USER_ID}',
+        fromJson: (json) => GetChatMessageResponse.fromJson(json)).getData();
+    if (roomResponse != null) {
+      setState(() {
+        dataRoomMerchant = roomResponse!.data;
+      });
+    }
+  }
+
+
   @override
   Widget build(BuildContext context) {
     ToastContext().init(context);
@@ -878,6 +902,65 @@ class _CanteenScreenState extends State<CanteenScreen>
                                         contentPadding:
                                             const EdgeInsets.symmetric(
                                                 horizontal: 25, vertical: 10),
+                                        tileColor: Warna.like.withOpacity(0.10),
+
+                                        title: const Text(
+                                          // dataMerchant!
+                                          //     .danusInformation!.organizationName!
+                                          //     .toString(),
+                                          "Fitur Terbatas, Akses Lengkap di Website Kami",
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w700),
+                                        ),
+                                        subtitle: const Text(
+                                          'Halaman ini masih dalam tahap pengembangan. Untuk mengakses fitur lengkap, seperti mengedit produk, memantau pendapatan dan stok, silakan kunjungi halaman website kami disini',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w400),
+                                        ),
+                                        trailing: IconButton(
+                                          onPressed: () async {
+                                            log('open url');
+                                            if (!await launchUrl(
+                                                Uri.parse(
+                                                    'https://campusfood.id/login#merchant'),
+                                                mode: LaunchMode
+                                                    .externalApplication)) {
+                                              throw Exception(
+                                                  'Could not launch url');
+                                            }
+                                            // navigateTo(
+                                            //     context,
+                                            //     UpdateMerchantScreen(
+                                            //       merchantId:
+                                            //           dataMerchant?.merchantId,
+                                            //     ));
+                                          },
+                                          icon: const Icon(Icons
+                                                  .arrow_forward_ios_rounded, color: Colors.white,),
+                                          iconSize: 18,
+                                          style: IconButton.styleFrom(
+                                            backgroundColor: Warna.like,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(50),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                  : Container()),
+                          dataMerchant == null
+                              ? Container(
+                                  height: 0,
+                                )
+                              : (widget.isOwner
+                                  ? Padding(
+                                      padding: const EdgeInsets.only(top: 15),
+                                      child: ListTile(
+                                        // contentPadding: EdgeInsets.zero,
+                                        contentPadding:
+                                            const EdgeInsets.symmetric(
+                                                horizontal: 25, vertical: 10),
                                         tileColor:
                                             Warna.hijau.withOpacity(0.10),
 
@@ -913,9 +996,63 @@ class _CanteenScreenState extends State<CanteenScreen>
                                       ),
                                     )
                                   : Container()),
-                          dataMerchant?.danusInformation == null
-                              ? (widget.isOwner
-                                  ? Padding(
+                          dataMerchant == null
+                              ? Container(
+                                  height: 0,
+                                )
+                              : dataMerchant?.danusInformation == null
+                                  ? (widget.isOwner
+                                      ? Padding(
+                                          padding:
+                                              const EdgeInsets.only(top: 15),
+                                          child: ListTile(
+                                            // contentPadding: EdgeInsets.zero,
+                                            contentPadding:
+                                                const EdgeInsets.symmetric(
+                                                    horizontal: 25,
+                                                    vertical: 10),
+                                            tileColor:
+                                                Warna.kuning.withOpacity(0.10),
+
+                                            title: const Text(
+                                              // dataMerchant!
+                                              //     .danusInformation!.organizationName!
+                                              //     .toString(),
+                                              "Lagi Danusan?",
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.w700),
+                                            ),
+                                            subtitle: const Text(
+                                              'Prioritaskan menu kamu agar mudah ditemukan pembeli',
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.w400),
+                                            ),
+                                            trailing: IconButton(
+                                              onPressed: () {
+                                                navigateTo(
+                                                  context,
+                                                  SignUpDanusScreen(
+                                                    campusId: dataMerchant!
+                                                        .studentInformation!
+                                                        .campusId!,
+                                                  ),
+                                                );
+                                              },
+                                              icon: const Icon(Icons
+                                                  .arrow_forward_ios_rounded),
+                                              iconSize: 18,
+                                              style: IconButton.styleFrom(
+                                                backgroundColor: Warna.kuning,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(50),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        )
+                                      : Container())
+                                  : Padding(
                                       padding: const EdgeInsets.only(top: 15),
                                       child: ListTile(
                                         // contentPadding: EdgeInsets.zero,
@@ -924,160 +1061,122 @@ class _CanteenScreenState extends State<CanteenScreen>
                                                 horizontal: 25, vertical: 10),
                                         tileColor:
                                             Warna.kuning.withOpacity(0.10),
-
+                                        leading: ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(50),
+                                          child: Container(
+                                            height: 50,
+                                            width: 50,
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(50),
+                                              color: Warna.abu2,
+                                            ),
+                                            child: Image.network(
+                                              '${AppConfig.URL_IMAGES_PATH}${dataMerchant?.danusInformation?.organizationPhoto}',
+                                              fit: BoxFit.cover,
+                                              errorBuilder:
+                                                  (context, error, stackTrace) {
+                                                return Container(
+                                                  height: 50,
+                                                  width: 50,
+                                                  decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            50),
+                                                    color: Warna.abu2,
+                                                  ),
+                                                );
+                                              },
+                                            ),
+                                          ),
+                                        ),
                                         title: const Text(
-                                          // dataMerchant!
-                                          //     .danusInformation!.organizationName!
-                                          //     .toString(),
-                                          "Lagi Danusan?",
+                                          "Sedang Danusan",
                                           style: TextStyle(
                                               fontWeight: FontWeight.w700),
                                         ),
-                                        subtitle: const Text(
-                                          'Prioritaskan menu kamu agar mudah ditemukan pembeli',
-                                          style: TextStyle(
+                                        subtitle: Text(
+                                          'Kegiatan ${dataMerchant?.danusInformation?.activityName}\n${dataMerchant?.danusInformation?.organizationName}',
+                                          style: const TextStyle(
                                               fontWeight: FontWeight.w400),
                                         ),
-                                        trailing: IconButton(
-                                          onPressed: () {
-                                            navigateTo(
-                                              context,
-                                              SignUpDanusScreen(
-                                                campusId: dataMerchant!
-                                                    .studentInformation!
-                                                    .campusId!,
-                                              ),
-                                            );
-                                          },
-                                          icon: const Icon(
-                                              Icons.arrow_forward_ios_rounded),
-                                          iconSize: 18,
-                                          style: IconButton.styleFrom(
-                                            backgroundColor: Warna.kuning,
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(50),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    )
-                                  : Container())
-                              : Padding(
-                                  padding: const EdgeInsets.only(top: 15),
-                                  child: ListTile(
-                                    // contentPadding: EdgeInsets.zero,
-                                    contentPadding: const EdgeInsets.symmetric(
-                                        horizontal: 25, vertical: 10),
-                                    tileColor: Warna.kuning.withOpacity(0.10),
-                                    leading: ClipRRect(
-                                      borderRadius: BorderRadius.circular(50),
-                                      child: Container(
-                                        height: 50,
-                                        width: 50,
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(50),
-                                          color: Warna.abu2,
-                                        ),
-                                        child: Image.network(
-                                          '${AppConfig.URL_IMAGES_PATH}${dataMerchant?.danusInformation?.organizationPhoto}',
-                                          fit: BoxFit.cover,
-                                          errorBuilder:
-                                              (context, error, stackTrace) {
-                                            return Container(
-                                              height: 50,
-                                              width: 50,
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(50),
-                                                color: Warna.abu2,
-                                              ),
-                                            );
-                                          },
-                                        ),
-                                      ),
-                                    ),
-                                    title: const Text(
-                                      "Sedang Danusan",
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.w700),
-                                    ),
-                                    subtitle: Text(
-                                      'Kegiatan ${dataMerchant?.danusInformation?.activityName}\n${dataMerchant?.danusInformation?.organizationName}',
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.w400),
-                                    ),
-                                    trailing: widget.isOwner
-                                        ? InkWell(
-                                            onTap: () {
-                                              log('finish danush?');
-                                              showMyCustomDialog(
-                                                context,
-                                                text:
-                                                    'Apakah anda yakin ingin menyelesaikan kegiatan danus?\nProduk danus tidak akan dihapus.',
-                                                colorYes: Warna.like,
-                                                onTapYes: () {
-                                                  finishDanus(context);
-                                                  navigateBack(context);
+                                        trailing: widget.isOwner
+                                            ? InkWell(
+                                                onTap: () {
+                                                  log('finish danush?');
+                                                  showMyCustomDialog(
+                                                    context,
+                                                    text:
+                                                        'Apakah anda yakin ingin menyelesaikan kegiatan danus?\nProduk danus tidak akan dihapus.',
+                                                    colorYes: Warna.like,
+                                                    onTapYes: () {
+                                                      finishDanus(context);
+                                                      navigateBack(context);
+                                                    },
+                                                  );
                                                 },
-                                              );
-                                            },
-                                            child: Container(
-                                              // height: 30,
-                                              padding:
-                                                  const EdgeInsets.symmetric(
+                                                child: Container(
+                                                  // height: 30,
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
                                                       horizontal: 15,
                                                       vertical: 8),
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(40),
-                                                color: Warna.like,
-                                              ),
-                                              child: const Row(
-                                                mainAxisSize: MainAxisSize.min,
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                children: [
-                                                  Text(
-                                                    'Selesai  ',
-                                                    style: TextStyle(
-                                                      color: Colors.white,
-                                                      fontSize: 14,
-                                                      fontWeight:
-                                                          FontWeight.w600,
-                                                    ),
-                                                  ),
-                                                  Icon(
-                                                    Icons
-                                                        .arrow_forward_ios_rounded,
-                                                    size: 15,
-                                                    color: Colors.white,
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          )
-                                        : IconButton(
-                                            onPressed: () => navigateTo(
-                                              context,
-                                              OrganizationScreen(
-                                                  id: dataMerchant!
-                                                      .danusInformation!
-                                                      .organizationId!),
-                                            ),
-                                            icon: const Icon(Icons
-                                                .arrow_forward_ios_rounded),
-                                            iconSize: 18,
-                                            style: IconButton.styleFrom(
-                                                backgroundColor: Warna.kuning,
-                                                shape: RoundedRectangleBorder(
+                                                  decoration: BoxDecoration(
                                                     borderRadius:
                                                         BorderRadius.circular(
-                                                            50))),
-                                          ),
-                                  ),
-                                ),
+                                                            40),
+                                                    color: Warna.like,
+                                                  ),
+                                                  child: const Row(
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      Text(
+                                                        'Selesai  ',
+                                                        style: TextStyle(
+                                                          color: Colors.white,
+                                                          fontSize: 14,
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                        ),
+                                                      ),
+                                                      Icon(
+                                                        Icons
+                                                            .arrow_forward_ios_rounded,
+                                                        size: 15,
+                                                        color: Colors.white,
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              )
+                                            : IconButton(
+                                                onPressed: () => navigateTo(
+                                                  context,
+                                                  OrganizationScreen(
+                                                      id: dataMerchant!
+                                                          .danusInformation!
+                                                          .organizationId!),
+                                                ),
+                                                icon: const Icon(Icons
+                                                    .arrow_forward_ios_rounded),
+                                                iconSize: 18,
+                                                style: IconButton.styleFrom(
+                                                    backgroundColor:
+                                                        Warna.kuning,
+                                                    shape:
+                                                        RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        50))),
+                                              ),
+                                      ),
+                                    ),
                           const SizedBox(
                             height: 25,
                           ),
@@ -1367,8 +1466,10 @@ class _CanteenScreenState extends State<CanteenScreen>
                       itemBuilder: (context, index) {
                         menuItems = menuMaps[selectedTab]!;
                         Menu item = menuItems[index];
+                        double rating = roundToOneDecimal(item.menuRate!);
                         // log('menu photo -> ${item.menuPhoto}');
                         // log('${item.menuName} | ${item.variants}');
+                        log("sold ${item.menuSolds!}");
                         return Container(
                           color: Colors.white,
                           padding: const EdgeInsets.symmetric(horizontal: 25),
@@ -1381,9 +1482,10 @@ class _CanteenScreenState extends State<CanteenScreen>
                                       item.menuDesc ?? 'deskripsi menu',
                                   price: item.menuPrice,
                                   likes: item.menuLikes.toString(),
-                                  rate: item.menuRate.toString(),
+                                  // rate: item.menuRate.toString(),
+                                  rate: '$rating',
                                   count: item.menuStock.toString(),
-                                  sold: item.menuSolds,
+                                  sold: item.menuSolds!,
                                   // isCustom: item.isDanus!,
                                   isCustom:
                                       item.variants!.isNotEmpty ? true : false,
@@ -1434,8 +1536,9 @@ class _CanteenScreenState extends State<CanteenScreen>
                                       likes: item.menuLikes!.toString(),
                                       // count: item.menuStock!.toString(),
                                       count: item.quantity!.toString(),
-                                      sold: item.menuSolds ?? 0,
-                                      rate: item.menuRate.toString(),
+                                      sold: item.menuSolds!,
+                                      // rate: item.menuRate.toString(),
+                                      rate: '$rating',
                                       innerContentSize: 110,
                                       isLike: item.isLike!,
                                       onTapLike: (updateState) {
@@ -1485,10 +1588,11 @@ class _CanteenScreenState extends State<CanteenScreen>
                                                     item.quantity!, // perbaiki
                                                 likes:
                                                     item.menuLikes.toString(),
-                                                rate: item.menuRate.toString(),
+                                                rate: '$rating',
+                                                // rate: item.menuRate.toString(),
                                                 // count: item.selectedCount!,
                                                 count: item.quantity!,
-                                                sold: item.menuSolds ?? 0,
+                                                sold: item.menuSolds!,
                                                 innerContentSize: 110,
                                                 variantSelected: null,
                                                 total: subtotal,
@@ -1579,11 +1683,13 @@ class _CanteenScreenState extends State<CanteenScreen>
                                       item.menuDesc ?? 'deskripsi menu',
                                   price: item.menuPrice,
                                   likes: item.menuLikes.toString(),
-                                  rate: item.menuRate.toString(),
+                                  // rate: item.menuRate.toString(),
+                                  rate: '$rating',
                                   // count: item.menuStock!.toString(),
                                   // count: item.selectedCount!.toString(),
                                   count: item.quantity!.toString(),
                                   // isCustom: item.isDanus!,
+                                  sold: item.menuSolds!,
                                   isCustom:
                                       item.variants!.isNotEmpty ? true : false,
                                   isDanus: item.isDanus!,
@@ -1603,10 +1709,11 @@ class _CanteenScreenState extends State<CanteenScreen>
                                         price: item.menuPrice!,
                                         subTotal: item.subTotal!,
                                         likes: item.menuLikes.toString(),
-                                        rate: item.menuRate.toString(),
+                                        rate: '$rating',
+                                        // rate: item.menuRate.toString(),
                                         // count: item.selectedCount!,
                                         count: item.quantity!,
-                                        sold: item.menuSolds ?? 0,
+                                        sold: item.menuSolds!,
                                         quantity: item.quantity!,
                                         stock: item.menuStock!,
                                         innerContentSize: 110,
@@ -1838,13 +1945,15 @@ class _CanteenScreenState extends State<CanteenScreen>
                 onPressed: () {
                   navigateTo(
                     context,
-                    const ReviewScreen(
-                      storeName: 'Nama Toko',
-                      likes: '100',
-                      rate: '4.4',
-                      imgUrl: '/.jpg',
-                      storeId: '000',
-                      type: 'Menu',
+                    ReviewScreen(
+                      type: 'WIRAUSAHA',
+                      merchantId: dataMerchant!.merchantId,
+                      // storeName: 'Nama Toko',
+                      // likes: '100',
+                      // rate: '4.4',
+                      // imgUrl: '/.jpg',
+                      // storeId: '000',
+                      // type: 'Menu',
                     ),
                   );
                 },
@@ -1881,13 +1990,26 @@ class _CanteenScreenState extends State<CanteenScreen>
                     children: [
                       Expanded(
                         flex: 2,
-                        child: Container(
-                          color: Warna.kuning,
-                          child: Center(
-                            child: Icon(
-                              UIcons.solidRounded.comment,
-                              size: 25,
-                              color: Colors.white,
+                        child: InkWell(
+                          onTap: () {
+                            navigateTo(context, ChatScreen(
+                              isMerchant: true,
+                              merchantId: dataRoomMerchant!.merchantId,
+                              userId: AppConfig.USER_ID,
+                              roomId: dataRoomMerchant!.roomId,
+                              profileImg: dataRoomMerchant!.photo,
+                              username: dataRoomMerchant!.name,
+                              subname: dataRoomMerchant!.subName,
+                            ));
+                          },
+                          child: Container(
+                            color: Warna.kuning,
+                            child: Center(
+                              child: Icon(
+                                UIcons.solidRounded.comment,
+                                size: 25,
+                                color: Colors.white,
+                              ),
                             ),
                           ),
                         ),
@@ -1976,6 +2098,7 @@ class _CanteenScreenState extends State<CanteenScreen>
           physics: const NeverScrollableScrollPhysics(),
           itemBuilder: (context, index) {
             Menu item = filteredMenuItems[index];
+            double rating = roundToOneDecimal(item.menuRate!);
             return Container(
               color: Colors.white,
               padding: const EdgeInsets.symmetric(horizontal: 25),
@@ -1996,8 +2119,9 @@ class _CanteenScreenState extends State<CanteenScreen>
                           likes: item.menuLikes!.toString(),
                           // count: item.selectedCount!.toString(),
                           count: item.quantity!.toString(),
-                          sold: item.menuSolds ?? 0,
-                          rate: item.menuRate.toString(),
+                          sold: item.menuSolds!,
+                          // rate: item.menuRate.toString(),
+                          rate: '$rating',
                           innerContentSize: 110,
                           isLike: item.isLike!,
                           onTapLike: (updateState) {
@@ -2032,8 +2156,10 @@ class _CanteenScreenState extends State<CanteenScreen>
                       description: item.menuDesc ?? 'deskripsi menu',
                       price: item.menuPrice,
                       likes: item.menuLikes.toString(),
-                      rate: item.menuRate.toString(),
+                      // rate: item.menuRate.toString(),
+                      rate: '$rating',
                       count: item.menuStock.toString(),
+                      sold: item.menuSolds!,
                       // isCustom: item.isDanus!,
                       isCustom: item.variants!.isNotEmpty ? true : false,
                       isOwner: widget.isOwner,
@@ -2055,8 +2181,9 @@ class _CanteenScreenState extends State<CanteenScreen>
                           likes: item.menuLikes!.toString(),
                           // count: item.selectedCount!.toString(),
                           count: item.quantity!.toString(),
-                          sold: item.menuSolds ?? 0,
-                          rate: item.menuRate.toString(),
+                          sold: item.menuSolds!,
+                          // rate: item.menuRate.toString(),
+                          rate: '$rating',
                           innerContentSize: 110,
                           isLike: item.isLike!,
                           onTapLike: (updateState) {
@@ -2098,10 +2225,11 @@ class _CanteenScreenState extends State<CanteenScreen>
                                 price: item.menuPrice!,
                                 subTotal: item.subTotal!,
                                 likes: item.menuLikes.toString(),
-                                rate: item.menuRate.toString(),
+                                rate: '$rating',
+                                // rate: item.menuRate.toString(),
                                 // count: item.selectedCount!,
                                 count: item.quantity!,
-                                sold: item.menuSolds ?? 0,
+                                sold: item.menuSolds!,
                                 quantity: item.quantity!,
                                 stock: item.menuStock!,
                                 innerContentSize: 110,
@@ -2178,8 +2306,10 @@ class _CanteenScreenState extends State<CanteenScreen>
                       description: item.menuDesc ?? 'deskripsi menu',
                       price: item.menuPrice,
                       likes: item.menuLikes.toString(),
-                      rate: item.menuRate.toString(),
+                      rate: '$rating',
+                      // rate: item.menuRate.toString(),
                       // count: item.selectedCount!.toString(),
+                      sold: item.menuSolds!,
                       count: item.quantity!.toString(),
                       isCustom: item.variants!.isNotEmpty ? true : false,
                       onTapAdd: () async {
@@ -2197,10 +2327,11 @@ class _CanteenScreenState extends State<CanteenScreen>
                             price: item.menuPrice!,
                             subTotal: item.subTotal!,
                             likes: item.menuLikes.toString(),
-                            rate: item.menuRate.toString(),
+                            rate: '$rating',
+                            // rate: item.menuRate.toString(),
                             // count: item.selectedCount!,
                             count: item.quantity!,
-                            sold: item.menuSolds ?? 0,
+                            sold: item.menuSolds!,
                             quantity: item.quantity!,
                             stock: item.menuStock!,
                             innerContentSize: 110,
@@ -3829,7 +3960,7 @@ class _CanteenScreenState extends State<CanteenScreen>
 //                                           likes: item.menuLikes!.toString(),
 //                                           // count: item.menuStock!.toString(),
 //                                           count: item.quantity!.toString(),
-//                                           sold: item.menuSolds ?? 0,
+//                                           sold: item.menuSolds!,
 //                                           rate: item.menuRate.toString(),
 //                                           innerContentSize: 110,
 //                                           isLike: item.isLike!,
@@ -3885,7 +4016,7 @@ class _CanteenScreenState extends State<CanteenScreen>
 //                                                         .toString(),
 //                                                     // count: item.selectedCount!,
 //                                                     count: item.quantity!,
-//                                                     sold: item.menuSolds ?? 0,
+//                                                     sold: item.menuSolds!,
 //                                                     innerContentSize: 110,
 //                                                     variantSelected: null,
 //                                                     total: subtotal,
@@ -4008,7 +4139,7 @@ class _CanteenScreenState extends State<CanteenScreen>
 //                                             rate: item.menuRate.toString(),
 //                                             // count: item.selectedCount!,
 //                                             count: item.quantity!,
-//                                             sold: item.menuSolds ?? 0,
+//                                             sold: item.menuSolds!,
 //                                             quantity: item.quantity!,
 //                                             stock: item.menuStock!,
 //                                             innerContentSize: 110,
@@ -4403,7 +4534,7 @@ class _CanteenScreenState extends State<CanteenScreen>
 //                           likes: item.menuLikes!.toString(),
 //                           // count: item.selectedCount!.toString(),
 //                           count: item.quantity!.toString(),
-//                           sold: item.menuSolds ?? 0,
+//                           sold: item.menuSolds!,
 //                           rate: item.menuRate.toString(),
 //                           innerContentSize: 110,
 //                           isLike: item.isLike!,
@@ -4461,7 +4592,7 @@ class _CanteenScreenState extends State<CanteenScreen>
 //                           likes: item.menuLikes!.toString(),
 //                           // count: item.selectedCount!.toString(),
 //                           count: item.quantity!.toString(),
-//                           sold: item.menuSolds ?? 0,
+//                           sold: item.menuSolds!,
 //                           rate: item.menuRate.toString(),
 //                           innerContentSize: 110,
 //                           isLike: item.isLike!,
@@ -4507,7 +4638,7 @@ class _CanteenScreenState extends State<CanteenScreen>
 //                                 rate: item.menuRate.toString(),
 //                                 // count: item.selectedCount!,
 //                                 count: item.quantity!,
-//                                 sold: item.menuSolds ?? 0,
+//                                 sold: item.menuSolds!,
 //                                 quantity: item.quantity!,
 //                                 stock: item.menuStock!,
 //                                 innerContentSize: 110,
@@ -4606,7 +4737,7 @@ class _CanteenScreenState extends State<CanteenScreen>
 //                             rate: item.menuRate.toString(),
 //                             // count: item.selectedCount!,
 //                             count: item.quantity!,
-//                             sold: item.menuSolds ?? 0,
+//                             sold: item.menuSolds!,
 //                             quantity: item.quantity!,
 //                             stock: item.menuStock!,
 //                             innerContentSize: 110,

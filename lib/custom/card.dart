@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cfood/custom/shimmer.dart';
 import 'package:cfood/style.dart';
 import 'package:cfood/utils/common.dart';
@@ -331,7 +333,6 @@ class ProductCardBoxHorizontal extends StatelessWidget {
   final String? rate;
   final String? likes;
   final String? count;
-  final int? sold;
   final VoidCallback? onPressed;
   final VoidCallback? onTapAdd;
   final VoidCallback? onTapRemove;
@@ -342,7 +343,8 @@ class ProductCardBoxHorizontal extends StatelessWidget {
   final bool hideBorder;
   final bool isOwner;
   final bool isDanus;
-  const ProductCardBoxHorizontal({
+  int sold;
+  ProductCardBoxHorizontal({
     super.key,
     this.productId,
     this.imgUrl,
@@ -352,7 +354,7 @@ class ProductCardBoxHorizontal extends StatelessWidget {
     this.rate,
     this.likes,
     this.count,
-    this.sold,
+    this.sold = 0,
     this.onPressed,
     this.onTapAdd,
     this.onTapRemove,
@@ -368,6 +370,7 @@ class ProductCardBoxHorizontal extends StatelessWidget {
   Widget build(BuildContext context) {
     // log(" product image -> $imgUrl");
     // log('$productName ||| $isCustom');
+    // log('sold $sold');
     return Container(
       padding: isCustom
           ? const EdgeInsets.fromLTRB(0, 25, 0, 15)
@@ -1320,6 +1323,7 @@ class InboxCardItems extends StatelessWidget {
   final String? lastMassage;
   final String? lastDateTime;
   final String? totalNewMessage;
+  final String? latestSenderType;
   final GestureTapCallback? onPressed;
   const InboxCardItems({
     super.key,
@@ -1331,6 +1335,7 @@ class InboxCardItems extends StatelessWidget {
     this.lastMassage,
     this.lastDateTime,
     this.totalNewMessage,
+    this.latestSenderType,
     this.onPressed,
   });
 
@@ -1352,7 +1357,7 @@ class InboxCardItems extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(8),
-                  border: totalNewMessage != null
+                  border: totalNewMessage != '0'
                       ? Border.all(
                           color: Warna.kuning,
                           width: 1,
@@ -1382,7 +1387,24 @@ class InboxCardItems extends StatelessWidget {
                           ? const Center(
                               child: Icon(Icons.image),
                             )
-                          : Image.network(imgUrl!),
+                          : ClipRRect(
+                              borderRadius: BorderRadius.circular(60),
+                              child: Image.network(
+                                '${AppConfig.URL_IMAGES_PATH}$imgUrl',
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Container(
+                                    width: 60,
+                                    height: 60,
+                                    // margin: const EdgeInsets.fromLTRB(20, 20, 0, 20),
+                                    decoration: BoxDecoration(
+                                      color: Warna.abu,
+                                      borderRadius: BorderRadius.circular(60),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
                     ),
                     Expanded(
                       child: Container(
@@ -1394,17 +1416,34 @@ class InboxCardItems extends StatelessWidget {
                               name!,
                               style: AppTextStyles.canteenName,
                             ),
-                            Text(
-                              lastMassage!,
-                              style: AppTextStyles.productStoreName,
+                            Row(
+                              children: [
+                                latestSenderType == 'USER'
+                                    ? Icon(
+                                        Icons.check,
+                                        size: 18,
+                                        color: Warna.kuning,
+                                      )
+                                    : Container(),
+                                latestSenderType == 'USER'
+                                    ? const SizedBox(
+                                        width: 8,
+                                      )
+                                    : Container(),
+                                    lastMassage == null ? Container() :
+                                Text(
+                                  lastMassage!,
+                                  style: AppTextStyles.productStoreName,
+                                ),
+                              ],
                             ),
                             const Spacer(),
-                            const Row(
+                            Row(
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
                                 // Spacer(),
                                 Text(
-                                  'date-time-hours',
+                                  lastDateTime.toString(),
                                   style: AppTextStyles.productStoreName,
                                 ),
                               ],
@@ -1418,27 +1457,29 @@ class InboxCardItems extends StatelessWidget {
               ),
             ),
           ),
-          Positioned(
-              top: 0,
-              right: 0,
-              child: Container(
-                padding: const EdgeInsets.all(5),
-                height: 30,
-                width: 30,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(60),
-                  color: Warna.kuning,
-                ),
-                child: Center(
-                  child: Text(
-                    totalNewMessage!,
-                    style: const TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w900,
+          totalNewMessage == '0'
+              ? Container()
+              : Positioned(
+                  top: 0,
+                  right: 0,
+                  child: Container(
+                    padding: const EdgeInsets.all(5),
+                    height: 30,
+                    width: 30,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(60),
+                      color: Warna.kuning,
                     ),
-                  ),
-                ),
-              ))
+                    child: Center(
+                      child: Text(
+                        totalNewMessage!,
+                        style: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                    ),
+                  ))
         ],
       ),
     );

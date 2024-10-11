@@ -12,7 +12,9 @@ import 'package:uicons/uicons.dart';
 
 class MainScreenMerchant extends StatefulWidget {
   final int firstIndexScreen;
-  const MainScreenMerchant({super.key, this.firstIndexScreen = 0});
+  final int transactionPageTabIndex;
+  const MainScreenMerchant(
+      {super.key, this.firstIndexScreen = 0, this.transactionPageTabIndex = 0});
 
   @override
   State<MainScreenMerchant> createState() => _MainScreenMerchantState();
@@ -44,7 +46,18 @@ class _MainScreenMerchantState extends State<MainScreenMerchant> {
 
   @override
   void initState() {
-    selectedScreen = _pageMenuCanteen[widget.firstIndexScreen];
+    if (widget.firstIndexScreen == 1) {
+      setState(() {
+        selectedScreen = TransactionWirausahaScreen(
+          firstTabIndex: widget.transactionPageTabIndex,
+        );
+      });
+    } else {
+      setState(() {
+        selectedScreen = _pageMenuCanteen[widget.firstIndexScreen];
+      });
+    }
+
     super.initState();
   }
 

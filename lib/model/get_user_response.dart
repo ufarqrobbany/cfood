@@ -162,13 +162,20 @@ class MerchantInformation {
   String? merchantPhoto;
   String? merchantDesc;
   String? merchantType;
+  int? totalIncomingOrders;
+  int? totalTransactions;
+  int? totalChats;
 
   MerchantInformation(
       {this.merchantId,
       this.merchantName,
       this.merchantPhoto,
       this.merchantDesc,
-      this.merchantType,});
+      this.merchantType,
+      this.totalChats,
+      this.totalIncomingOrders,
+      this.totalTransactions,
+      });
 
   MerchantInformation.fromJson(Map<String, dynamic> json) {
     merchantId = json['id'];
@@ -176,6 +183,9 @@ class MerchantInformation {
     merchantPhoto = json['merchantPhoto'];
     merchantDesc = json['merchantDesc'];
     merchantType = json['merchantType'];
+    totalChats = json['totalChats'];
+    totalIncomingOrders = json['totalIncomingOrders'];
+    totalTransactions = json['totalTransactions'];
   }
 
   Map<String, dynamic> toJson() {

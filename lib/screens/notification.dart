@@ -17,7 +17,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
         leading: backButtonCustom(context: context),
         leadingWidth: 90,
         title: Text(
-          'Notification',
+          'Notifikasi',
           style: AppTextStyles.appBarTitle,
         ),
         foregroundColor: Colors.white,
