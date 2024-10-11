@@ -1,4 +1,4 @@
-package com.cfood.id
+package com.campusfood.id
 
 import io.flutter.embedding.android.FlutterActivity
 
