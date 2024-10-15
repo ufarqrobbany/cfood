@@ -180,6 +180,7 @@ class _InboxScreenState extends State<InboxScreen> {
                           .then((onValue) {
                         setState(() {
                           item.unreadMessages = 0;
+                          fetchData();
                         });
                       });
                       // Navigator.push(context, MaterialPageRoute(builder: (context) => const ChatScreen(),));

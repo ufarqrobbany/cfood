@@ -166,6 +166,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
 
   GetChatMessageResponse? roomResponse;
   DataChat? dataRoomMerchant;
+  DataChat? dataRoomUser;
 
   @override
   void initState() {
@@ -185,6 +186,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
       });
       if (dataOrderResponse!.orderInformation!.merchantInformation != null) {
         fetcthMerchatRooms();
+        fetcthUserRooms();
       }
     } else {
       fetchDetail();
@@ -206,6 +208,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
       });
       if (dataOrderResponse!.orderInformation!.merchantInformation != null) {
         fetcthMerchatRooms();
+        fetcthUserRooms();
       }
     }
   }
@@ -515,6 +518,19 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     }
   }
 
+    Future<void> fetcthUserRooms() async {
+    roomResponse = await FetchController(
+        endpoint:
+            'chats/users/id?merchantId=${AppConfig.MERCHANT_ID}&userId=${dataOrderResponse!.userInformation!.userId}&page=1&size=10',
+        // endpoint: 'chats/merchants?userId=${AppConfig.USER_ID}',
+        fromJson: (json) => GetChatMessageResponse.fromJson(json)).getData();
+    if (roomResponse != null) {
+      setState(() {
+        dataRoomUser = roomResponse!.data;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     ToastContext().init(context);
@@ -689,14 +705,18 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                           margin: const EdgeInsets.symmetric(vertical: 10),
                           child: DynamicColorButton(
                             onPressed: () {
+                              // dataRoomUser
                               navigateTo(
-                                context,
-                                ChatScreen(
-                                  isMerchant: true,
-                                  merchantId: 1,
-                                  userId: 1,
-                                ),
-                              );
+                                  context,
+                                  ChatScreen(
+                                    isMerchant: false,
+                                    merchantId: dataRoomUser!.merchantId,
+                                    userId: AppConfig.USER_ID,
+                                    roomId: dataRoomUser!.roomId,
+                                    profileImg: "${AppConfig.URL_IMAGES_PATH}${dataRoomUser!.photo}",
+                                    username: dataRoomUser!.name,
+                                    subname: dataRoomUser!.subName,
+                                  ));
                             },
                             icon: Icon(
                               UIcons.solidRounded.comment,
@@ -720,7 +740,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                                     merchantId: dataRoomMerchant!.merchantId,
                                     userId: AppConfig.USER_ID,
                                     roomId: dataRoomMerchant!.roomId,
-                                    profileImg: dataRoomMerchant!.photo,
+                                    profileImg: "${AppConfig.URL_IMAGES_PATH}${dataRoomMerchant!.photo}",
                                     username: dataRoomMerchant!.name,
                                     subname: dataRoomMerchant!.subName,
                                   ));

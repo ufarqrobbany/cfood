@@ -8,6 +8,7 @@ import 'package:cfood/custom/shimmer.dart';
 import 'package:cfood/model/getl_all_merchant_response.dart';
 import 'package:cfood/model/get_all_menu_response.dart';
 import 'package:cfood/model/get_all_organization_response.dart';
+import 'package:cfood/repository/background/service_notification.dart';
 import 'package:cfood/repository/fetch_controller.dart';
 import 'package:cfood/screens/canteen.dart';
 import 'package:cfood/screens/favorite.dart';
@@ -76,6 +77,19 @@ class _HomeScreenState extends State<HomeScreen> {
           ? nama_user.split(' ')[0]
           : _capitalizeFirstLetter(AppConfig.EMAIL.split('.')[0]);
     });
+
+    NotificationUnreads.fecthUnreadMessageUser(
+      context,
+      countDown: 5,
+      unreadMessage: NotificationConfig.userChatNotification,
+      onUpdatedMessage: (updatedUnreadMessage) {
+        setState(() {
+          log('unread message for user');
+          NotificationConfig.userChatNotification = updatedUnreadMessage;
+          log(NotificationConfig.userChatNotification.toString());
+        });
+      },
+    );
   }
 
   String _capitalizeFirstLetter(String input) {
@@ -211,7 +225,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   actions: [
                     notifIconButton(
                       icons: UIcons.solidRounded.bell,
-                      notifCount: NotificationConfig.userNotification.toString(),
+                      notifCount:
+                          NotificationConfig.userNotification.toString(),
                       onPressed: () {
                         navigateTo(context, const NotificationScreen());
                         // log(AppConfig.URL_PHOTO_PROFILE);
@@ -241,7 +256,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     // ),
                     notifIconButton(
                       icons: UIcons.solidRounded.comment,
-                      notifCount: NotificationConfig.userChatNotification.toString(),
+                      notifCount:
+                          NotificationConfig.userChatNotification.toString(),
                       onPressed: () => navigateTo(
                           context,
                           InboxScreen(
@@ -544,8 +560,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               CanteenScreen(
                                   menuId: '${items.menuId}',
                                   merchantId: items.merchants!.merchantId!,
-                                  merchantType:
-                                      items.merchants!.merchantType!),
+                                  merchantType: items.merchants!.merchantType!),
                             );
                           },
                           imgUrl:
@@ -618,71 +633,76 @@ class _HomeScreenState extends State<HomeScreen> {
         // ),
 
         // SUMBANGAN DANA BANtu Usaha
-        dataOrganizations?.organizations == null ? Container() :Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 25),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                'Bantu Dana Usaha',
-                style: AppTextStyles.subTitle,
-                textAlign: TextAlign.left,
-              ),
-              CYellowMoreButton(
-                  onPressed: () => navigateTo(
-                        context,
-                        const SeeAllItemsScreen(
-                          typeName: 'Organisasi',
-                          typeCode: 'organisasi',
-                        ),
-                      ),
-                  text: 'Lihat Semua'),
-            ],
-          ),
-        ),
-
-        dataOrganizations?.organizations == null ? Container() : SizedBox(
-          height: dataOrganizations?.organizations == null ? 200 : 224,
-          child: dataOrganizations?.organizations == null
-              ? SizedBox(
-                  height: 200,
-                  child: shimmerListBuilder(
-                    context,
-                    enabled:
-                        dataOrganizations?.organizations == null ? true : false,
-                    isVertical: false,
-                    isBox: true,
-                    itemCount: 3,
-                  ),
-                )
-              : ListView.builder(
-                  itemCount: dataOrganizations?.organizations!.length,
-                  physics: const BouncingScrollPhysics(),
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 15),
-                  itemExtent: 180,
-                  shrinkWrap: true,
-                  // lagi di bikin
-                  itemBuilder: (context, index) {
-                    OrganizationItems? items =
-                        dataOrganizations?.organizations![index];
-                    return Container(
-                      alignment: Alignment.center,
-                      margin: const EdgeInsets.only(top: 24, bottom: 40),
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: OrganizationCard(
-                        text: items?.organizationName!,
-                        imgUrl:
-                            '${AppConfig.URL_IMAGES_PATH}${items?.organizationLogo}',
+        dataOrganizations?.organizations == null
+            ? Container()
+            : Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 25),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'Bantu Dana Usaha',
+                      style: AppTextStyles.subTitle,
+                      textAlign: TextAlign.left,
+                    ),
+                    CYellowMoreButton(
                         onPressed: () => navigateTo(
-                          context,
-                          OrganizationScreen(id: items?.id),
-                        ),
-                      ),
-                    );
-                  },
+                              context,
+                              const SeeAllItemsScreen(
+                                typeName: 'Organisasi',
+                                typeCode: 'organisasi',
+                              ),
+                            ),
+                        text: 'Lihat Semua'),
+                  ],
                 ),
-        ),
+              ),
+
+        dataOrganizations?.organizations == null
+            ? Container()
+            : SizedBox(
+                height: dataOrganizations?.organizations == null ? 200 : 224,
+                child: dataOrganizations?.organizations == null
+                    ? SizedBox(
+                        height: 200,
+                        child: shimmerListBuilder(
+                          context,
+                          enabled: dataOrganizations?.organizations == null
+                              ? true
+                              : false,
+                          isVertical: false,
+                          isBox: true,
+                          itemCount: 3,
+                        ),
+                      )
+                    : ListView.builder(
+                        itemCount: dataOrganizations?.organizations!.length,
+                        physics: const BouncingScrollPhysics(),
+                        scrollDirection: Axis.horizontal,
+                        padding: const EdgeInsets.symmetric(horizontal: 15),
+                        itemExtent: 180,
+                        shrinkWrap: true,
+                        // lagi di bikin
+                        itemBuilder: (context, index) {
+                          OrganizationItems? items =
+                              dataOrganizations?.organizations![index];
+                          return Container(
+                            alignment: Alignment.center,
+                            margin: const EdgeInsets.only(top: 24, bottom: 40),
+                            padding: const EdgeInsets.symmetric(horizontal: 10),
+                            child: OrganizationCard(
+                              text: items?.organizationName!,
+                              imgUrl:
+                                  '${AppConfig.URL_IMAGES_PATH}${items?.organizationLogo}',
+                              onPressed: () => navigateTo(
+                                context,
+                                OrganizationScreen(id: items?.id),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+              ),
 
         // Kantin dan Wirausaga
         const Padding(

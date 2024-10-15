@@ -11,6 +11,7 @@ import 'package:cfood/custom/reload_indicator.dart';
 import 'package:cfood/model/add_driver_response.dart';
 import 'package:cfood/model/get_user_response.dart';
 import 'package:cfood/model/open_close_store_response.dart';
+import 'package:cfood/repository/background/service_notification.dart';
 import 'package:cfood/repository/fetch_controller.dart';
 import 'package:cfood/screens/app_setting_info.dart';
 import 'package:cfood/screens/inbox.dart';
@@ -66,6 +67,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
     isStudent = false;
     getUserData(context);
     log('usertype : ${AppConfig.USER_TYPE}\n userId : ${AppConfig.USER_ID}\n${AppConfig.NAME}\nMerchnat id: ${AppConfig.MERCHANT_ID}');
+    if (AppConfig.ON_DASHBOARD) {
+      NotificationUnreads.fecthUnreadMessageMerchant(
+        context,
+        countDown: 5,
+        unreadMessage: NotificationConfig.sellerChatNotification,
+        onUpdatedMessage: (updatedUnreadMessage) {
+          setState(() {
+            log('unread message for merchants');
+            NotificationConfig.sellerChatNotification = updatedUnreadMessage;
+            log(NotificationConfig.sellerChatNotification.toString());
+          });
+        },
+      );
+    } else {
+      NotificationUnreads.fecthUnreadMessageUser(
+        context,
+        countDown: 5,
+        unreadMessage: NotificationConfig.userChatNotification,
+        onUpdatedMessage: (updatedUnreadMessage) {
+          setState(() {
+            log('unread message for user');
+            NotificationConfig.userChatNotification = updatedUnreadMessage;
+            log(NotificationConfig.userChatNotification.toString());
+          });
+        },
+      );
+    }
   }
 
   Future<void> refreshPage() async {
@@ -171,13 +199,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
         scrolledUnderElevation: 0,
         actions: [
           notifIconButton(
-            icons: UIcons.solidRounded.bell,
-            iconColor: Warna.biru,
-            notifCount: NotificationConfig.userNotification.toString(),
-            onPressed: (){
-              navigateTo(context, const NotificationScreen());
-            }
-          ),
+              icons: UIcons.solidRounded.bell,
+              iconColor: Warna.biru,
+              notifCount: NotificationConfig.userNotification.toString(),
+              onPressed: () {
+                navigateTo(context, const NotificationScreen());
+              }),
           // const SizedBox(
           //   width: 10,
           // ),
@@ -187,9 +214,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
             iconColor: Warna.biru,
             onPressed: () => navigateTo(
                 context,
-                AppConfig.ON_DASHBOARD == true ? const ChatSellerScreen() : InboxScreen(
-                  canBack: true,
-                )),
+                AppConfig.ON_DASHBOARD == true
+                    ? const ChatSellerScreen()
+                    : InboxScreen(
+                        canBack: true,
+                      )),
           ),
           const SizedBox(
             width: 15,
@@ -331,7 +360,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
               sectionMenuBox(
                 title: 'Info Lainnya',
                 items: [
-                  
                   menuItemContainer(
                     icons: UIcons.solidRounded.map_marker,
                     showBorder: true,
@@ -369,7 +397,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       showToast('Not Availalble');
                     },
                   ),
-                   menuItemContainer(
+                  menuItemContainer(
                     icons: UIcons.solidRounded.shield,
                     showBorder: true,
                     text: 'Kebijakan Privasi',
@@ -417,7 +445,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     showBorder: false,
                     text: 'Kritik dan Saran',
                     onTap: () async {
-                       log('open url');
+                      log('open url');
                       final Uri url =
                           Uri.parse('https://forms.gle/RfsccR6ouf5htV3U7');
                       if (!await launchUrl(url)) {
@@ -425,8 +453,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       }
                     },
                   ),
-                  
-                 
                 ],
               ),
               // sectionMenuBox(
@@ -1006,25 +1032,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
               const SizedBox(
                 height: 5,
               ),
-              notifCount == 0 ? Container() :
-              Container(
-                width: 18,
-                height: 18,
-                // padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 3),
-                decoration: BoxDecoration(
-                  color: Warna.kuning,
-                  borderRadius: BorderRadius.circular(33),
-                ),
-                child: Center(
-                  child: Text(
-                    notifCount.toString(),
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w900,
+              notifCount == 0
+                  ? Container()
+                  : Container(
+                      width: 18,
+                      height: 18,
+                      // padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: Warna.kuning,
+                        borderRadius: BorderRadius.circular(33),
+                      ),
+                      child: Center(
+                        child: Text(
+                          notifCount.toString(),
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-              ),
             ],
           ),
         ),

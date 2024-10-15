@@ -5,6 +5,7 @@ import 'package:cfood/custom/CPageMover.dart';
 import 'package:cfood/custom/page_item_void.dart';
 import 'package:cfood/custom/reload_indicator.dart';
 import 'package:cfood/model/get_all_order_list_response.dart';
+import 'package:cfood/repository/background/service_notification.dart';
 import 'package:cfood/repository/fetch_controller.dart';
 import 'package:cfood/screens/inbox.dart';
 import 'package:cfood/screens/order_confirm.dart';
@@ -203,6 +204,18 @@ class _OrderScreenState extends State<OrderScreen> {
   void initState() {
     super.initState();
     fetchData();
+    NotificationUnreads.fecthUnreadMessageUser(
+      context,
+      countDown: 5,
+      unreadMessage: NotificationConfig.userChatNotification,
+      onUpdatedMessage: (updatedUnreadMessage) {
+        setState(() {
+          log('unread message for user');
+          NotificationConfig.userChatNotification = updatedUnreadMessage;
+          log(NotificationConfig.userChatNotification.toString());
+        });
+      },
+    );
   }
 
   Future<void> refreshPage() async {
@@ -266,7 +279,7 @@ class _OrderScreenState extends State<OrderScreen> {
           actions: [
             notifIconButton(
               icons: UIcons.solidRounded.comment,
-              onPressed: () {navigateTo(context, InboxScreen());},
+              onPressed: () {navigateTo(context, InboxScreen(canBack: true,));},
               iconColor: Warna.biru,
               notifCount: NotificationConfig.userChatNotification.toString(),
             ),

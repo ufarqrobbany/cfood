@@ -5,6 +5,7 @@ import 'package:cfood/custom/CPageMover.dart';
 import 'package:cfood/custom/page_item_void.dart';
 import 'package:cfood/custom/reload_indicator.dart';
 import 'package:cfood/model/transaction_merchant_response.dart';
+import 'package:cfood/repository/background/service_notification.dart';
 import 'package:cfood/repository/fetch_controller.dart';
 import 'package:cfood/screens/kurir_pages/chat_seller.dart';
 import 'package:cfood/screens/notification.dart';
@@ -95,6 +96,18 @@ class _TransactionWirausahaScreenState
   void initState() {
     super.initState();
     fetchData();
+    NotificationUnreads.fecthUnreadMessageMerchant(
+        context,
+        countDown: 5,
+        unreadMessage: NotificationConfig.sellerChatNotification,
+        onUpdatedMessage: (updatedUnreadMessage) {
+          setState(() {
+            log('unread message for merchants');
+            NotificationConfig.sellerChatNotification = updatedUnreadMessage;
+            log(NotificationConfig.sellerChatNotification.toString());
+          });
+        },
+      );
   }
 
   Future<void> refreshPage() async {

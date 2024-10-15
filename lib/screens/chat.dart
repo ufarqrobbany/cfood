@@ -66,7 +66,8 @@ class _ChatScreenState extends State<ChatScreen>
 
     super.initState();
     _scrolController.addListener(_scrollListener);
-    log('is merchant: ${widget.isMerchant}');
+    log('to merchant: ${widget.isMerchant}');
+    log('room id : ${widget.roomId}');
     fetchData();
     _fetchNewMessages();
     // startMessagePolling();
@@ -76,7 +77,8 @@ class _ChatScreenState extends State<ChatScreen>
   void _scrollListener() {
     if (_scrolController.position.atEdge) {
       log(_scrolController.position.pixels.toString());
-      if (_scrolController.position.pixels == _scrolController.position.maxScrollExtent) {
+      if (_scrolController.position.pixels ==
+          _scrolController.position.maxScrollExtent) {
         // Ketika sudah di bagian paling atas
         _fetchOldMessages();
       }
@@ -94,7 +96,10 @@ class _ChatScreenState extends State<ChatScreen>
   bool isClick1 = false;
 
   void fetchData() {
-    fetchMessages();
+    if (widget.roomId != 0) {
+      log('fetch message');
+      fetchMessages();
+    }
   }
 
   // void startMessagePolling() {
@@ -104,11 +109,18 @@ class _ChatScreenState extends State<ChatScreen>
   // }
 
   Future<void> fetchMessages() async {
-    roomResponse = await FetchController(
-      endpoint:
-          'chats/merchants/room?roomId=${widget.roomId}&page=$page&size=10',
-      fromJson: (json) => GetChatMessageResponse.fromJson(json),
-    ).getData();
+    if (widget.isMerchant == true) {
+      roomResponse = await FetchController(
+        endpoint:
+            'chats/merchants/room?roomId=${widget.roomId}&page=$page&size=10',
+        fromJson: (json) => GetChatMessageResponse.fromJson(json),
+      ).getData();
+    } else {
+      roomResponse = await FetchController(
+        endpoint: 'chats/users/room?roomId=${widget.roomId}&page=$page&size=10',
+        fromJson: (json) => GetChatMessageResponse.fromJson(json),
+      ).getData();
+    }
 
     if (roomResponse != null && roomResponse!.data != null && page > 1) {
       setState(() {
@@ -137,11 +149,18 @@ class _ChatScreenState extends State<ChatScreen>
     // Naikkan halaman untuk fetch data sebelumnya
     page++;
 
-    roomResponse = await FetchController(
-      endpoint:
-          'chats/merchants/room?roomId=${widget.roomId}&page=$page&size=10',
-      fromJson: (json) => GetChatMessageResponse.fromJson(json),
-    ).getData();
+    if (widget.isMerchant == true) {
+      roomResponse = await FetchController(
+        endpoint:
+            'chats/merchants/room?roomId=${widget.roomId}&page=$page&size=10',
+        fromJson: (json) => GetChatMessageResponse.fromJson(json),
+      ).getData();
+    } else {
+      roomResponse = await FetchController(
+        endpoint: 'chats/users/room?roomId=${widget.roomId}&page=$page&size=10',
+        fromJson: (json) => GetChatMessageResponse.fromJson(json),
+      ).getData();
+    }
 
     if (roomResponse != null && roomResponse!.data != null) {
       setState(() {
@@ -162,27 +181,41 @@ class _ChatScreenState extends State<ChatScreen>
   }
 
   // Fungsi untuk fetch message saat scroll ke atas (pagination)
-  Future<void> _fetchNewMessages() async {
-    Timer.periodic(const Duration(seconds: 20), (timer) async {
-      roomResponse = await FetchController(
-        endpoint: 'chats/merchants/room?roomId=${widget.roomId}&page=1&size=10',
-        fromJson: (json) => GetChatMessageResponse.fromJson(json),
-      ).getData();
+  Future<void> _fetchNewMessages({
+    int countDown = 20,
+  }) async {
+    int? roomId = widget.roomId == 0 ? dataChat!.roomId : widget.roomId;
+    if (widget.roomId != 0) {
+      Timer.periodic(Duration(seconds: countDown), (timer) async {
+        if (widget.isMerchant == true) {
+          roomResponse = await FetchController(
+            endpoint:
+                'chats/merchants/room?roomId=${widget.roomId}&page=$page&size=10',
+            fromJson: (json) => GetChatMessageResponse.fromJson(json),
+          ).getData();
+        } else {
+          roomResponse = await FetchController(
+            endpoint:
+                'chats/users/room?roomId=${widget.roomId}&page=$page&size=10',
+            fromJson: (json) => GetChatMessageResponse.fromJson(json),
+          ).getData();
+        }
 
-      if (roomResponse != null && roomResponse!.data != null) {
-        setState(() {
-          // Gabungkan pesan baru (lama) dengan pesan yang sudah ada di list
-          // dataChat?.messages?.insertAll(0, roomResponse!.data!.messages!);
-          // dataChat?.messages?.addAll(roomResponse!.data!.messages!);
-          // Optional: Group ulang jika diperlukan
-          dataChat = roomResponse!.data;
-          dataChat?.messages = groupMessagesByDay(dataChat!.messages!)
-              .values
-              .expand((msg) => msg)
-              .toList();
-        });
-      }
-    });
+        if (roomResponse != null && roomResponse!.data != null) {
+          setState(() {
+            // Gabungkan pesan baru (lama) dengan pesan yang sudah ada di list
+            // dataChat?.messages?.insertAll(0, roomResponse!.data!.messages!);
+            // dataChat?.messages?.addAll(roomResponse!.data!.messages!);
+            // Optional: Group ulang jika diperlukan
+            dataChat = roomResponse!.data;
+            dataChat?.messages = groupMessagesByDay(dataChat!.messages!)
+                .values
+                .expand((msg) => msg)
+                .toList();
+          });
+        }
+      });
+    }
   }
 
   // Future<void> fetcthMessages() async {
@@ -219,10 +252,27 @@ class _ChatScreenState extends State<ChatScreen>
   }
 
   Future<void> postMessage() async {
+    String senderType = widget.isMerchant == true ? 'USER' : 'MERCHANT';
+    int? merchantId = widget.isMerchant!
+        ? widget.roomId == 0
+            ? widget.merchantId
+            : dataChat!.merchantId
+        : widget.roomId == 0
+            ? AppConfig.MERCHANT_ID
+            : AppConfig.MERCHANT_ID;
+    int? userId = widget.isMerchant!
+        ? widget.roomId == 0
+            ? AppConfig.USER_ID
+            : AppConfig.USER_ID
+        : widget.roomId == 0
+            ? widget.merchantId
+            : dataChat!.merchantId;
+    log(senderType);
     log(inputMessageController.text);
+    log('merchant: $merchantId || user: $userId');
     ResponseHendler response = await FetchController(
         endpoint:
-            'chats/?userId=${AppConfig.USER_ID}&merchantId=${dataChat!.merchantId}&senderType=USER', //MERCHANT
+            'chats/?userId=$userId&merchantId=$merchantId&senderType=$senderType', //MERCHANT
         fromJson: (json) =>
             ResponseHendler.fromJson(json)).postMultipartDataMessage(
         dataKeyName: 'message',
@@ -233,9 +283,17 @@ class _ChatScreenState extends State<ChatScreen>
 
     if (response.statusCode == 200) {
       // Menambahkan pesan baru secara lokal tanpa perlu fetch semua data
+      if (widget.roomId == 0) {
+        if (widget.isMerchant == true) {
+          fetcthMerchatRooms();
+        } else {
+          fetcthUserRooms();
+        }
+      }
+
       setState(() {
         Messages newMessage = Messages(
-          senderType: 'USER',
+          senderType: widget.isMerchant! ? 'USER' : 'MERCHANT',
           message: inputMessageController.text,
           media: null,
           mediaLocal: _image,
@@ -253,6 +311,60 @@ class _ChatScreenState extends State<ChatScreen>
         inputMessageController.clear();
       });
       log('Pesan berhasil ditambahkan secara lokal');
+    }
+  }
+
+  Future<void> fetcthMerchatRooms() async {
+     int? merchantId = widget.isMerchant!
+        ? widget.roomId == 0
+            ? widget.merchantId
+            : dataChat!.merchantId
+        : widget.roomId == 0
+            ? AppConfig.MERCHANT_ID
+            : AppConfig.MERCHANT_ID;
+    int? userId = widget.isMerchant!
+        ? widget.roomId == 0
+            ? AppConfig.USER_ID
+            : AppConfig.USER_ID
+        : widget.roomId == 0
+            ? widget.merchantId
+            : dataChat!.merchantId;
+    roomResponse = await FetchController(
+        endpoint:
+            'chats/merchants/id?merchantId=$merchantId&userId=$userId&page=1&size=10',
+        // endpoint: 'chats/merchants?userId=${AppConfig.USER_ID}',
+        fromJson: (json) => GetChatMessageResponse.fromJson(json)).getData();
+    if (roomResponse != null) {
+      setState(() {
+        dataChat = roomResponse!.data;
+      });
+    }
+  }
+
+  Future<void> fetcthUserRooms() async {
+     int? merchantId = widget.isMerchant!
+        ? widget.roomId == 0
+            ? widget.merchantId
+            : dataChat!.merchantId
+        : widget.roomId == 0
+            ? AppConfig.MERCHANT_ID
+            : AppConfig.MERCHANT_ID;
+    int? userId = widget.isMerchant!
+        ? widget.roomId == 0
+            ? AppConfig.USER_ID
+            : AppConfig.USER_ID
+        : widget.roomId == 0
+            ? widget.merchantId
+            : dataChat!.merchantId;
+    roomResponse = await FetchController(
+        endpoint:
+            'chats/users/id?merchantId=$merchantId&userId=$userId&page=1&size=10',
+        // endpoint: 'chats/merchants?userId=${AppConfig.USER_ID}',
+        fromJson: (json) => GetChatMessageResponse.fromJson(json)).getData();
+    if (roomResponse != null) {
+      setState(() {
+        dataChat = roomResponse!.data;
+      });
     }
   }
 
@@ -346,8 +458,8 @@ class _ChatScreenState extends State<ChatScreen>
                     )
                   : Text(
                       dataChat == null
-                          ? widget.subname.toString()
-                          : dataChat!.subName!,
+                          ? widget.username.toString()
+                          : dataChat!.name!,
                       style: AppTextStyles.subTitle,
                     ),
             ],
@@ -360,16 +472,15 @@ class _ChatScreenState extends State<ChatScreen>
       body: Stack(
         children: [
           const BackgroundImageGenerated(),
-          roomResponse == null
-              ? Center(
-                  child: LoadingAnimationWidget.staggeredDotsWave(
-                    color: Warna.biru,
-                    size: 30,
-                  ),
-                )
-              : dataChat == null
-                  ? Container()
-                  : chatBody(),
+          // roomResponse == null
+          //     ? Center(
+          //         child: LoadingAnimationWidget.staggeredDotsWave(
+          //           color: Warna.biru,
+          //           size: 30,
+          //         ),
+          //       )
+          //     :
+          dataChat == null ? Container() : chatBody(),
           // AnimatedContainer(
           //   duration: const Duration(milliseconds: 500),
           //   curve: Curves.easeIn,
@@ -539,7 +650,13 @@ class _ChatScreenState extends State<ChatScreen>
                       itemBuilder: (context, index) {
                         Messages data = dayMessages[index];
                         return customChatBubble(
-                          isSender: data.senderType == 'USER' ? true : false,
+                          isSender: widget.isMerchant!
+                              ? data.senderType == 'USER'
+                                  ? true
+                                  : false
+                              : data.senderType == 'MERCHANT'
+                                  ? true
+                                  : false,
                           text: data.message,
                           times: formatTimestampToHour(
                               data.timestamp!), // Menampilkan jam

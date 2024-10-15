@@ -6,7 +6,7 @@ class ResponseHendler {
   int? statusCode;
   String? status;
   String? message;
-  // Null? data;
+  dynamic data;
 
   ResponseHendler({this.statusCode, this.status, this.message,});
 
@@ -14,7 +14,7 @@ class ResponseHendler {
     statusCode = json['statusCode'];
     status = json['status'];
     message = json['message'];
-    // data = json['data'];
+    data = json['data'];
   }
 
   Map<String, dynamic> toJson() {
@@ -22,7 +22,7 @@ class ResponseHendler {
     data['statusCode'] = statusCode;
     data['status'] = status;
     data['message'] = message;
-    // data['data'] = this.data;
+    data['data'] = this.data;
     return data;
   }
 }

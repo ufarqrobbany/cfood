@@ -10,6 +10,7 @@ import 'package:cfood/model/cancel_order_response.dart';
 // import 'package:cfood/model/get_all_order_list_response.dart';
 import 'package:cfood/model/get_merchant_order_response.dart' as merchant;
 import 'package:cfood/model/open_close_store_response.dart';
+import 'package:cfood/repository/background/service_notification.dart';
 import 'package:cfood/repository/fetch_controller.dart';
 import 'package:cfood/screens/inbox.dart';
 import 'package:cfood/screens/kurir_pages/chat_seller.dart';
@@ -106,6 +107,18 @@ class _OrderWirausahaScreenState extends State<OrderWirausahaScreen> {
     super.initState();
     fetchData();
     fetchSummaryMerchant();
+    NotificationUnreads.fecthUnreadMessageMerchant(
+        context,
+        countDown: 5,
+        unreadMessage: NotificationConfig.sellerChatNotification,
+        onUpdatedMessage: (updatedUnreadMessage) {
+          setState(() {
+            log('unread message for merchants');
+            NotificationConfig.sellerChatNotification = updatedUnreadMessage;
+            log(NotificationConfig.sellerChatNotification.toString());
+          });
+        },
+      );
   }
 
   Future<void> refreshPage() async {

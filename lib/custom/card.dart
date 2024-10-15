@@ -1324,6 +1324,7 @@ class InboxCardItems extends StatelessWidget {
   final String? lastDateTime;
   final String? totalNewMessage;
   final String? latestSenderType;
+  final String? userType;
   final GestureTapCallback? onPressed;
   const InboxCardItems({
     super.key,
@@ -1336,6 +1337,7 @@ class InboxCardItems extends StatelessWidget {
     this.lastDateTime,
     this.totalNewMessage,
     this.latestSenderType,
+    this.userType = 'USER',
     this.onPressed,
   });
 
@@ -1418,14 +1420,14 @@ class InboxCardItems extends StatelessWidget {
                             ),
                             Row(
                               children: [
-                                latestSenderType == 'USER'
+                                latestSenderType == userType
                                     ? Icon(
                                         Icons.check,
                                         size: 18,
                                         color: Warna.kuning,
                                       )
                                     : Container(),
-                                latestSenderType == 'USER'
+                                latestSenderType == userType
                                     ? const SizedBox(
                                         width: 8,
                                       )

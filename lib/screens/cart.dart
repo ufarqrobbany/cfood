@@ -14,6 +14,7 @@ import 'package:cfood/model/reponse_handler.dart';
 import 'package:cfood/model/update_cartitem_response.dart';
 import 'package:cfood/model/get_calculate_cart_response.dart';
 import 'package:cfood/model/delete_cart_response.dart';
+import 'package:cfood/repository/background/service_notification.dart';
 import 'package:cfood/repository/fetch_controller.dart';
 import 'package:cfood/model/post_menu_like_response.dart';
 import 'package:cfood/model/post_menu_unlike_response.dart';
@@ -57,6 +58,18 @@ class _CartScreenState extends State<CartScreen> {
   void initState() {
     super.initState();
     getAllCarts();
+    NotificationUnreads.fecthUnreadMessageUser(
+      context,
+      countDown: 5,
+      unreadMessage: NotificationConfig.userChatNotification,
+      onUpdatedMessage: (updatedUnreadMessage) {
+        setState(() {
+          log('unread message for user');
+          NotificationConfig.userChatNotification = updatedUnreadMessage;
+          log(NotificationConfig.userChatNotification.toString());
+        });
+      },
+    );
   }
 
   void getSpecificMenu(int cartId, CartItem item, int merchantId) {

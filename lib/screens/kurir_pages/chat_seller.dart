@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cfood/custom/CButtons.dart';
 import 'package:cfood/custom/CPageMover.dart';
 import 'package:cfood/custom/card.dart';
@@ -39,18 +41,19 @@ class _ChatSellerScreenState extends State<ChatSellerScreen> {
   }
 
   void fetchData() {
-    fetcthMerchatRooms();
+    log(selectedTab);
+    fetcthUserRooms();
   }
 
-  Future<void> fetcthMerchatRooms() async {
+  Future<void> fetcthUserRooms() async {
     roomResponse = await FetchController(
         // endpoint: 'chats/merchants?userId=91',
-        endpoint: 'chats/merchants?userId=${AppConfig.USER_ID}',
+        endpoint: 'chats/users?merchantId=${AppConfig.MERCHANT_ID}',
         fromJson: (json) => GetChatRoomResponse.fromJson(json)).getData();
     if (roomResponse != null) {
       setState(() {
-        // dataRoomMerchant = roomResponse!.data;
-        dataRoomMerchant = null;
+        dataRoomMerchant = roomResponse!.data;
+        // dataRoomMerchant = null;
       });
     }
   }
@@ -155,6 +158,7 @@ class _ChatSellerScreenState extends State<ChatSellerScreen> {
                 // padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 0),
                 itemBuilder: (context, index) {
                   Rooms item = dataRoomMerchant!.rooms![index];
+                  log(item.latestSenderType!);
                   return InboxCardItems(
                     chatId: item.roomId,
                     inboxId: item.roomId,
@@ -165,6 +169,7 @@ class _ChatSellerScreenState extends State<ChatSellerScreen> {
                     totalNewMessage: item.unreadMessages.toString(),
                     lastDateTime: item.latestUpdated,
                     latestSenderType: item.latestSenderType,
+                    userType: 'MERCHANT',
                     onPressed: () {
                       //         final bool? isMerchant;
                       // final int? userId;
@@ -173,7 +178,7 @@ class _ChatSellerScreenState extends State<ChatSellerScreen> {
                       navigateTo(
                               context,
                               ChatScreen(
-                                isMerchant: true,
+                                isMerchant: false,
                                 roomId: int.parse(item.roomId!),
                                 merchantId: 0,
                                 userId: 0,
@@ -186,6 +191,7 @@ class _ChatSellerScreenState extends State<ChatSellerScreen> {
                           .then((onValue) {
                         setState(() {
                           item.unreadMessages = 0;
+                          fetchData();
                         });
                       });
                       // Navigator.push(context, MaterialPageRoute(builder: (context) => const ChatScreen(),));
